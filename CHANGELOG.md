@@ -7,4 +7,6 @@ All notable changes to this project will be documented here.
 - Created the private planning and research workspace.
 - Documented the Minecraft 26.2 water-rendering pipeline.
 - Added the initial implementation roadmap and benchmark methodology.
+- Added the MIT license and project conduct policy.
+- Added maintenance, distribution, and repository privacy-audit guidance.
 - No runtime mod implementation has been added yet.

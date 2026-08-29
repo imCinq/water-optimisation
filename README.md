@@ -42,6 +42,7 @@ This project is render-only. It must not add packets, automation, movement chang
 ## Documentation
 
 - [AGENTS.md](AGENTS.md) — development and maintenance rules
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — project conduct
 - [docs/RESEARCH.md](docs/RESEARCH.md) — Minecraft 26.2 water findings
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — proposed design
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — staged work plan
@@ -49,6 +50,8 @@ This project is render-only. It must not add packets, automation, movement chang
 - [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — Fabric, Sodium, and DonutSMP boundaries
 - [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — proposed settings
 - [docs/TESTING.md](docs/TESTING.md) — verification checklist
+- [docs/MAINTENANCE.md](docs/MAINTENANCE.md) — update and release process
+- [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) — future distribution plan
 
 ## Current baseline
 
@@ -57,4 +60,4 @@ This project is render-only. It must not add packets, automation, movement chang
 - Mod loader: Fabric
 - Provisional mod id: wateroptimisation
 - Intended distribution: private development first
-- License: to be decided before public source release
+- License: MIT
