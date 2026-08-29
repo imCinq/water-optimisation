@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Minecraft runtime data
+run/
+logs/
+crash-reports/
+screenshots/
+config/
+
+# Local benchmark output
+benchmarks/results/
+benchmarks/*.json
+benchmarks/*.csv
+
+# OS files
+.DS_Store
+Thumbs.db

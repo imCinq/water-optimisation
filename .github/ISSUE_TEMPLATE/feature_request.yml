@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a measurable, client-only rendering or diagnostics improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What measurable problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the proposed behavior and its visual trade-offs.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Scope check
+      options:
+        - label: This is client-side and render-only.
+          required: true
+        - label: This does not add automation, player information, or server-state changes.
+          required: true
