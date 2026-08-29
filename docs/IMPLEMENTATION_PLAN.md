@@ -1,5 +1,49 @@
 # Implementation Plan
 
+Remote-first Codex development is evaluated throughout this plan. It is a delivery method, not a replacement for local Minecraft validation.
+
+## Cross-cutting workstream — Remote-first Codex evaluation
+
+The goal is to determine how much of the project Codex can complete without using storage or Java/Gradle processes on the Mac.
+
+### Remote tasks
+
+Codex should be able to:
+
+- create and modify the Fabric project in a temporary remote workspace;
+- create branches and commits directly against the private GitHub repository;
+- run Java, Gradle, unit tests, repository audits, and build tasks remotely;
+- inspect build output and dependency changes;
+- produce a temporary test JAR without committing generated artifacts;
+- update documentation and issue plans.
+
+### Local-only tasks
+
+The user should only need to run the final client locally for:
+
+- M2 GPU and macOS graphics-backend behavior;
+- real frame-time and FPS measurements;
+- visual comparison in the exact Minecraft instance;
+- Sodium/resource-pack/modpack interaction;
+- DonutSMP connection and server-rule smoke testing.
+
+### Evaluation checklist
+
+- [ ] Create a Codex feature branch without cloning to the Mac.
+- [ ] Add the minimal Fabric 26.2 scaffold remotely.
+- [ ] Run the remote build and unit tests successfully.
+- [ ] Run repository privacy and client-only audits remotely.
+- [ ] Review the diff and commit only source, tests, docs, and configuration.
+- [ ] Produce a temporary JAR without adding build output to Git.
+- [ ] Confirm the Mac needs no Java or Gradle installation for the workflow.
+- [ ] Download only the JAR required for local Minecraft testing.
+- [ ] Record which results are remote and which are M2/DonutSMP-specific.
+- [ ] Decide whether remote-first remains the default after the first implementation cycle.
+
+### Known limitations
+
+Remote builds may use different operating-system, Java, GPU, driver, and dependency-cache conditions. They can prove compilation and automated behavior but cannot prove M2 rendering performance or server acceptance. Remote work also uses Codex execution time and requires regular commits because a temporary workspace may be discarded.
+
 ## Phase 0 — Baseline
 
 Create repeatable test scenes and record average FPS, 1% lows, long-tail frame time, chunk compilation time, translucent resort time, water blocks and faces emitted, particle counts, backend, render distance, resolution, Java, and companion mods.

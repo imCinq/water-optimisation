@@ -34,6 +34,12 @@ The main settings screen should be understandable without renderer knowledge:
 
 Mod Menu should be an optional integration, not a required dependency. When installed, it provides the normal Configure button. The core mod must still load safely without Mod Menu and retain local defaults/configuration.
 
+## Remote-first development
+
+Codex can later implement, build, test, audit, and commit the project from a temporary remote workspace. This avoids cloning the repository, installing Java or Gradle, and storing build caches on the Mac. Only the final Minecraft run and real M2, graphics-backend, visual, and DonutSMP checks need to happen locally.
+
+See [docs/REMOTE_CODEX_WORKFLOW.md](docs/REMOTE_CODEX_WORKFLOW.md) for the workflow, limitations, and evaluation checklist.
+
 ## Roadmap
 
 | Phase | Focus | Status |
@@ -46,6 +52,8 @@ Mod Menu should be an optional integration, not a required dependency. When inst
 | 5 | Sodium compatibility and broader validation | Planned |
 | 6 | Release review and server-rule documentation | Planned |
 
+Remote-first Codex development is a cross-cutting workflow evaluated throughout every phase.
+
 ## Safety boundary
 
 This project is render-only. It must not add packets, automation, movement changes, combat assistance, ESP, radar, freecam, x-ray behavior, or changes to fluid collision and world state. Client-only does not automatically mean server-approved; current server rules must be checked before use.
@@ -57,6 +65,7 @@ This project is render-only. It must not add packets, automation, movement chang
 - [docs/RESEARCH.md](docs/RESEARCH.md) — Minecraft 26.2 water findings
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — proposed design
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — staged work plan
+- [docs/REMOTE_CODEX_WORKFLOW.md](docs/REMOTE_CODEX_WORKFLOW.md) — remote implementation plan
 - [docs/UI_AND_OPTIONS.md](docs/UI_AND_OPTIONS.md) — simple settings and Mod Menu plan
 - [docs/BENCHMARKING.md](docs/BENCHMARKING.md) — measurement methodology
 - [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — Fabric, Sodium, Mod Menu, and DonutSMP boundaries

@@ -14,6 +14,14 @@ Water Optimisation is a client-side Minecraft rendering project. Work should imp
 - Fall back to vanilla-compatible geometry whenever a block shape, fluid state, overlay, or transparency case is ambiguous.
 - Document every intentional visual trade-off.
 
+## Remote-first Codex workflow
+
+When practical, use Codex's temporary remote workspace for implementation, builds, tests, audits, and artifact preparation. Do not require a local clone, Java installation, Gradle installation, or local build cache merely to develop the project.
+
+Commit source, documentation, tests, and reproducible configuration to GitHub. Keep Gradle caches, build outputs, runtime data, logs, screenshots, test worlds, and temporary artifacts out of Git. Commit frequently so work can be recovered if the temporary workspace is discarded.
+
+Remote verification does not replace local hardware verification. The final release candidate still needs a Minecraft run on the target Mac, including M2 GPU behavior, OpenGL/Vulkan behavior, visual correctness, and DonutSMP smoke testing.
+
 ## Multiplayer boundary
 
 Do not add networking, custom packets, input automation, movement changes, combat logic, inventory logic, targeting, entity overlays, ESP, radar, freecam, x-ray behavior, macros, or anti-cheat workarounds.
@@ -39,6 +47,7 @@ Before considering a change complete:
 4. Compare visual output with the feature disabled.
 5. Record average FPS, 1% lows, long-tail frame time, fluid compilation time, translucent sorting time, and particle counts when relevant.
 6. Test with and without Sodium when integration is affected.
+7. State whether each check ran remotely or locally.
 
 ## Change scope
 
