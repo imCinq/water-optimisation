@@ -25,6 +25,10 @@ Initializes local configuration, diagnostics, optional Mod Menu integration, and
 
 Stores local settings with safe defaults. The master feature should start disabled until the implementation has passed visual and multiplayer validation.
 
+### User interface
+
+A native Minecraft screen contains a simple master switch and profile selector. Advanced settings are separated into a second screen. Mod Menu connects to this screen through a small optional adapter and does not contain renderer logic.
+
 ### Fluid visibility classifier
 
 Receives the current fluid state and neighboring block/fluid states. It can reject faces only when the evidence is sufficient. Ambiguous cases use the vanilla-compatible fallback.
@@ -44,6 +48,7 @@ Tracks water blocks visited, faces emitted by category, section compilation time
 ## Compatibility strategy
 
 - Fabric API is the primary integration surface.
+- Mod Menu is optional and must be declared as a suggested dependency, not a required runtime dependency.
 - Sodium should own its renderer when it is present, unless a documented compatible hook is available.
 - Do not run two fluid renderers for one block.
 - Keep version-specific mixins isolated and tested against exact mappings.

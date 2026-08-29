@@ -4,7 +4,12 @@
 
 Planned unit coverage includes:
 
-- configuration defaults, clamping, recovery, and atomic writes;
+- configuration defaults, profiles, clamping, recovery, and atomic writes;
+- main-screen profile mapping;
+- Reset to profile behavior;
+- Done, Cancel, Escape, and invalid-config recovery;
+- Mod Menu adapter behavior when the optional dependency is present;
+- safe loading when Mod Menu is absent;
 - same-fluid face visibility;
 - full-block and partial-shape occlusion;
 - waterlogged and overlay fallbacks;
@@ -25,9 +30,10 @@ Test with the feature disabled and enabled in:
 - underwater view;
 - chunk loading and block updates;
 - Sodium absent and present;
+- Mod Menu installed and absent;
 - OpenGL and Vulkan on Minecraft 26.2.
 
-Look for missing top planes, disappearing sides, incorrect overlays, seams, z-fighting, wrong flow orientation, lighting differences, and stale geometry after updates.
+Look for missing top planes, disappearing sides, incorrect overlays, seams, z-fighting, wrong flow orientation, lighting differences, stale geometry after updates, unreadable labels, clipped descriptions, and settings that do not persist correctly.
 
 ## Multiplayer smoke test
 

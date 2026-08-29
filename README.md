@@ -23,12 +23,23 @@ The highest-value targets are:
 
 Water physics is not a client-side optimisation target. The server remains authoritative over fluid state.
 
+## Simple user experience
+
+The main settings screen should be understandable without renderer knowledge:
+
+- one master enable switch;
+- three performance profiles;
+- a short explanation of the visual trade-off;
+- one button for Advanced settings.
+
+Mod Menu should be an optional integration, not a required dependency. When installed, it provides the normal Configure button. The core mod must still load safely without Mod Menu and retain local defaults/configuration.
+
 ## Roadmap
 
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | Reproducible water benchmarks and instrumentation | Planned |
-| 1 | Fabric 26.2 project scaffold and safe diagnostics | Planned |
+| 1 | Fabric 26.2 scaffold, configuration, and Mod Menu screen | Planned |
 | 2 | Water-particle distance and fog filtering | Planned |
 | 3 | Conservative fluid-face culling | Planned |
 | 4 | Flat source-water fast path | Planned |
@@ -46,8 +57,9 @@ This project is render-only. It must not add packets, automation, movement chang
 - [docs/RESEARCH.md](docs/RESEARCH.md) — Minecraft 26.2 water findings
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — proposed design
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — staged work plan
+- [docs/UI_AND_OPTIONS.md](docs/UI_AND_OPTIONS.md) — simple settings and Mod Menu plan
 - [docs/BENCHMARKING.md](docs/BENCHMARKING.md) — measurement methodology
-- [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — Fabric, Sodium, and DonutSMP boundaries
+- [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — Fabric, Sodium, Mod Menu, and DonutSMP boundaries
 - [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — proposed settings
 - [docs/TESTING.md](docs/TESTING.md) — verification checklist
 - [docs/MAINTENANCE.md](docs/MAINTENANCE.md) — update and release process
@@ -59,5 +71,6 @@ This project is render-only. It must not add packets, automation, movement chang
 - Java target: 25
 - Mod loader: Fabric
 - Provisional mod id: wateroptimisation
+- Optional integration: Mod Menu
 - Intended distribution: private development first
 - License: MIT
