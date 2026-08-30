@@ -2,13 +2,13 @@
 
 ## Current status
 
-Water Optimisation 0.0.1 is the first official stable GitHub release for Minecraft 26.2. The development previews remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation 0.0.2 is the current stable GitHub release for Minecraft 26.2. It adds the packaged Fabric icon; the development previews and 0.0.1 remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
-| Mod version | 0.0.1 |
+| Mod version | 0.0.2 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3 or newer |
 | Fabric API | 0.158.0+26.2 |
@@ -20,7 +20,7 @@ Water Optimisation 0.0.1 is the first official stable GitHub release for Minecra
 
 ## Release artifacts
 
-Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.1) for the canonical runtime JAR and matching sources JAR. Verify the tag, accepted commit, and SHA-256 checksum before distributing the artifact.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.2) for the canonical runtime JAR and matching sources JAR. Verify the tag, accepted commit, and SHA-256 checksum before distributing the artifact.
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
