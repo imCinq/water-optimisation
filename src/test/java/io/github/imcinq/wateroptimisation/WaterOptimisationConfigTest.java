@@ -37,6 +37,12 @@ class WaterOptimisationConfigTest {
 		assertFalse(config.isWaterParticles());
 		assertEquals(16, config.getParticleDistance());
 		assertTrue(config.isParticleFogCulling());
+
+		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.MAXIMUM);
+		assertTrue(config.isEnabled());
+		assertTrue(config.isFlatWaterFastPath());
+		assertEquals(WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL, config.getFluidCullingMode());
+		assertFalse(config.isWaterParticles());
 	}
 
 	@Test

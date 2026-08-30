@@ -7,7 +7,7 @@ The configuration is local to the client and is written to config/wateroptimisat
 | Setting | Default | Behavior |
 | --- | --- | --- |
 | enabled | false | Master switch. When off, rendering and particle hooks preserve vanilla behavior. |
-| performanceProfile | balanced | Selects Vanilla, Balanced, or Performance defaults. |
+| performanceProfile | balanced | Selects Vanilla, Balanced, Performance, or Maximum FPS defaults. |
 
 The main screen keeps changes in memory until Done. Cancel and Escape discard unsaved edits. The configuration file is replaced through a temporary file and an atomic move when the filesystem supports it.
 
@@ -18,6 +18,7 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Vanilla | Disables the master switch and all optimization paths. Use it as the reference state. |
 | Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
 | Performance | Keeps vanilla fluid-face decisions, enables the explicitly labelled flat source-water fast path, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. |
+| Maximum FPS | Enables the flat source-water fast path and optional reduced-face mode, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. The reduced-face mode can change inside-water views. |
 
 Selecting a preset resets its Advanced settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
@@ -33,7 +34,7 @@ Selecting a preset resets its Advanced settings values. Choosing Vanilla also tu
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, translucent-resort averages, and removed reverse-face counts. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
-The experimental label is intentional. Experimental reduced-face mode can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is disabled by all presets and by Sodium ownership. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
+The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it; Sodium ownership disables it. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
 
 ## Compatibility behavior
 

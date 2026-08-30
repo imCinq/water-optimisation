@@ -4,13 +4,14 @@ Water Optimisation is developed as a conservative, client-only rendering mod. Ev
 
 ## Current preview
 
-The 0.1.0-preview.7 build contains the first GPU-focused experiment for Minecraft 26.2:
+The 0.1.0-preview.8 build contains the first GPU-focused experiment for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
 - vanilla same-fluid face decisions with no duplicate face hook;
 - a fully hidden source-water fast path;
 - an explicitly opt-in vanilla reduced-face mode;
+- a Maximum FPS profile that enables the reduced-face mode together with the fast path;
 - grouped native settings screens with plain-language controls and responsive layout;
 - section and translucent-resort diagnostics;
 - Sodium renderer-ownership protection;
@@ -46,7 +47,7 @@ Sodium ownership detection disables the vanilla fluid hooks rather than replacin
 
 ### Phase 6 — Experimental reduced faces
 
-The Experimental culling mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is deliberately not part of the safe profiles because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering.
+The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering.
 
 ## Next priorities
 

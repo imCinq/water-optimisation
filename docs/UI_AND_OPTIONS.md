@@ -11,7 +11,7 @@ Mod Menu 19.0.0-alpha.1 is a compile-only, suggested dependency for the 26.2 tar
 The main screen contains:
 
 1. an enable switch;
-2. a Vanilla, Balanced, or Performance preset selector;
+2. a Vanilla, Balanced, Performance, or Maximum FPS preset selector;
 3. a short client-only explanation;
 4. an Advanced settings button;
 5. Done and Cancel buttons.
