@@ -22,5 +22,6 @@ All notable changes to Water Optimisation are documented here.
 - Added an early return for inactive fluid hook paths so disabled diagnostics and non-fast-path profiles do not perform unnecessary per-fluid policy work.
 - Made the conservative interior-water probe fail fast on the open-facing side and reuse ordinary water block state data instead of performing a second fluid-region lookup.
 - Made diagnostics resets generation-safe and invalidate compiled water geometry after an effective configuration change, so post-toggle counters exclude in-flight pre-toggle work and newly selected settings are rendered immediately.
+- Routed settings-triggered render refreshes through Minecraft 26.2's level-extractor lifecycle to avoid clearing visible terrain directly from the settings callback.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
