@@ -34,6 +34,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ConfigManager.load();
 		sodiumLoaded = FabricLoader.getInstance().isModLoaded("sodium");
+		FluidOptimizationPolicy.refresh();
 		openConfigKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.wateroptimisation.open_config",
 				InputConstants.Type.KEYSYM,
@@ -68,7 +69,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		if (!isWaterParticle(particle)) {
 			return true;
 		}
-		Diagnostics.recordParticleCandidate();
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (diagnosticsEnabled) {
+			Diagnostics.recordParticleCandidate();
+		}
 
 		WaterOptimisationConfig config = ConfigManager.get();
 		if (!config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
@@ -78,7 +82,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return true;
 		}
 		if (!config.isWaterParticles()) {
-			Diagnostics.recordParticleRejected(false);
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleRejected(false);
+			}
 			return false;
 		}
 
@@ -99,7 +105,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		}
 
 		if (!WaterParticleDistancePolicy.isWithinDistance(config, referenceX, referenceY, referenceZ, x, y, z)) {
-			Diagnostics.recordParticleRejected(true);
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleRejected(true);
+			}
 			return false;
 		}
 		return true;
@@ -108,13 +116,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	private static boolean isWaterParticle(ParticleOptions particle) {
 		ParticleType<?> type = particle.getType();
 		return type == ParticleTypes.BUBBLE
-				|| type == ParticleTypes.BUBBLE_COLUMN_UP
-				|| type == ParticleTypes.BUBBLE_POP
-				|| type == ParticleTypes.CURRENT_DOWN
-				|| type == ParticleTypes.DRIPPING_WATER
-				|| type == ParticleTypes.FALLING_WATER
-				|| type == ParticleTypes.SPLASH
-				|| type == ParticleTypes.UNDERWATER;
+			|| type == ParticleTypes.BUBBLE_COLUMN_UP
+			|| type == ParticleTypes.BUBBLE_POP
+			|| type == ParticleTypes.CURRENT_DOWN
+			|| type == ParticleTypes.DRIPPING_WATER
+			|| type == ParticleTypes.FALLING_WATER
+			|| type == ParticleTypes.SPLASH
+			|| type == ParticleTypes.UNDERWATER;
 	}
 
 	private static void extractDiagnostics(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -128,17 +136,18 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		int x = 6;
 		int y = 6;
 		int lineHeight = client.font.lineHeight + 2;
-		int lines = 9;
+		int lines = 10;
 		graphics.fill(x - 3, y - 3, x + 290, y + lineHeight * lines + 2, 0x90000000);
 		graphics.text(client.font, Component.literal("Water Optimisation"), x, y, 0xFFFFFFFF, true);
 		graphics.text(client.font, Component.literal("mode: " + modeLabel(config)), x, y += lineHeight, 0xFFFFFFFF, false);
+		graphics.text(client.font, Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())), x, y += lineHeight, 0xFFFFFFFF, false);
+		graphics.text(client.font, Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("faces kept/cut: " + snapshot.fluidFacesAccepted() + "/" + snapshot.fluidFacesCulled()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("particles rejected: " + snapshot.particleRejected()), x, y += lineHeight, 0xFFFFFFFF, false);
+		graphics.text(client.font, Component.literal("particles rejected: " + snapshot.particleRejected() + "/" + snapshot.particleCandidates()), x, y += lineHeight, 0xFFFFFFFF, false);
 	}
 
 	private static String modeLabel(WaterOptimisationConfig config) {
@@ -149,5 +158,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return "particles only (Sodium owns fluids)";
 		}
 		return config.getPerformanceProfile().name().toLowerCase(java.util.Locale.ROOT);
+	}
+
+	private static String onOff(boolean value) {
+		return value ? "on" : "off";
 	}
 }

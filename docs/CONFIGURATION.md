@@ -16,8 +16,8 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Profile | Behavior |
 | --- | --- |
 | Vanilla | Disables the master switch and all optimization paths. Use it as the reference state. |
-| Balanced | Uses conservative exact source-water face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
-| Performance | Uses the same conservative fluid policy and enables the explicitly labelled flat source-water fast path plus a 48-block particle bound. |
+| Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
+| Performance | Keeps vanilla fluid-face decisions and enables the explicitly labelled flat source-water fast path plus a 24-block particle bound. |
 
 Selecting a profile resets its Advanced values. Choosing Vanilla also turns off the master switch. Profiles do not promise a particular FPS result.
 
@@ -25,7 +25,7 @@ Selecting a profile resets its Advanced values. Choosing Vanilla also turns off 
 
 | Setting | Default | Behavior |
 | --- | --- | --- |
-| fluidCullingMode | conservative | Disabled, Conservative, or Experimental (safe subset). Only equal full source-water blocks can be forced hidden. |
+| fluidCullingMode | conservative | Disabled, Conservative, or Experimental (currently the same safe subset). It gates the interior fast path; vanilla remains responsible for ordinary same-fluid face culling. |
 | flatWaterFastPath | false | Skips only an ordinary source-water block surrounded on all six sides by ordinary source-water blocks. |
 | waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. |
 | particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. During camera initialization, the player position is used as a lifecycle fallback. |
@@ -33,7 +33,7 @@ Selecting a profile resets its Advanced values. Choosing Vanilla also turns off 
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, and translucent-resort averages. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
-The experimental label is intentional. The current safe subset is narrow; ambiguous shapes are not classified by this mod.
+The experimental label is intentional. The current safe subset is narrow; ambiguous shapes are not classified by this mod. The face-culling mode does not add a second face predicate because that was measured as redundant overhead.
 
 ## Compatibility behavior
 

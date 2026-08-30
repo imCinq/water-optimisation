@@ -42,7 +42,7 @@ Look for missing planes, seams, z-fighting, incorrect overlays, wrong flow orien
 
 ## Performance measurements
 
-Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks/faces, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
+Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks, interior fast-path skips, face counts from Tracy or mesh statistics, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
 
 Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
 

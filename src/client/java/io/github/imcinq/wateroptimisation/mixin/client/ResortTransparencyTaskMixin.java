@@ -14,6 +14,9 @@ public abstract class ResortTransparencyTaskMixin {
 			SectionBufferBuilderPack buffers,
 			CallbackInfoReturnable<?> callback
 	) {
+		if (!Diagnostics.isEnabled()) {
+			return;
+		}
 		Diagnostics.beginTranslucentResort();
 	}
 
@@ -22,6 +25,9 @@ public abstract class ResortTransparencyTaskMixin {
 			SectionBufferBuilderPack buffers,
 			CallbackInfoReturnable<?> callback
 	) {
+		if (!Diagnostics.isEnabled()) {
+			return;
+		}
 		Diagnostics.endTranslucentResort();
 	}
 }

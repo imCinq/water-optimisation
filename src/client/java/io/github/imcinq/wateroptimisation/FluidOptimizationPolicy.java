@@ -1,90 +1,77 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public final class FluidOptimizationPolicy {
-	private static final Direction[] DIRECTIONS = {
-			Direction.DOWN,
-			Direction.UP,
-			Direction.NORTH,
-			Direction.SOUTH,
-			Direction.WEST,
-			Direction.EAST
-	};
-	private static final ThreadLocal<BlockPos.MutableBlockPos> NEIGHBOR_POS = ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
+	private static volatile boolean fluidHooksActive;
+	private static volatile boolean flatWaterFastPathActive;
 
 	private FluidOptimizationPolicy() {
 	}
 
-	public static boolean fluidHooksActive() {
+	/**
+	 * Refreshes the cached active flags after configuration or renderer ownership changes.
+	 * The mixin hot paths then avoid repeated configuration reads for every fluid block/face.
+	 */
+	public static void refresh() {
 		WaterOptimisationConfig config = ConfigManager.get();
-		return config.isEnabled()
+		boolean hooksActive = config.isEnabled()
 				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
 				&& config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
 				&& !WaterOptimisationClient.isSodiumLoaded();
+		fluidHooksActive = hooksActive;
+		flatWaterFastPathActive = hooksActive && config.isFlatWaterFastPath();
+	}
+
+	public static boolean fluidHooksActive() {
+		return fluidHooksActive;
 	}
 
 	public static boolean flatWaterFastPathActive() {
-		WaterOptimisationConfig config = ConfigManager.get();
-		return fluidHooksActive() && config.isFlatWaterFastPath();
+		return flatWaterFastPathActive;
 	}
 
 	/**
-	 * Skips only a complete source-water cube whose six neighboring block states
-	 * are also ordinary full water blocks. Any boundary, flow, waterlogged block,
-	 * overlay, or unusual transparency case falls back to vanilla tessellation.
+	 * Skips only a complete source-water cube whose six neighboring block and
+	 * fluid states are also ordinary full water blocks. The caller supplies the
+	 * states already loaded by vanilla, so this predicate does not repeat chunk
+	 * lookups. Any boundary, flow, waterlogged block, overlay, or unusual
+	 * transparency case falls back to vanilla tessellation.
 	 */
-	public static boolean shouldSkipInteriorSourceWater(BlockAndTintGetter level, BlockPos pos, BlockState blockState, FluidState fluidState) {
-		if (!flatWaterFastPathActive()
-				|| fluidState.getType() != Fluids.WATER
-				|| !fluidState.isSource()
-				|| !blockState.is(Blocks.WATER)) {
+	public static boolean shouldSkipInteriorSourceWater(
+			BlockState blockState,
+			FluidState fluidState,
+			BlockState blockStateDown,
+			FluidState fluidStateDown,
+			BlockState blockStateUp,
+			FluidState fluidStateUp,
+			BlockState blockStateNorth,
+			FluidState fluidStateNorth,
+			BlockState blockStateSouth,
+			FluidState fluidStateSouth,
+			BlockState blockStateWest,
+			FluidState fluidStateWest,
+			BlockState blockStateEast,
+			FluidState fluidStateEast
+	) {
+		if (!isOrdinarySourceWater(blockState, fluidState)
+				|| !isOrdinarySourceWater(blockStateUp, fluidStateUp)) {
 			return false;
 		}
 
-		BlockPos.MutableBlockPos neighbor = NEIGHBOR_POS.get();
-		for (Direction direction : DIRECTIONS) {
-			neighbor.setWithOffset(pos, direction);
-			BlockState neighborState = level.getBlockState(neighbor);
-			FluidState neighborFluid = level.getFluidState(neighbor);
-			if (!neighborState.is(Blocks.WATER)
-					|| neighborFluid.getType() != Fluids.WATER
-					|| !neighborFluid.isSource()) {
-				return false;
-			}
-		}
-		return true;
+		return isOrdinarySourceWater(blockStateDown, fluidStateDown)
+				&& isOrdinarySourceWater(blockStateNorth, fluidStateNorth)
+				&& isOrdinarySourceWater(blockStateSouth, fluidStateSouth)
+				&& isOrdinarySourceWater(blockStateWest, fluidStateWest)
+				&& isOrdinarySourceWater(blockStateEast, fluidStateEast);
 	}
 
-	/**
-	 * The face override is intentionally narrower than a general occlusion test:
-	 * only equal, full source-water blocks can be hidden. Partial shapes and all
-	 * waterlogged or transparent neighbors are left to the game's renderer.
-	 */
-	public static Boolean overrideFaceDecision(
-			FluidState fluidState,
-			BlockState selfState,
-			Direction direction,
-			BlockState otherState
-	) {
-		if (!fluidHooksActive()
-				|| fluidState.getType() != Fluids.WATER
-				|| !fluidState.isSource()
-				|| !selfState.is(Blocks.WATER)
-				|| !otherState.is(Blocks.WATER)) {
-			return null;
-		}
-
-		FluidState otherFluid = otherState.getFluidState();
-		if (otherFluid.getType() == Fluids.WATER && otherFluid.isSource()) {
-			return Boolean.FALSE;
-		}
-		return null;
+	private static boolean isOrdinarySourceWater(BlockState blockState, FluidState fluidState) {
+		return blockState.is(Blocks.WATER)
+				&& fluidState.getType() == Fluids.WATER
+				&& fluidState.isSource();
 	}
 }

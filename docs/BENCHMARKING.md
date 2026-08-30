@@ -30,7 +30,7 @@ Warm the scene before measuring. Use multiple captures rather than a single F3 s
 
 ## Metrics
 
-Record average FPS, 1% low FPS, p95 and p99 frame time, hitch count, fluid tessellation time, section compilation time, translucent resort time, number of water blocks visited, faces emitted by category, particle candidates and rejected particles, and memory or allocation changes when measurable.
+Record average FPS, 1% low FPS, p95 and p99 frame time, hitch count, fluid tessellation time, section compilation time, translucent resort time, number of water blocks visited, interior fast-path skips, face counts from Tracy or mesh statistics, particle candidates and rejected particles, and memory or allocation changes when measurable.
 
 The diagnostics HUD reports local fluid, section-compilation, and translucent-resort averages plus particle counters. Minecraft 26.2's Tracy support and particle_render_stats remain useful for frame-time distributions, tail latency, and independent cross-checks. Keep the backend fixed within each before-and-after comparison.
 

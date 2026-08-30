@@ -4,7 +4,6 @@
 	"screen.wateroptimisation.title": "Water Optimisation",
 	"screen.wateroptimisation.description": "Client-only rendering controls. Gameplay and world simulation are unchanged.",
 	"screen.wateroptimisation.warning": "Performance changes are opt-in; compare with the feature disabled if visuals differ.",
-	"screen.wateroptimisation.keybind": "Keybind: open this screen from the Controls menu.",
 	"screen.wateroptimisation.enabled.on": "Optimisation: ON",
 	"screen.wateroptimisation.enabled.off": "Optimisation: OFF",
 	"screen.wateroptimisation.profile": "Profile: %s",
