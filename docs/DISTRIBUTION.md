@@ -30,7 +30,7 @@ Publishing automation is not enabled. Never commit API keys or publishing tokens
 ## Listing facts
 
 - Name: Water Optimisation
-- Brand: Cinq
+- Creator: Cinq
 - Category: Client-side rendering optimisation
 - Loader: Fabric
 - Environment: Client

@@ -13,6 +13,6 @@ All notable changes to Water Optimisation are documented here.
 - Added opt-in diagnostics for fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering.
 - Added Sodium renderer-ownership detection so the mod does not compete with an active Sodium fluid renderer.
 - Added configuration and particle-distance unit tests, privacy audits, and client-only boundary audits.
-- Added public documentation, benchmark templates, and Cinq branding assets.
+- Added public documentation, benchmark templates, and the creator logo asset.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.

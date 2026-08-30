@@ -1,6 +1,6 @@
 # Project Guidance
 
-Water Optimisation is a client-side Minecraft rendering project maintained under the Cinq brand. Changes should improve measured frame time in water-heavy scenes without changing gameplay or server-visible behavior.
+Water Optimisation is a client-side Minecraft rendering project. Changes should improve measured frame time in water-heavy scenes without changing gameplay or server-visible behavior.
 
 ## Development principles
 
@@ -23,7 +23,7 @@ Client-only behavior is not automatically approved by every server. Check the cu
 ## Privacy and repository hygiene
 
 - Do not add personal names, personal email addresses, precise locations, credentials, tokens, or private logs.
-- Keep Cinq branding and use the public GitHub handle imCinq only where repository metadata or ownership needs to be described.
+- Keep product copy focused on Water Optimisation; use creator attribution only where project metadata or ownership needs to be described.
 - Never commit generated runtime data, screenshots containing account information, or copied server logs.
 - Do not add telemetry, analytics, update checkers, remote configuration, or outbound network calls.
 

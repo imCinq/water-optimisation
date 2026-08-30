@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/cinq-water-optimisation-logo.webp" alt="Cinq logo" width="180">
+  <img src="assets/cinq-water-optimisation-logo.webp" alt="Cinq creator logo" width="180">
 </p>
 
 <h1 align="center">Water Optimisation</h1>
 
 <p align="center">
-  A Cinq client-side Fabric mod focused on smoother water-heavy Minecraft scenes.
+  A client-side Fabric mod focused on smoother water-heavy Minecraft scenes.
 </p>
 
 <p align="center">
@@ -106,4 +106,4 @@ Generated build output, runtime data, logs, screenshots, and benchmark results a
 
 ## License
 
-Water Optimisation is released under the [MIT License](LICENSE) and maintained under Cinq branding.
+Water Optimisation is released under the [MIT License](LICENSE). Created by Cinq.
