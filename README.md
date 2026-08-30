@@ -15,8 +15,8 @@ The mod is client-only and render-focused. It must not change server simulation,
 ## Implemented opt-in features
 
 - Native Minecraft settings screens with a master switch, Vanilla/Balanced/Performance profiles, Advanced controls, Reset to profile, and atomic local configuration.
-- Optional local diagnostics HUD for fluid tessellation counters, face decisions, fast-path skips, fluid compile timing, and rejected water particles.
-- Optional water-particle admission filtering by distance, with a conservative fog/distance tightening mode.
+- Optional local diagnostics HUD for fluid tessellation counters, face decisions, fast-path skips, fluid/section compile timing, translucent-resort timing, and rejected water particles.
+- Optional water-particle admission filtering by camera-relative distance, with a player-position fallback during camera initialization and a conservative fog/distance tightening mode.
 - Conservative fluid-face decisions limited to equal full source-water blocks.
 - An explicit flat source-water fast path that skips only fully interior ordinary source-water blocks.
 - Sodium detection that disables the vanilla fluid hooks so the mod does not compete with a renderer-owned fluid path.

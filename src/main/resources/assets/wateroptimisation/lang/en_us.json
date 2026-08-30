@@ -25,5 +25,5 @@
 	"wateroptimisation.profile.performance": "Performance",
 	"wateroptimisation.culling.disabled": "Disabled",
 	"wateroptimisation.culling.conservative": "Conservative",
-	"wateroptimisation.culling.experimental": "Experimental (safe subset)",
+	"wateroptimisation.culling.experimental": "Experimental (safe subset)"
 }

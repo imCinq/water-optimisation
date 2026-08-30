@@ -15,8 +15,8 @@ All notable changes to this project will be documented here.
 - Added a client-only boundary audit for the scaffold.
 - Implemented local JSON configuration with safe defaults, atomic replacement, clamping, profile reset, and invalid-file recovery.
 - Implemented native main and Advanced settings screens, a registered configuration keybind, optional Mod Menu integration, and English translations.
-- Implemented opt-in diagnostics for fluid tessellation timing, face decisions, fast-path skips, and particle filtering.
-- Implemented distance-based water-particle admission filtering with an explicitly conservative fog/distance mode.
+- Implemented opt-in diagnostics for fluid tessellation, section compilation, translucent resort timing, face decisions, fast-path skips, and particle filtering.
+- Implemented camera-relative water-particle admission filtering with a player-position lifecycle fallback and an explicitly conservative fog/distance mode.
 - Implemented exact source-water face culling and an explicit full-interior source-water fast path with vanilla fallbacks.
 - Added Sodium renderer-ownership detection that disables vanilla fluid hooks without replacing the active renderer.
 - Added configuration unit tests and updated the client-only audit to distinguish local chat components from packet APIs.

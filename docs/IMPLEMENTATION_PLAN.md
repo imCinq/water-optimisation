@@ -46,9 +46,9 @@ Remote builds use different operating-system, Java, GPU, driver, and dependency-
 
 ## Phase 0 — Baseline and instrumentation
 
-The code includes opt-in local fluid and particle counters and fluid tessellation timing. The report template defines repeatable scenes and the required environment fields. Section compiler time, translucent resort time, and frame-time distribution must be recorded with Minecraft's profiler/Tracy output during the local run.
+The code includes opt-in local fluid, particle, section-compilation, and translucent-resort counters/timing. The report template defines repeatable scenes and the required environment fields. Frame-time distributions and tail latency must still be recorded with Minecraft's profiler/Tracy output during the local run.
 
-Status: remote instrumentation and reporting template complete; baseline measurements pending.
+Status: remote instrumentation and reporting template complete; live counter sanity checks and baseline measurements pending.
 
 ## Phase 1 — Scaffold, configuration, and Mod Menu
 

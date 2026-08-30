@@ -7,6 +7,7 @@ Client fluid state
 → conservative source-water classifier
 → vanilla fluid mesh path or explicit interior fast-path skip
 → translucent section buffer
+→ section compilation and translucent resort diagnostics
 
 Particle state
 → ClientLevel admission hook
@@ -37,11 +38,11 @@ The mixin is client-only and isolated in wateroptimisation.client.mixins.json. I
 
 ### Particle filter
 
-ClientLevelMixin intercepts only the client-side addParticle overload. It recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies the local distance policy only when the master switch is enabled.
+ClientLevelMixin intercepts only the client-side addParticle overload. It recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies the local camera-relative distance policy only when the master switch is enabled. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
 
 ### Diagnostics
 
-Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation timing uses one primitive timing holder per worker thread, and the HUD displays only local counters. Section compiler and translucent resort timings still require Minecraft's profiler/Tracy output because they are not inferred from a per-fluid call.
+Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread, and the HUD displays local averages and counters. Tracy is still required for frame-time distributions, tail latency, and independent verification.
 
 ## Compatibility strategy
 

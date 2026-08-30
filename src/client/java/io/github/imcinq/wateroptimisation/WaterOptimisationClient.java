@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -16,6 +17,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,15 +87,26 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return true;
 		}
 
+		double referenceX = client.player.getX();
+		double referenceY = client.player.getY();
+		double referenceZ = client.player.getZ();
+		Camera camera = client.gameRenderer.mainCamera();
+		if (camera.isInitialized()) {
+			Vec3 cameraPosition = camera.position();
+			referenceX = cameraPosition.x;
+			referenceY = cameraPosition.y;
+			referenceZ = cameraPosition.z;
+		}
+
 		double maxDistance = config.getParticleDistance();
 		if (config.isParticleFogCulling()) {
 			// The fog option is deliberately conservative: it tightens the local
 			// distance bound without trying to reproduce renderer-specific fog math.
 			maxDistance *= 0.75D;
 		}
-		double dx = client.player.getX() - x;
-		double dy = client.player.getY() - y;
-		double dz = client.player.getZ() - z;
+		double dx = referenceX - x;
+		double dy = referenceY - y;
+		double dz = referenceZ - z;
 		if (dx * dx + dy * dy + dz * dz > maxDistance * maxDistance) {
 			Diagnostics.recordParticleRejected(true);
 			return false;
@@ -124,7 +137,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		int x = 6;
 		int y = 6;
 		int lineHeight = client.font.lineHeight + 2;
-		int lines = 7;
+		int lines = 9;
 		graphics.fill(x - 3, y - 3, x + 290, y + lineHeight * lines + 2, 0x90000000);
 		graphics.text(client.font, Component.literal("Water Optimisation"), x, y, 0xFFFFFFFF, true);
 		graphics.text(client.font, Component.literal("mode: " + modeLabel(config)), x, y += lineHeight, 0xFFFFFFFF, false);
@@ -132,6 +145,8 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		graphics.text(client.font, Component.literal("faces kept/cut: " + snapshot.fluidFacesAccepted() + "/" + snapshot.fluidFacesCulled()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
+		graphics.text(client.font, Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
+		graphics.text(client.font, Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("particles rejected: " + snapshot.particleRejected()), x, y += lineHeight, 0xFFFFFFFF, false);
 	}
 

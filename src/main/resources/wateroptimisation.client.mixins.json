@@ -5,7 +5,9 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"ClientLevelMixin",
-		"FluidRendererMixin"
+		"FluidRendererMixin",
+		"SectionCompilerMixin",
+		"ResortTransparencyTaskMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

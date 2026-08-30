@@ -50,7 +50,7 @@ Use the report template and compare identical warmed scenes with:
 - Sodium absent/present;
 - OpenGL/Vulkan separately.
 
-Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation time, section compilation time, translucent resort time, water blocks/faces, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
+Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation time, section compilation time, translucent resort time, water blocks/faces, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods. Use the diagnostics HUD averages as a local cross-check, not as a substitute for frame-time profiling.
 
 ## Multiplayer smoke test
 
@@ -60,4 +60,4 @@ Do not use private server logs or screenshots containing account information in 
 
 ## Verification boundary
 
-The current evidence is remote build/test/audit success only. The local M2, graphics backend, visual, modpack, and DonutSMP checks are not marked complete until they are run.
+The current evidence is remote build/test/audit success, including compilation of the section and translucent-resort diagnostics hooks. The counters have not yet been validated in a live client. The local M2, graphics backend, visual, modpack, and DonutSMP checks are not marked complete until they are run.

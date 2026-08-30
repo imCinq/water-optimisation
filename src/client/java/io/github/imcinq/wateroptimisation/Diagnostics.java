@@ -14,7 +14,12 @@ public final class Diagnostics {
 	private static final LongAdder particleDistanceRejected = new LongAdder();
 	private static final LongAdder fluidCompileCalls = new LongAdder();
 	private static final LongAdder fluidCompileNanos = new LongAdder();
+	private static final LongAdder sectionCompileCalls = new LongAdder();
+	private static final LongAdder sectionCompileNanos = new LongAdder();
+	private static final LongAdder translucentResortCalls = new LongAdder();
+	private static final LongAdder translucentResortNanos = new LongAdder();
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
+	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
 
 	private Diagnostics() {
 	}
@@ -92,9 +97,57 @@ public final class Diagnostics {
 		fluidCompileNanos.add(Math.max(0L, System.nanoTime() - timing.startNanos));
 	}
 
+	public static void beginSectionCompile() {
+		if (!enabled()) {
+			return;
+		}
+		PhaseTiming timing = PHASE_TIMING.get();
+		timing.sectionCompileStartNanos = System.nanoTime();
+		timing.sectionCompileActive = true;
+	}
+
+	public static void endSectionCompile() {
+		if (!enabled()) {
+			return;
+		}
+		PhaseTiming timing = PHASE_TIMING.get();
+		if (!timing.sectionCompileActive) {
+			return;
+		}
+		timing.sectionCompileActive = false;
+		sectionCompileCalls.increment();
+		sectionCompileNanos.add(Math.max(0L, System.nanoTime() - timing.sectionCompileStartNanos));
+	}
+
+	public static void beginTranslucentResort() {
+		if (!enabled()) {
+			return;
+		}
+		PhaseTiming timing = PHASE_TIMING.get();
+		timing.translucentResortStartNanos = System.nanoTime();
+		timing.translucentResortActive = true;
+	}
+
+	public static void endTranslucentResort() {
+		if (!enabled()) {
+			return;
+		}
+		PhaseTiming timing = PHASE_TIMING.get();
+		if (!timing.translucentResortActive) {
+			return;
+		}
+		timing.translucentResortActive = false;
+		translucentResortCalls.increment();
+		translucentResortNanos.add(Math.max(0L, System.nanoTime() - timing.translucentResortStartNanos));
+	}
+
 	public static Snapshot snapshot() {
-		long calls = fluidCompileCalls.sum();
-		long nanos = fluidCompileNanos.sum();
+		long fluidCalls = fluidCompileCalls.sum();
+		long fluidNanos = fluidCompileNanos.sum();
+		long sectionCalls = sectionCompileCalls.sum();
+		long sectionNanos = sectionCompileNanos.sum();
+		long resortCalls = translucentResortCalls.sum();
+		long resortNanos = translucentResortNanos.sum();
 		return new Snapshot(
 				fluidBlocksVisited.sum(),
 				fluidFacesAccepted.sum(),
@@ -105,10 +158,20 @@ public final class Diagnostics {
 				particleCandidates.sum(),
 				particleRejected.sum(),
 				particleDistanceRejected.sum(),
-				calls,
-				nanos,
-				calls == 0 ? 0.0 : nanos / 1_000_000.0 / calls
+				fluidCalls,
+				fluidNanos,
+				averageMillis(fluidCalls, fluidNanos),
+				sectionCalls,
+				sectionNanos,
+				averageMillis(sectionCalls, sectionNanos),
+				resortCalls,
+				resortNanos,
+				averageMillis(resortCalls, resortNanos)
 		);
+	}
+
+	private static double averageMillis(long calls, long nanos) {
+		return calls == 0 ? 0.0 : nanos / 1_000_000.0 / calls;
 	}
 
 	private static boolean enabled() {
@@ -119,6 +182,13 @@ public final class Diagnostics {
 	private static final class FluidTiming {
 		private long startNanos;
 		private boolean active;
+	}
+
+	private static final class PhaseTiming {
+		private long sectionCompileStartNanos;
+		private boolean sectionCompileActive;
+		private long translucentResortStartNanos;
+		private boolean translucentResortActive;
 	}
 
 	public record Snapshot(
@@ -133,7 +203,13 @@ public final class Diagnostics {
 			long particleDistanceRejected,
 			long fluidCompileCalls,
 			long fluidCompileNanos,
-			double averageFluidCompileMillis
+			double averageFluidCompileMillis,
+			long sectionCompileCalls,
+			long sectionCompileNanos,
+			double averageSectionCompileMillis,
+			long translucentResortCalls,
+			long translucentResortNanos,
+			double averageTranslucentResortMillis
 	) {
 	}
 }
