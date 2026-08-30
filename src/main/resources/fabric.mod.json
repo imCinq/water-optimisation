@@ -3,6 +3,7 @@
 	"id": "wateroptimisation",
 	"version": "${version}",
 	"name": "Water Optimisation",
+	"icon": "assets/wateroptimisation/icon.png",
 	"description": "Client-side water rendering optimisation for Minecraft 26.2 with conservative geometry culling, particle filtering, and diagnostics.",
 	"authors": [
 		"imCinq"

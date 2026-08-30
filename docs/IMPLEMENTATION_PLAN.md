@@ -4,7 +4,7 @@ Water Optimisation is developed as a conservative, client-only rendering mod. Ev
 
 ## Current release
 
-The 0.0.1 release contains the current client-only implementation for Minecraft 26.2:
+The 0.0.2 release contains the current client-only implementation for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
@@ -16,6 +16,7 @@ The 0.0.1 release contains the current client-only implementation for Minecraft 
 - section and translucent-resort diagnostics;
 - Sodium renderer-ownership protection;
 - automated tests and repository audits.
+- packaged Fabric mod icon matching the public project logo.
 
 The implementation is build-verified and packaged as the first official GitHub release. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
 

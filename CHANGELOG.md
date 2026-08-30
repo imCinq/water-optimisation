@@ -2,6 +2,14 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.0.2 — 2026-08-30
+
+Polish release focused on making the mod identifiable and easier to install.
+
+- Packaged the supplied water-block logo as the Fabric mod icon so compatible mod lists can display it.
+- Added the icon path to the generated Fabric metadata.
+- Kept the public README logo, installation guidance, compatibility notes, and client-only boundaries aligned with the packaged artifact.
+
 ## 0.0.1 — 2026-08-30
 
 The first official release of Water Optimisation for Minecraft 26.2.

@@ -29,7 +29,7 @@ Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The first official package is [0.0.1](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.1). It requires Minecraft 26.2, Java 25, Fabric Loader 0.19.3 or newer, and a matching Fabric API build (`0.158.0+26.2`). Mod Menu `19.0.0-alpha.1` is optional.
+The current stable package is [0.0.2](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.2); `0.0.1` was the first official release. The supplied water-block logo is used in this README and is also packaged as the mod icon. The mod requires Minecraft 26.2, Java 25, Fabric Loader 0.19.3 or newer, and a matching Fabric API build (`0.158.0+26.2`). Mod Menu `19.0.0-alpha.1` is optional.
 
 ## Pick a preset
 
