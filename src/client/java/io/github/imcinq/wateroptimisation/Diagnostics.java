@@ -20,8 +20,38 @@ public final class Diagnostics {
 	private static final LongAdder translucentResortNanos = new LongAdder();
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
 	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
+	private static volatile boolean instrumentationEnabled;
 
 	private Diagnostics() {
+	}
+
+	/**
+	 * Refreshes the cached instrumentation gate after the active configuration changes.
+	 * This keeps disabled diagnostics out of the fluid-rendering hot path.
+	 */
+	public static void updateConfig(WaterOptimisationConfig config) {
+		instrumentationEnabled = config != null && (config.isDiagnosticsHud() || config.isDebugFallbackLogging());
+	}
+
+	/**
+	 * Clears counters so a new settings/benchmark run starts from zero.
+	 */
+	public static void reset() {
+		fluidBlocksVisited.reset();
+		fluidFacesAccepted.reset();
+		fluidFacesCulled.reset();
+		fluidFaceOverrides.reset();
+		fluidFastPathSkips.reset();
+		fluidFallbacks.reset();
+		particleCandidates.reset();
+		particleRejected.reset();
+		particleDistanceRejected.reset();
+		fluidCompileCalls.reset();
+		fluidCompileNanos.reset();
+		sectionCompileCalls.reset();
+		sectionCompileNanos.reset();
+		translucentResortCalls.reset();
+		translucentResortNanos.reset();
 	}
 
 	public static void recordFluidBlock() {
@@ -178,8 +208,7 @@ public final class Diagnostics {
 	}
 
 	private static boolean enabled() {
-		WaterOptimisationConfig config = ConfigManager.get();
-		return config.isDiagnosticsHud() || config.isDebugFallbackLogging();
+		return instrumentationEnabled;
 	}
 
 	private static final class FluidTiming {
