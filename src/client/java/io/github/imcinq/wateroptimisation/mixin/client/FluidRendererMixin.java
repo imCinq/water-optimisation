@@ -47,7 +47,7 @@ public abstract class FluidRendererMixin {
 	}
 
 	@Inject(
-			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;)Z",
+			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
 			at = @At("HEAD"),
 			cancellable = true
 	)
@@ -55,10 +55,10 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			BlockState selfState,
 			Direction direction,
-			BlockState otherState,
+			FluidState otherFluidState,
 			CallbackInfoReturnable<Boolean> callback
 	) {
-		Boolean decision = FluidOptimizationPolicy.overrideFaceDecision(fluidState, selfState, direction, otherState);
+		Boolean decision = FluidOptimizationPolicy.overrideFaceDecision(fluidState, selfState, direction, otherFluidState);
 		if (decision != null) {
 			Diagnostics.recordFluidFaceOverride();
 			callback.setReturnValue(decision);
@@ -66,14 +66,14 @@ public abstract class FluidRendererMixin {
 	}
 
 	@Inject(
-			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;)Z",
+			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
 			at = @At("RETURN")
 	)
 	private static void wateroptimisation$recordFaceDecision(
 			FluidState fluidState,
 			BlockState selfState,
 			Direction direction,
-			BlockState otherState,
+			FluidState otherFluidState,
 			CallbackInfoReturnable<Boolean> callback
 	) {
 		Diagnostics.recordFluidFace(callback.getReturnValueZ());
