@@ -29,6 +29,8 @@ Compilation alone is not sufficient evidence of Minecraft-version support.
 
 ## Release process
 
+Start with the [public release checklist](RELEASE_CHECKLIST.md) and keep its acceptance record with the tagged release.
+
 Before any public artifact:
 
 1. Confirm the repository contains no secrets, private paths, personal information, or generated runtime files.

@@ -41,10 +41,10 @@ Requirements:
 
 - Minecraft 26.2
 - Fabric Loader 0.19.3 or newer
-- Fabric API matching Minecraft 26.2
+- Fabric API 0.158.0+26.2
 - Java 25
 
-No stable release has been published yet. For preview testing, download the latest successful build artifact from [GitHub Actions](https://github.com/imCinq/water-optimisation/actions/workflows/build.yml), extract the runtime JAR, and place it in the Fabric `mods` folder with the matching Fabric API.
+No stable release has been published yet. For preview testing only, download the latest successful build artifact from [GitHub Actions](https://github.com/imCinq/water-optimisation/actions/workflows/build.yml). Workflow artifacts are temporary verification outputs, not stable releases; extract the runtime JAR and place it in the Fabric `mods` folder with Fabric API 0.158.0+26.2.
 
 Mod Menu is optional. The mod remains usable without it.
 
@@ -91,6 +91,7 @@ Generated build output, runtime data, logs, screenshots, and benchmark results a
 - [Research notes](docs/RESEARCH.md)
 - [Roadmap](docs/IMPLEMENTATION_PLAN.md)
 - [Distribution](docs/DISTRIBUTION.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
 - [Maintenance](docs/MAINTENANCE.md)
 
 ## Roadmap
