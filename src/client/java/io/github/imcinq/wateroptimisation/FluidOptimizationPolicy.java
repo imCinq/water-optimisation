@@ -9,9 +9,13 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public final class FluidOptimizationPolicy {
+	/*
+	 * Check the open-facing side first. Most surface water fails here, so the
+	 * conservative probe returns before visiting the remaining neighbors.
+	 */
 	private static final Direction[] DIRECTIONS = {
-			Direction.DOWN,
 			Direction.UP,
+			Direction.DOWN,
 			Direction.NORTH,
 			Direction.SOUTH,
 			Direction.WEST,
@@ -63,10 +67,17 @@ public final class FluidOptimizationPolicy {
 		for (Direction direction : DIRECTIONS) {
 			neighbor.setWithOffset(pos, direction);
 			BlockState neighborState = level.getBlockState(neighbor);
-			FluidState neighborFluid = level.getFluidState(neighbor);
-			if (!neighborState.is(Blocks.WATER)
-					|| neighborFluid.getType() != Fluids.WATER
-					|| !neighborFluid.isSource()) {
+			if (!neighborState.is(Blocks.WATER)) {
+				return false;
+			}
+
+			/*
+			 * The ordinary water block state already owns the fluid state needed by
+			 * this exact predicate. Reusing it avoids a second region lookup and
+			 * keeps non-water neighbors on the fast failure path.
+			 */
+			FluidState neighborFluid = neighborState.getFluidState();
+			if (neighborFluid.getType() != Fluids.WATER || !neighborFluid.isSource()) {
 				return false;
 			}
 		}
