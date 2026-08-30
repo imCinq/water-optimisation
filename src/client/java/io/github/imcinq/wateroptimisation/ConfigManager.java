@@ -76,10 +76,31 @@ public final class ConfigManager {
 	}
 
 	private static void applyConfig(WaterOptimisationConfig updated) {
+		WaterOptimisationConfig previous = config;
 		config = updated;
 		FluidOptimizationPolicy.refresh();
 		Diagnostics.updateConfig(updated);
 		Diagnostics.reset();
+
+		if (!sameConfiguration(previous, updated)) {
+			Minecraft client = Minecraft.getInstance();
+			if (client.level != null && client.levelRenderer != null) {
+				client.levelRenderer.allChanged();
+			}
+		}
+	}
+
+	private static boolean sameConfiguration(WaterOptimisationConfig first, WaterOptimisationConfig second) {
+		return first != null
+				&& first.isEnabled() == second.isEnabled()
+				&& first.getPerformanceProfile() == second.getPerformanceProfile()
+				&& first.getFluidCullingMode() == second.getFluidCullingMode()
+				&& first.isFlatWaterFastPath() == second.isFlatWaterFastPath()
+				&& first.isWaterParticles() == second.isWaterParticles()
+				&& first.getParticleDistance() == second.getParticleDistance()
+				&& first.isParticleFogCulling() == second.isParticleFogCulling()
+				&& first.isDiagnosticsHud() == second.isDiagnosticsHud()
+				&& first.isDebugFallbackLogging() == second.isDebugFallbackLogging();
 	}
 
 	private static Path getConfigPath() {
