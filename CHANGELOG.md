@@ -2,6 +2,14 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.0.3 — 2026-08-30
+
+Small compatibility and settings-clarity release.
+
+- Explain in Advanced settings when Sodium owns fluid rendering and why the overlapping vanilla fluid-geometry controls are unavailable.
+- Show the Sodium notice only when Sodium is present and account for its wrapped height in the responsive layout.
+- Preserve the existing client-only boundary, vanilla fallbacks, and Sodium renderer ownership behavior.
+
 ## 0.0.2 — 2026-08-30
 
 Polish release focused on making the mod identifiable and easier to install.
@@ -89,4 +97,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.2 package is the current canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.3 package is the current canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.
