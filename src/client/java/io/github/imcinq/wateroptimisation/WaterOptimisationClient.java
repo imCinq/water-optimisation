@@ -156,6 +156,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("mode: " + modeLabel(config)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
+				Component.literal("water backfaces: " + (FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),

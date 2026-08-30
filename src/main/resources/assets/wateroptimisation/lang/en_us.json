@@ -10,7 +10,7 @@
 	"screen.wateroptimisation.advanced": "More settings",
 	"screen.wateroptimisation.advanced.title": "Water Optimisation — More Settings",
 	"screen.wateroptimisation.advanced.description": "Extra settings can trade visual detail for performance.",
-	"screen.wateroptimisation.advanced.warning": "Unclear cases use vanilla. Sodium controls its own water rendering.",
+	"screen.wateroptimisation.advanced.warning": "Unclear cases use vanilla. Reduced faces can look wrong underwater. Sodium controls its own water rendering.",
 	"screen.wateroptimisation.culling": "Water culling: %s",
 	"screen.wateroptimisation.fast_path": "Skip enclosed water: %s",
 	"screen.wateroptimisation.particles": "Water particles: %s",
@@ -24,5 +24,5 @@
 	"wateroptimisation.profile.performance": "Performance",
 	"wateroptimisation.culling.disabled": "Off",
 	"wateroptimisation.culling.conservative": "Safe",
-	"wateroptimisation.culling.experimental": "Experimental"
+	"wateroptimisation.culling.experimental": "Reduced faces (experimental)"
 }

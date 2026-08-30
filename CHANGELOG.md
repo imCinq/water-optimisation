@@ -2,6 +2,14 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.1.0-preview.5
+
+- Added an explicit Experimental reduced-face mode for vanilla fluid rendering.
+- Reduced-face mode keeps each outward fluid face but omits vanilla's optional reverse face, cutting translucent water geometry and overdraw at the cost of possible visual differences when viewing water from inside or through unusual transparent arrangements.
+- Kept reduced-face mode off in all presets and disabled it automatically when Sodium owns fluid rendering.
+- Added diagnostics and UI wording that make the visual trade-off visible before testing.
+- Kept water-distance fading out of this preview because the shared translucent section layer cannot safely apply a camera-relative water-only fade without a renderer-specific implementation.
+
 ## 0.1.0-preview.4
 
 - Sampled fluid timing in the diagnostics HUD to reduce measurement overhead.

@@ -10,7 +10,7 @@ Mod Menu 19.0.0-alpha.1 is an optional compile-only dependency for the target. T
 
 ## Sodium
 
-Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables its vanilla FluidRenderer face and tessellation hooks. It does not force a renderer replacement or call Sodium internals. The particle and configuration paths remain independent.
+Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables its vanilla FluidRenderer face, reduced-face, and tessellation hooks. It does not force a renderer replacement or call Sodium internals. The particle and configuration paths remain independent. The Experimental reduced-face setting therefore has no effect while Sodium is present.
 
 This is a renderer-ownership guard, not proof of complete Sodium integration. Test the exact Sodium build and companion-mod combination before enabling fluid optimization.
 
