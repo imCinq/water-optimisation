@@ -63,28 +63,25 @@ public final class FluidOptimizationPolicy {
 	}
 
 	/**
-	 * The face override is intentionally narrower than a general occlusion test:
-	 * only equal, full source-water blocks can be hidden. Partial shapes and all
-	 * waterlogged or transparent neighbors are left to the game's renderer.
+	 * The face override is intentionally limited to equal full source-water
+	 * states, which is the information available to vanilla Fabric's face
+	 * predicate. Partial levels and other fluid types remain on vanilla logic.
 	 */
 	public static Boolean overrideFaceDecision(
 			FluidState fluidState,
 			BlockState selfState,
 			Direction direction,
-			BlockState otherState
+			FluidState otherFluidState
 	) {
 		if (!fluidHooksActive()
 				|| fluidState.getType() != Fluids.WATER
 				|| !fluidState.isSource()
 				|| !selfState.is(Blocks.WATER)
-				|| !otherState.is(Blocks.WATER)) {
+				|| otherFluidState.getType() != Fluids.WATER
+				|| !otherFluidState.isSource()) {
 			return null;
 		}
 
-		FluidState otherFluid = otherState.getFluidState();
-		if (otherFluid.getType() == Fluids.WATER && otherFluid.isSource()) {
-			return Boolean.FALSE;
-		}
-		return null;
+		return Boolean.FALSE;
 	}
 }
