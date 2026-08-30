@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml?query=branch%3Acodex%2Fissue-7-fabric-26-2-scaffold"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg?branch=codex%2Fissue-7-fabric-26-2-scaffold" alt="Build status"></a>
+  <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2f6fed.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/Minecraft-26.2-2f6fed.svg" alt="Minecraft 26.2">
   <img src="https://img.shields.io/badge/Fabric-client--side-2f6fed.svg" alt="Fabric client-side mod">
