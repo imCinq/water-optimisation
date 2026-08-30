@@ -85,7 +85,12 @@ public final class ConfigManager {
 		if (!sameConfiguration(previous, updated)) {
 			Minecraft client = Minecraft.getInstance();
 			if (client.level != null && client.levelRenderer != null) {
-				client.levelRenderer.invalidateCompiledGeometry();
+				client.levelRenderer.invalidateCompiledGeometry(
+						client.level,
+						client.options,
+						client.gameRenderer.mainCamera(),
+						client.getBlockColors()
+				);
 			}
 		}
 	}
