@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "wateroptimisation",
+	"version": "${version}",
+	"name": "Water Optimisation",
+	"description": "Client-side rendering diagnostics and conservative water performance options.",
+	"authors": [
+		"imCinq"
+	],
+	"contact": {
+		"sources": "https://github.com/imCinq/water-optimisation"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"io.github.imcinq.wateroptimisation.WaterOptimisationClient"
+		],
+		"modmenu": [
+			"io.github.imcinq.wateroptimisation.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		{
+			"config": "wateroptimisation.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"suggests": {
+		"modmenu": ">=19.0.0-alpha.1"
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

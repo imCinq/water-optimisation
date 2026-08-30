@@ -4,7 +4,7 @@ This repository was created as a private planning workspace based on the structu
 
 ## Current state
 
-The first planning commit contains documentation only. A Fabric 26.2 build scaffold should be added as the first implementation task after the benchmark plan is finalized.
+The repository now has a minimal Fabric 26.2 client-only build scaffold. It includes the official 26.2 Gradle wrapper/toolchain structure, a client entrypoint, mod metadata, a remote build workflow, and a client-only boundary audit. No rendering optimisation, configuration, or Mod Menu implementation is active yet.
 
 ## Planned project baseline
 

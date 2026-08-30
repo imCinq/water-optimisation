@@ -11,4 +11,14 @@ All notable changes to this project will be documented here.
 - Added maintenance, distribution, and repository privacy-audit guidance.
 - Added the optional Mod Menu, simple-profile, and Advanced-settings plan.
 - Added the remote-first Codex implementation and verification plan.
-- No runtime mod implementation has been added yet.
+- Added the initial Fabric 26.2 client-only build scaffold and remote build workflow on the issue #7 branch.
+- Added a client-only boundary audit for the scaffold.
+- Implemented local JSON configuration with safe defaults, atomic replacement, clamping, profile reset, and invalid-file recovery.
+- Implemented native main and Advanced settings screens, a registered configuration keybind, optional Mod Menu integration, and English translations.
+- Implemented opt-in diagnostics for fluid tessellation, section compilation, translucent resort timing, face decisions, fast-path skips, and particle filtering.
+- Implemented camera-relative water-particle admission filtering with a player-position lifecycle fallback and an explicitly conservative fog/distance mode.
+- Extracted particle distance math into a common allocation-free policy with unit coverage and avoided disabled diagnostics timing initialization on the fluid hot path.
+- Implemented exact source-water face culling and an explicit full-interior source-water fast path with vanilla fallbacks.
+- Added Sodium renderer-ownership detection that disables vanilla fluid hooks without replacing the active renderer.
+- Added configuration unit tests and updated the client-only audit to distinguish local chat components from packet APIs.
+- Local Minecraft visual/performance, OpenGL/Vulkan, Sodium, modpack, and DonutSMP validation remain required before release.

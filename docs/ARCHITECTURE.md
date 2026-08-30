@@ -1,58 +1,56 @@
-# Proposed Architecture
+# Architecture
 
 ## Data flow
 
 Client fluid state
-→ local neighbor and shape classifier
-→ conservative visibility decision
-→ fluid mesh path
+→ version-isolated FluidRenderer hook
+→ conservative source-water classifier
+→ vanilla fluid mesh path or explicit interior fast-path skip
 → translucent section buffer
+→ section compilation and translucent resort diagnostics
 
 Particle state
-→ local distance and fog filter
-→ particle admission decision
-→ normal particle renderer
+→ ClientLevel admission hook
+→ local water-particle classifier
+→ vanilla particle renderer or distance rejection
 
-Diagnostics observe both paths without changing gameplay state.
+Diagnostics observe these decisions locally without changing gameplay state.
 
 ## Components
 
 ### Client entrypoint
 
-Initializes local configuration, diagnostics, optional Mod Menu integration, and version-specific hooks.
+Initializes the local configuration, keybind, native screens, HUD element, and Sodium ownership detection. No server entrypoint is declared.
 
 ### Configuration
 
-Stores local settings with safe defaults. The master feature should start disabled until the implementation has passed visual and multiplayer validation.
+The common configuration model is independent of Minecraft client classes so defaults, profile reset, clamping, and copy isolation can be unit-tested. ConfigManager loads and atomically saves the JSON file on the client.
 
-### User interface
+### Fluid hooks
 
-A native Minecraft screen contains a simple master switch and profile selector. Advanced settings are separated into a second screen. Mod Menu connects to this screen through a small optional adapter and does not contain renderer logic.
+FluidRendererMixin targets Minecraft 26.2's public FluidRenderer tessellation and face-decision methods. The policy is intentionally narrow:
 
-### Fluid visibility classifier
+- the face decision can force a face hidden only when both states are ordinary full source-water blocks;
+- the flat path cancels tessellation only when the current block and all six neighbors are ordinary full source-water blocks;
+- flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
 
-Receives the current fluid state and neighboring block/fluid states. It can reject faces only when the evidence is sufficient. Ambiguous cases use the vanilla-compatible fallback.
-
-### Fluid fast path
-
-Handles only uniform source-water surfaces with no height variation, overlays, waterlogged shape complications, or unusual transparency. All other fluids and shapes use the normal path.
+The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 ### Particle filter
 
-Limits only cosmetic particle admission or extraction based on distance and fog visibility. It must not alter fluid state, particle physics, gameplay feedback, or server behavior.
+ClientLevelMixin intercepts only the client-side addParticle overload. It recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies the local camera-relative distance policy only when the master switch is enabled. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
 
 ### Diagnostics
 
-Tracks water blocks visited, faces emitted by category, section compilation time, translucent resort time, particle groups, and fallback counts. Diagnostics are local and opt-in.
+Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread, and the HUD displays local averages and counters. Tracy is still required for frame-time distributions, tail latency, and independent verification.
 
 ## Compatibility strategy
 
-- Fabric API is the primary integration surface.
-- Mod Menu is optional and must be declared as a suggested dependency, not a required runtime dependency.
-- Sodium should own its renderer when it is present, unless a documented compatible hook is available.
-- Do not run two fluid renderers for one block.
-- Keep version-specific mixins isolated and tested against exact mappings.
-- Use feature detection and graceful fallback rather than assuming another renderer's internals.
+- Fabric API is the primary client integration surface.
+- Mod Menu is optional and contains no renderer logic.
+- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks.
+- The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
+- Every uncertain classification falls back to vanilla behavior.
 
 ## Non-goals
 
