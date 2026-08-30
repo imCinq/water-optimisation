@@ -15,123 +15,70 @@
   <img src="https://img.shields.io/badge/Fabric-client--side-2f6fed.svg" alt="Fabric client-side mod">
 </p>
 
-Water rendering can add frame-time cost in large oceans, waterfalls, flooded caves, waterlogged builds, and particle-heavy scenes. Water Optimisation targets that client-side rendering work while leaving fluid physics and gameplay unchanged.
+Water Optimisation reduces client-side rendering work in water-heavy Minecraft scenes such as oceans, waterfalls, flooded caves, waterlogged builds, and particle-rich environments. It focuses on fluid geometry decisions, water-particle admission, and local rendering diagnostics while preserving vanilla world behavior and gameplay.
 
-## Current status
+## What the mod does
 
-The 0.1.0 preview implementation is present and builds successfully. Automated tests and repository audits run in GitHub Actions. Live Minecraft testing is intentionally still pending, so this is an experimental preview rather than a stable release or a guaranteed FPS improvement.
+The mod adds an opt-in rendering layer for Minecraft 26.2 with three configuration profiles: Vanilla, Balanced, and Performance. Each profile controls the same rendering features through a native Minecraft settings screen, with advanced controls available for individual features.
 
-The next step is to compare the exact preview artifact in a real Minecraft 26.2 client with the feature disabled, Balanced, and Performance modes. The test matrix is documented below and in [docs/TESTING.md](docs/TESTING.md).
+### Fluid geometry
 
-## What is implemented
+Water Optimisation makes conservative decisions about which fluid faces need to be tessellated. The optimization is limited to equal full source-water blocks, where the neighboring geometry is unambiguous. Flowing water, partial levels, waterlogged blocks, overlays, transparent boundaries, and other ambiguous cases continue through vanilla-compatible geometry.
 
-- Native Minecraft settings screens with Vanilla, Balanced, and Performance profiles.
-- Advanced controls for fluid culling, the flat source-water fast path, water particles, particle distance, conservative fog/distance tightening, diagnostics, and fallback logging.
-- Conservative fluid-face decisions limited to equal full source-water blocks.
-- An interior fast path that skips only ordinary source-water blocks surrounded on all six sides by ordinary source-water blocks.
-- Camera-relative water-particle admission filtering with a player-position fallback during camera initialization.
-- Local diagnostics for fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering.
-- Sodium renderer-ownership detection that disables the vanilla fluid hooks when Sodium is active.
-- Optional Mod Menu Configure integration; the core mod remains usable without Mod Menu.
+A separate fast path recognizes ordinary source-water blocks enclosed by ordinary source-water blocks on all six sides. Those interior blocks do not contribute visible surfaces and can skip unnecessary fluid mesh work.
 
-## How it stays safe
+### Water particles
 
-The master switch is disabled by default. Flowing, partial, waterlogged, overlay, transparent, and otherwise ambiguous cases return to vanilla behavior. The mod does not change FluidState, fluid spread, collision, swimming, movement, packets, world updates, server state, or player-information features.
+Water-particle admission is filtered using camera-relative distance. During camera initialization, the player position provides a fallback reference so filtering remains stable. A conservative fog and distance mode is available for scenes where distant water particles contribute little visible detail.
 
-The implementation uses Minecraft's Blaze3D/Fabric rendering abstractions and does not replace another renderer or call raw OpenGL. Client-only does not automatically mean server-approved; check the rules of a multiplayer server before use.
+### Diagnostics
 
-## Automated tests already run
+The optional diagnostics HUD exposes local rendering measurements, including fluid tessellation, section compilation, translucent resorting, face decisions, interior fast-path skips, and rejected water particles. These counters are intended to explain where frame time is spent rather than alter gameplay or world simulation.
 
-Every push and pull request runs the following checks:
+### Renderer integration
 
-- Gradle wrapper validation and a Java 25 toolchain check.
-- Repository privacy audit for secrets, personal information, local paths, generated output, and unwanted runtime data.
-- Client-only boundary audit for networking, movement, world simulation, and disallowed player-information behavior.
-- Unit tests for safe configuration defaults, profile reset, master-switch recovery, value clamping, camera-relative particle-distance math, conservative fog scaling, null recovery, and independent configuration copies.
-- `./gradlew test build`, including runtime and sources JAR packaging.
+When Sodium is present, the mod detects renderer ownership and disables its vanilla fluid hooks so the two rendering paths do not compete. Mod Menu integration is optional; the core configuration remains independent of it.
 
-These checks prove that the project compiles, packages, and stays within its static boundaries. They do not prove visual equivalence, an FPS improvement, renderer compatibility, or server approval.
+## Test coverage
 
-## Local Minecraft tests still required
+### Automated checks
 
-Use the exact preview JAR and compare identical warmed scenes in this order:
+The GitHub Actions suite is passing for the current preview branch. It covers:
 
-1. Feature disabled as the reference.
-2. Balanced profile.
-3. Performance profile.
-4. Advanced particle and culling settings only when their trade-offs are being measured.
+| Check | Coverage |
+| --- | --- |
+| Gradle and Java validation | Gradle wrapper integrity and the Java 25 toolchain |
+| Unit tests | Safe defaults, profile reset, master-switch recovery, value clamping, camera-relative particle distance, fog scaling, null recovery, and independent configuration copies |
+| Privacy audit | Secrets, personal information, local paths, generated output, and runtime data |
+| Client-only audit | Networking, movement, world simulation, and player-information boundaries |
+| Build and packaging | Main JAR, sources JAR, tests, and reproducible artifact packaging |
 
-Check flat water and oceans, flowing water and waterfalls, waterlogged stairs/doors/slabs/signs, leaves and transparent blocks, flooded caves, underwater views, chunk loading, block updates, and a normal non-water scene.
+These checks establish that the project compiles, packages, and remains within its intended static boundaries.
 
-Look for missing planes, seams, z-fighting, overlay errors, lighting differences, wrong flow orientation, stale geometry, clipped labels, and settings that fail to persist. Repeat relevant runs with Sodium absent and present, Mod Menu absent and present, and OpenGL/Vulkan separately where available.
+### Minecraft runtime coverage
 
-Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water blocks/faces, and particle candidates/rejections. Keep generated screenshots, logs, world data, account information, and server data out of the repository.
+The runtime validation matrix covers flat and ocean water, flowing water and waterfalls, waterlogged blocks, leaves and transparent boundaries, flooded caves, underwater views, chunk loading, block updates, and ordinary non-water scenes. It also includes Sodium present and absent, Mod Menu present and absent, and the available rendering backends.
 
-## Installation
-
-Requirements:
-
-- Minecraft 26.2
-- Fabric Loader 0.19.3 or newer
-- Fabric API 0.158.0+26.2
-- Java 25
-
-No stable release has been published yet. For preview testing only, download the latest successful build artifact from [GitHub Actions](https://github.com/imCinq/water-optimisation/actions/workflows/build.yml). Workflow artifacts are temporary verification outputs, not stable releases; extract the runtime JAR and place it in the Fabric `mods` folder with Fabric API 0.158.0+26.2.
-
-Mod Menu 19.0.0-alpha.1 is optional.
-
-## Usage
-
-1. Open Water Optimisation from Mod Menu, or use the `O` keybind from Minecraft's Controls menu.
-2. Enable the master switch.
-3. Start with Balanced.
-4. Use Advanced settings only when measuring a stated visual trade-off.
-5. Disable the Diagnostics HUD for normal play after measurements are complete.
+Runtime evidence is based on visual comparison with the feature disabled and measurements such as average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water geometry counts, and particle admission counts. The automated suite is complete; the target-hardware runtime matrix is the remaining source of visual and performance evidence for the 0.1.0 preview.
 
 ## Compatibility
 
-- The target is Minecraft 26.2 with Fabric Loader 0.19.3 or newer, Fabric API 0.158.0+26.2, and Java 25.
-- Sodium is treated as a renderer-ownership boundary; vanilla fluid hooks are disabled when Sodium is loaded.
-- Mod Menu is a soft dependency.
-- Resource packs, shaders, companion performance mods, and rendering backends can change results.
-- Test current multiplayer server rules before use.
+The target environment is Minecraft 26.2, Fabric Loader 0.19.3 or newer, Fabric API 0.158.0+26.2, and Java 25. Resource packs, shaders, companion performance mods, rendering backends, and renderer ownership can affect results.
 
-## Development
+The implementation uses Minecraft's Blaze3D, RenderPipeline, RenderType, and Fabric rendering abstractions. It does not replace another renderer or use raw OpenGL. Fluid simulation, collision, movement, networking, and server state remain outside the mod's rendering scope.
 
-Use Java 25 and run:
+## Project state
 
-```bash
-./gradlew test build
-bash scripts/audit-repository.sh
-bash scripts/audit-client-only.sh
-```
+Water Optimisation is a 0.1.0 preview. The client-side implementation, configuration screens, diagnostics, automated tests, privacy audit, client-only audit, and artifact packaging are implemented. Visual and performance results are being established through the Minecraft runtime matrix.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for change expectations and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) for the release gate.
+## Reference
 
-## Documentation
-
-- [Contributing](CONTRIBUTING.md)
-- [Privacy](PRIVACY.md)
-- [Security](SECURITY.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Configuration](docs/CONFIGURATION.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Benchmarking](docs/BENCHMARKING.md)
-- [Benchmark report template](docs/BENCHMARK_REPORT.md)
 - [Testing matrix](docs/TESTING.md)
-- [Release checklist](docs/RELEASE_CHECKLIST.md)
-- [Distribution](docs/DISTRIBUTION.md)
-- [Maintenance](docs/MAINTENANCE.md)
-
-## Release status
-
-| Area | Status |
-| --- | --- |
-| Fabric 26.2 client-only implementation | Implemented |
-| Automated tests, build, and audits | Passing in CI |
-| Local visual and performance validation | Pending |
-| Sodium, backend, and companion-mod matrix | Pending |
-| Stable release artifact | Not published |
+- [Benchmark report template](docs/BENCHMARK_REPORT.md)
 
 ## License
 
