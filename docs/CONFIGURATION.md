@@ -25,7 +25,7 @@ Selecting a preset resets its More settings values. Choosing Vanilla also turns 
 
 | Setting | Default | Behavior |
 | --- | --- | --- |
-| fluidCullingMode | conservative | Disabled, Conservative, or Experimental (currently the same safe subset). It gates the interior fast path; vanilla remains responsible for ordinary same-fluid face culling. |
+| fluidCullingMode | conservative | Disabled, Conservative, or Experimental. Disabled turns off fluid hooks; Conservative enables only the enclosed-water fast path; Experimental additionally removes vanilla's optional reverse fluid faces. |
 | flatWaterFastPath | false | Skips only an ordinary source-water block surrounded on all six sides by ordinary source-water blocks. |
 | waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. The Performance preset sets this to false. |
 | particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. The Performance preset uses 16. During camera initialization, the player position is used as a lifecycle fallback. |
@@ -33,7 +33,7 @@ Selecting a preset resets its More settings values. Choosing Vanilla also turns 
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, and translucent-resort averages. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
-The experimental label is intentional. The current safe subset is narrow; ambiguous shapes are not classified by this mod. The face-culling mode does not add a second face predicate because that was measured as redundant overhead.
+The experimental label is intentional. Experimental reduced-face mode can change how water looks from inside a fluid volume or through unusual transparent arrangements. It is disabled by all presets and by Sodium ownership. Ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
 
 ## Compatibility behavior
 

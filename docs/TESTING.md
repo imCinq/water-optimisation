@@ -39,6 +39,8 @@ Test with the feature disabled and enabled in:
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.
 
+For the Experimental reduced-face mode, additionally compare above-water, underwater, waterlogged, glass/leaves, cave, and surface-transition views. Confirm the outward water face remains present, note any missing reverse faces, and verify that switching back to Conservative rebuilds the sections.
+
 Look for missing planes, seams, z-fighting, incorrect overlays, wrong flow orientation, lighting differences, stale geometry, unreadable labels, clipped descriptions, and settings that fail to persist.
 
 ## Performance measurements

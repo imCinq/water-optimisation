@@ -34,9 +34,10 @@ FluidRendererMixin targets Minecraft 26.2's public FluidRenderer tessellation me
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
 - the flat path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when they are ordinary full source-water blocks;
+- Experimental reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace`, preserving the outward face while reducing translucent geometry. It is off by default and inactive when Sodium owns fluid rendering;
 - flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
 
-The optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
+The interior optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 ### Particle filter
 

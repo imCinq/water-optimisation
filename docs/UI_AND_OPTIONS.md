@@ -32,7 +32,7 @@ Advanced controls are separate from the main screen:
 - fallback logging;
 - Reset preset.
 
-The labels communicate the choice without requiring knowledge of renderer internals. The enclosed-water fast path and experimental culling choice remain explicit.
+The labels communicate the choice without requiring knowledge of renderer internals. The enclosed-water fast path and Experimental reduced-face choice remain explicit; the warning explains that the latter can look different underwater. Sodium ownership keeps the choice inactive because Sodium controls its own fluid renderer.
 
 ## Recovery
 

@@ -8,6 +8,7 @@ import net.minecraft.world.level.material.Fluids;
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
+	private static volatile boolean reducedWaterBackfacesActive;
 
 	private FluidOptimizationPolicy() {
 	}
@@ -24,6 +25,8 @@ public final class FluidOptimizationPolicy {
 				&& !WaterOptimisationClient.isSodiumLoaded();
 		fluidHooksActive = hooksActive;
 		flatWaterFastPathActive = hooksActive && config.isFlatWaterFastPath();
+		reducedWaterBackfacesActive = hooksActive
+				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
 	}
 
 	public static boolean fluidHooksActive() {
@@ -32,6 +35,15 @@ public final class FluidOptimizationPolicy {
 
 	public static boolean flatWaterFastPathActive() {
 		return flatWaterFastPathActive;
+	}
+
+	/**
+	 * The experimental mode removes only vanilla's optional reverse face for a
+	 * fluid quad. It is deliberately disabled for Sodium, which owns its fluid
+	 * renderer, and is never enabled by a safe preset.
+	 */
+	public static boolean reducedWaterBackfacesActive() {
+		return reducedWaterBackfacesActive;
 	}
 
 	/**
