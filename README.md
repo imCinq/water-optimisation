@@ -87,6 +87,7 @@ Generated build output, runtime data, logs, screenshots, and benchmark results a
 - [Configuration](docs/CONFIGURATION.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Benchmarking](docs/BENCHMARKING.md)
+- [Benchmark report](docs/BENCHMARK_REPORT.md)
 - [Testing](docs/TESTING.md)
 - [Research notes](docs/RESEARCH.md)
 - [Roadmap](docs/IMPLEMENTATION_PLAN.md)

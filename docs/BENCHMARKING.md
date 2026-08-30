@@ -1,5 +1,7 @@
 # Benchmarking
 
+Use the [benchmark report template](BENCHMARK_REPORT.md) to record reproducible results. Do not commit generated captures or runtime data.
+
 ## Required comparisons
 
 Compare the same client, world, camera, resolution, render distance, simulation distance, FPS cap, graphics settings, Java runtime, and rendering backend.
