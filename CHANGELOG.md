@@ -19,5 +19,6 @@ All notable changes to Water Optimisation are documented here.
 - Replaced the plan-oriented README with an implementation and testing guide.
 - Fixed the SectionCompiler mixin target to match vanilla Minecraft 26.2.
 - Cached configuration gates in fluid and diagnostics hot paths, reset diagnostics on saved test configuration changes, and exposed active fluid hooks and face-override counters in the diagnostics HUD.
+- Added an early return for inactive fluid hook paths so disabled diagnostics and non-fast-path profiles do not perform unnecessary per-fluid policy work.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
