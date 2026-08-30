@@ -1,23 +1,10 @@
 package io.github.imcinq.wateroptimisation;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 public final class Diagnostics {
-	private static final LongAdder fluidBlocksVisited = new LongAdder();
-	private static final LongAdder fluidFacesAccepted = new LongAdder();
-	private static final LongAdder fluidFacesCulled = new LongAdder();
-	private static final LongAdder fluidFaceOverrides = new LongAdder();
-	private static final LongAdder fluidFastPathSkips = new LongAdder();
-	private static final LongAdder fluidFallbacks = new LongAdder();
-	private static final LongAdder particleCandidates = new LongAdder();
-	private static final LongAdder particleRejected = new LongAdder();
-	private static final LongAdder particleDistanceRejected = new LongAdder();
-	private static final LongAdder fluidCompileCalls = new LongAdder();
-	private static final LongAdder fluidCompileNanos = new LongAdder();
-	private static final LongAdder sectionCompileCalls = new LongAdder();
-	private static final LongAdder sectionCompileNanos = new LongAdder();
-	private static final LongAdder translucentResortCalls = new LongAdder();
-	private static final LongAdder translucentResortNanos = new LongAdder();
+	private static final AtomicReference<Counters> ACTIVE_COUNTERS = new AtomicReference<>(new Counters());
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
 	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
 	private static volatile boolean instrumentationEnabled;
@@ -38,163 +25,171 @@ public final class Diagnostics {
 	}
 
 	/**
-	 * Clears counters so a new settings/benchmark run starts from zero.
+	 * Starts a new counter generation. Work already in progress keeps its old
+	 * counter set, so it cannot appear in the next snapshot after a reset.
 	 */
 	public static void reset() {
-		fluidBlocksVisited.reset();
-		fluidFacesAccepted.reset();
-		fluidFacesCulled.reset();
-		fluidFaceOverrides.reset();
-		fluidFastPathSkips.reset();
-		fluidFallbacks.reset();
-		particleCandidates.reset();
-		particleRejected.reset();
-		particleDistanceRejected.reset();
-		fluidCompileCalls.reset();
-		fluidCompileNanos.reset();
-		sectionCompileCalls.reset();
-		sectionCompileNanos.reset();
-		translucentResortCalls.reset();
-		translucentResortNanos.reset();
+		ACTIVE_COUNTERS.set(new Counters());
 	}
 
 	public static void recordFluidBlock() {
-		if (enabled()) {
-			fluidBlocksVisited.increment();
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.fluidBlocksVisited.increment();
 		}
 	}
 
 	public static void recordFluidFace(boolean accepted) {
-		if (!enabled()) {
+		Counters counters = activeCounters();
+		if (counters == null) {
 			return;
 		}
 		if (accepted) {
-			fluidFacesAccepted.increment();
+			counters.fluidFacesAccepted.increment();
 		} else {
-			fluidFacesCulled.increment();
+			counters.fluidFacesCulled.increment();
 		}
 	}
 
 	public static void recordFluidFaceOverride() {
-		if (enabled()) {
-			fluidFaceOverrides.increment();
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.fluidFaceOverrides.increment();
 		}
 	}
 
 	public static void recordFluidFastPathSkip() {
-		if (enabled()) {
-			fluidFastPathSkips.increment();
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.fluidFastPathSkips.increment();
 		}
 	}
 
 	public static void recordFluidFallback(String reason) {
-		if (!enabled()) {
+		Counters counters = activeCounters();
+		if (counters == null) {
 			return;
 		}
-		fluidFallbacks.increment();
+		counters.fluidFallbacks.increment();
 		if (ConfigManager.get().isDebugFallbackLogging()) {
 			WaterOptimisationClient.LOGGER.debug("Fluid optimization fallback: {}", reason);
 		}
 	}
 
 	public static void recordParticleCandidate() {
-		if (enabled()) {
-			particleCandidates.increment();
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.particleCandidates.increment();
 		}
 	}
 
 	public static void recordParticleRejected(boolean distance) {
-		if (enabled()) {
-			particleRejected.increment();
-			if (distance) {
-				particleDistanceRejected.increment();
-			}
+		Counters counters = activeCounters();
+		if (counters == null) {
+			return;
+		}
+		counters.particleRejected.increment();
+		if (distance) {
+			counters.particleDistanceRejected.increment();
 		}
 	}
 
 	public static void beginFluidCompile() {
-		if (!enabled()) {
+		Counters counters = activeCounters();
+		if (counters == null) {
 			return;
 		}
 		FluidTiming timing = FLUID_TIMING.get();
 		timing.startNanos = System.nanoTime();
+		timing.counters = counters;
 		timing.active = true;
 	}
 
 	public static void endFluidCompile() {
-		if (!enabled()) {
-			return;
-		}
 		FluidTiming timing = FLUID_TIMING.get();
 		if (!timing.active) {
 			return;
 		}
 		timing.active = false;
-		fluidCompileCalls.increment();
-		fluidCompileNanos.add(Math.max(0L, System.nanoTime() - timing.startNanos));
+		Counters counters = timing.counters;
+		timing.counters = null;
+		if (counters == null) {
+			return;
+		}
+		counters.fluidCompileCalls.increment();
+		counters.fluidCompileNanos.add(Math.max(0L, System.nanoTime() - timing.startNanos));
 	}
 
 	public static void beginSectionCompile() {
-		if (!enabled()) {
+		Counters counters = activeCounters();
+		if (counters == null) {
 			return;
 		}
 		PhaseTiming timing = PHASE_TIMING.get();
 		timing.sectionCompileStartNanos = System.nanoTime();
+		timing.sectionCompileCounters = counters;
 		timing.sectionCompileActive = true;
 	}
 
 	public static void endSectionCompile() {
-		if (!enabled()) {
-			return;
-		}
 		PhaseTiming timing = PHASE_TIMING.get();
 		if (!timing.sectionCompileActive) {
 			return;
 		}
 		timing.sectionCompileActive = false;
-		sectionCompileCalls.increment();
-		sectionCompileNanos.add(Math.max(0L, System.nanoTime() - timing.sectionCompileStartNanos));
+		Counters counters = timing.sectionCompileCounters;
+		timing.sectionCompileCounters = null;
+		if (counters == null) {
+			return;
+		}
+		counters.sectionCompileCalls.increment();
+		counters.sectionCompileNanos.add(Math.max(0L, System.nanoTime() - timing.sectionCompileStartNanos));
 	}
 
 	public static void beginTranslucentResort() {
-		if (!enabled()) {
+		Counters counters = activeCounters();
+		if (counters == null) {
 			return;
 		}
 		PhaseTiming timing = PHASE_TIMING.get();
 		timing.translucentResortStartNanos = System.nanoTime();
+		timing.translucentResortCounters = counters;
 		timing.translucentResortActive = true;
 	}
 
 	public static void endTranslucentResort() {
-		if (!enabled()) {
-			return;
-		}
 		PhaseTiming timing = PHASE_TIMING.get();
 		if (!timing.translucentResortActive) {
 			return;
 		}
 		timing.translucentResortActive = false;
-		translucentResortCalls.increment();
-		translucentResortNanos.add(Math.max(0L, System.nanoTime() - timing.translucentResortStartNanos));
+		Counters counters = timing.translucentResortCounters;
+		timing.translucentResortCounters = null;
+		if (counters == null) {
+			return;
+		}
+		counters.translucentResortCalls.increment();
+		counters.translucentResortNanos.add(Math.max(0L, System.nanoTime() - timing.translucentResortStartNanos));
 	}
 
 	public static Snapshot snapshot() {
-		long fluidCalls = fluidCompileCalls.sum();
-		long fluidNanos = fluidCompileNanos.sum();
-		long sectionCalls = sectionCompileCalls.sum();
-		long sectionNanos = sectionCompileNanos.sum();
-		long resortCalls = translucentResortCalls.sum();
-		long resortNanos = translucentResortNanos.sum();
+		Counters counters = ACTIVE_COUNTERS.get();
+		long fluidCalls = counters.fluidCompileCalls.sum();
+		long fluidNanos = counters.fluidCompileNanos.sum();
+		long sectionCalls = counters.sectionCompileCalls.sum();
+		long sectionNanos = counters.sectionCompileNanos.sum();
+		long resortCalls = counters.translucentResortCalls.sum();
+		long resortNanos = counters.translucentResortNanos.sum();
 		return new Snapshot(
-				fluidBlocksVisited.sum(),
-				fluidFacesAccepted.sum(),
-				fluidFacesCulled.sum(),
-				fluidFaceOverrides.sum(),
-				fluidFastPathSkips.sum(),
-				fluidFallbacks.sum(),
-				particleCandidates.sum(),
-				particleRejected.sum(),
-				particleDistanceRejected.sum(),
+				counters.fluidBlocksVisited.sum(),
+				counters.fluidFacesAccepted.sum(),
+				counters.fluidFacesCulled.sum(),
+				counters.fluidFaceOverrides.sum(),
+				counters.fluidFastPathSkips.sum(),
+				counters.fluidFallbacks.sum(),
+				counters.particleCandidates.sum(),
+				counters.particleRejected.sum(),
+				counters.particleDistanceRejected.sum(),
 				fluidCalls,
 				fluidNanos,
 				averageMillis(fluidCalls, fluidNanos),
@@ -211,19 +206,40 @@ public final class Diagnostics {
 		return calls == 0 ? 0.0 : nanos / 1_000_000.0 / calls;
 	}
 
-	private static boolean enabled() {
-		return instrumentationEnabled;
+	private static Counters activeCounters() {
+		return instrumentationEnabled ? ACTIVE_COUNTERS.get() : null;
+	}
+
+	private static final class Counters {
+		private final LongAdder fluidBlocksVisited = new LongAdder();
+		private final LongAdder fluidFacesAccepted = new LongAdder();
+		private final LongAdder fluidFacesCulled = new LongAdder();
+		private final LongAdder fluidFaceOverrides = new LongAdder();
+		private final LongAdder fluidFastPathSkips = new LongAdder();
+		private final LongAdder fluidFallbacks = new LongAdder();
+		private final LongAdder particleCandidates = new LongAdder();
+		private final LongAdder particleRejected = new LongAdder();
+		private final LongAdder particleDistanceRejected = new LongAdder();
+		private final LongAdder fluidCompileCalls = new LongAdder();
+		private final LongAdder fluidCompileNanos = new LongAdder();
+		private final LongAdder sectionCompileCalls = new LongAdder();
+		private final LongAdder sectionCompileNanos = new LongAdder();
+		private final LongAdder translucentResortCalls = new LongAdder();
+		private final LongAdder translucentResortNanos = new LongAdder();
 	}
 
 	private static final class FluidTiming {
 		private long startNanos;
+		private Counters counters;
 		private boolean active;
 	}
 
 	private static final class PhaseTiming {
 		private long sectionCompileStartNanos;
+		private Counters sectionCompileCounters;
 		private boolean sectionCompileActive;
 		private long translucentResortStartNanos;
+		private Counters translucentResortCounters;
 		private boolean translucentResortActive;
 	}
 
