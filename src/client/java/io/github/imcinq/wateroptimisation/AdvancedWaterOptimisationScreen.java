@@ -36,6 +36,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private int experimentalSectionY;
 	private int diagnosticsSectionY;
 	private int actionY;
+	private int sodiumNoticeY;
 	private boolean columns;
 
 	public AdvancedWaterOptimisationScreen(Screen parent, WaterOptimisationConfig workingCopy) {
@@ -51,9 +52,14 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		this.buttonLeft = (this.width - this.buttonWidth) / 2;
 		this.descriptionY = 16;
 
-		int y = this.descriptionY
-				+ wrappedHeight(Component.translatable("screen.wateroptimisation.advanced.description"))
-				+ 8;
+		Component description = Component.translatable("screen.wateroptimisation.advanced.description");
+		int y = this.descriptionY + wrappedHeight(description) + 8;
+		if (WaterOptimisationClient.isSodiumLoaded()) {
+			this.sodiumNoticeY = y;
+			y += wrappedHeight(sodiumNotice()) + 8;
+		} else {
+			this.sodiumNoticeY = -1;
+		}
 		this.columns = this.contentWidth >= 600
 				|| (this.contentWidth >= 360 && singleColumnBottom(y) > this.height - 42);
 		if (this.columns) {
@@ -188,6 +194,9 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.advanced.description"), this.descriptionY, 0xFFFFFFFF);
+		if (this.sodiumNoticeY >= 0) {
+			drawCenteredWrapped(graphics, sodiumNotice(), this.sodiumNoticeY, 0xFFB0B0B0);
+		}
 		if (this.columns) {
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.safe"), this.buttonLeft, this.safeSectionY, this.columnWidth);
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.experimental"), this.rightColumnLeft, this.experimentalSectionY, this.columnWidth);
@@ -230,6 +239,10 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private Component fallbackLabel() {
 		return Component.translatable("screen.wateroptimisation.fallback_logging", yesNo(this.workingCopy.isDebugFallbackLogging()));
+	}
+
+	private Component sodiumNotice() {
+		return Component.translatable("screen.wateroptimisation.sodium_notice");
 	}
 
 	private Component yesNo(boolean value) {
