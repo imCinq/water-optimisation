@@ -59,7 +59,7 @@ These checks establish that the project compiles, packages, and remains within i
 
 The runtime validation matrix covers flat and ocean water, flowing water and waterfalls, waterlogged blocks, leaves and transparent boundaries, flooded caves, underwater views, chunk loading, block updates, and ordinary non-water scenes. It also includes Sodium present and absent, Mod Menu present and absent, and the available rendering backends.
 
-Runtime evidence is based on visual comparison with the feature disabled and measurements such as average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water geometry counts, and particle admission counts. The automated suite is complete; the target-hardware runtime matrix is the remaining source of visual and performance evidence for the 0.1.0-preview.2 build.
+Runtime evidence is based on visual comparison with the feature disabled and measurements such as average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water geometry counts, and particle admission counts. The automated suite is complete; the target-hardware runtime matrix is the remaining source of visual and performance evidence for the 0.1.0-preview.3 build.
 
 ## Compatibility
 
@@ -69,7 +69,7 @@ The implementation uses Minecraft's Blaze3D, RenderPipeline, RenderType, and Fab
 
 ## Project state
 
-Water Optimisation is a 0.1.0-preview.2 build. The client-side implementation, configuration screens, diagnostics, automated tests, privacy audit, client-only audit, and artifact packaging are implemented. Visual and performance results are being established through the Minecraft runtime matrix.
+Water Optimisation is a 0.1.0-preview.3 build. The client-side implementation, configuration screens, diagnostics, automated tests, privacy audit, client-only audit, and artifact packaging are implemented. Visual and performance results are being established through the Minecraft runtime matrix.
 
 ## Reference
 

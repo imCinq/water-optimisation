@@ -86,6 +86,18 @@ public final class WaterOptimisationConfig {
 		return copy;
 	}
 
+	/**
+	 * Returns whether changing to {@code other} can change compiled fluid geometry.
+	 * Particle and diagnostics settings take effect without rebuilding sections.
+	 */
+	boolean sameFluidRenderingConfiguration(WaterOptimisationConfig other) {
+		return other != null
+				&& this.enabled == other.enabled
+				&& this.performanceProfile == other.performanceProfile
+				&& this.fluidCullingMode == other.fluidCullingMode
+				&& this.flatWaterFastPath == other.flatWaterFastPath;
+	}
+
 	public void sanitize() {
 		if (this.performanceProfile == null) {
 			this.performanceProfile = PerformanceProfile.BALANCED;

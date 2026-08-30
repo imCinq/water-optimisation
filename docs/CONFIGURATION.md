@@ -19,9 +19,9 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
 | Performance | Keeps vanilla fluid-face decisions and enables the explicitly labelled flat source-water fast path plus a 24-block particle bound. |
 
-Selecting a profile resets its Advanced values. Choosing Vanilla also turns off the master switch. Profiles do not promise a particular FPS result.
+Selecting a preset resets its More settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
-## Advanced settings
+## More settings
 
 | Setting | Default | Behavior |
 | --- | --- | --- |

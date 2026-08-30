@@ -29,6 +29,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	);
 	private static KeyMapping openConfigKey;
 	private static volatile boolean sodiumLoaded;
+	private static volatile ParticleFilterSettings particleFilterSettings = ParticleFilterSettings.INACTIVE;
 
 	@Override
 	public void onInitializeClient() {
@@ -65,7 +66,23 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return sodiumLoaded;
 	}
 
+	public static void refreshParticleFiltering(WaterOptimisationConfig config) {
+		if (config == null) {
+			particleFilterSettings = ParticleFilterSettings.INACTIVE;
+			return;
+		}
+
+		boolean active = config.isEnabled()
+				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA;
+		double maxDistance = WaterParticleDistancePolicy.effectiveDistance(config);
+		particleFilterSettings = new ParticleFilterSettings(active, config.isWaterParticles(), maxDistance * maxDistance);
+	}
+
 	public static boolean shouldKeepWaterParticle(ParticleOptions particle, boolean alwaysShow, double x, double y, double z) {
+		ParticleFilterSettings settings = particleFilterSettings;
+		if (!settings.active()) {
+			return true;
+		}
 		if (!isWaterParticle(particle)) {
 			return true;
 		}
@@ -74,14 +91,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			Diagnostics.recordParticleCandidate();
 		}
 
-		WaterOptimisationConfig config = ConfigManager.get();
-		if (!config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
-			return true;
-		}
 		if (alwaysShow) {
 			return true;
 		}
-		if (!config.isWaterParticles()) {
+		if (!settings.keepWaterParticles()) {
 			if (diagnosticsEnabled) {
 				Diagnostics.recordParticleRejected(false);
 			}
@@ -104,7 +117,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			referenceZ = cameraPosition.z;
 		}
 
-		if (!WaterParticleDistancePolicy.isWithinDistance(config, referenceX, referenceY, referenceZ, x, y, z)) {
+		if (!WaterParticleDistancePolicy.isWithinDistanceSquared(settings.maxDistanceSquared(), referenceX, referenceY, referenceZ, x, y, z)) {
 			if (diagnosticsEnabled) {
 				Diagnostics.recordParticleRejected(true);
 			}
@@ -162,5 +175,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 
 	private static String onOff(boolean value) {
 		return value ? "on" : "off";
+	}
+
+	private record ParticleFilterSettings(boolean active, boolean keepWaterParticles, double maxDistanceSquared) {
+		private static final ParticleFilterSettings INACTIVE = new ParticleFilterSettings(false, true, 0.0D);
 	}
 }

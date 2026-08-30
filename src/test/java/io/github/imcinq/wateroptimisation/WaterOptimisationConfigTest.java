@@ -71,6 +71,8 @@ class WaterOptimisationConfigTest {
 		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 42.0D, 20.0D, 30.0D));
 		assertFalse(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 42.001D, 20.0D, 30.0D));
 		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 10.0D, 20.0D, 62.0D));
+		assertTrue(WaterParticleDistancePolicy.isWithinDistanceSquared(32.0D * 32.0D, 10.0D, 20.0D, 30.0D, 42.0D, 20.0D, 30.0D));
+		assertFalse(WaterParticleDistancePolicy.isWithinDistanceSquared(32.0D * 32.0D, 10.0D, 20.0D, 30.0D, 42.001D, 20.0D, 30.0D));
 	}
 
 	@Test
@@ -94,5 +96,27 @@ class WaterOptimisationConfigTest {
 
 		assertFalse(original.isEnabled());
 		assertEquals(32, original.getParticleDistance());
+	}
+
+	@Test
+	void cosmeticSettingsDoNotRequireFluidSectionRefresh() {
+		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
+		WaterOptimisationConfig changed = original.copy();
+		changed.setWaterParticles(false);
+		changed.setParticleDistance(64);
+		changed.setParticleFogCulling(true);
+		changed.setDiagnosticsHud(true);
+		changed.setDebugFallbackLogging(true);
+
+		assertTrue(original.sameFluidRenderingConfiguration(changed));
+	}
+
+	@Test
+	void fluidSettingsRequireFluidSectionRefresh() {
+		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
+		WaterOptimisationConfig changed = original.copy();
+		changed.setFlatWaterFastPath(true);
+
+		assertFalse(original.sameFluidRenderingConfiguration(changed));
 	}
 }

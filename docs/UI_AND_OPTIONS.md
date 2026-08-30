@@ -11,10 +11,10 @@ Mod Menu 19.0.0-alpha.1 is a compile-only, suggested dependency for the 26.2 tar
 The main screen contains:
 
 1. an enable switch;
-2. a Vanilla, Balanced, or Performance profile selector;
+2. a Vanilla, Balanced, or Performance preset selector;
 3. a short client-only explanation;
 4. a visible visual-trade-off warning;
-5. an Advanced settings button;
+5. a More settings button;
 6. Done and Cancel buttons.
 
 Done saves the working copy. Cancel and Escape return to the parent screen without saving. The screen never changes a server or world setting.
@@ -23,16 +23,16 @@ Done saves the working copy. Cancel and Escape return to the parent screen witho
 
 Advanced controls are separate from the main screen:
 
-- fluid culling mode;
-- flat source-water fast path;
+- water culling mode;
+- enclosed-water fast path;
 - water particles;
 - particle distance;
-- conservative fog/distance tightening;
-- diagnostics HUD;
+- distant-effect culling;
+- performance stats;
 - fallback logging;
-- Reset to profile.
+- Reset preset.
 
-The labels communicate the choice without requiring knowledge of renderer internals. The fast path and experimental culling choice remain explicit.
+The labels communicate the choice without requiring knowledge of renderer internals. The enclosed-water fast path and experimental culling choice remain explicit.
 
 ## Recovery
 

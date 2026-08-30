@@ -21,7 +21,8 @@ Unit coverage includes:
 - camera-relative particle-distance math;
 - conservative fog scaling;
 - null enum recovery;
-- independent configuration copies.
+- independent configuration copies;
+- separation of cosmetic settings from fluid-section invalidation.
 
 ## Manual visual matrix
 
