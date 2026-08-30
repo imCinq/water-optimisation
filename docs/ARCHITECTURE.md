@@ -44,7 +44,7 @@ ClientLevelMixin intercepts only the client-side addParticle overload. It exits 
 
 ### Diagnostics
 
-Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread, and the HUD displays local averages and counters. Face decisions are deliberately not instrumented because a per-face callback costs more than the redundant optimization it replaced. Tracy is still required for frame-time distributions, tail latency, face counts, and independent verification.
+	Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread; fluid timing samples one in sixteen calls to avoid adding clock reads to every fluid block while the HUD remains open. The HUD snapshots and formats its lines at most four times per second, then reuses the immutable components between refreshes. Face decisions are deliberately not instrumented because a per-face callback costs more than the redundant optimization it replaced. Tracy is still required for frame-time distributions, tail latency, face counts, and independent verification.
 
 ## Compatibility strategy
 

@@ -30,6 +30,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	private static KeyMapping openConfigKey;
 	private static volatile boolean sodiumLoaded;
 	private static volatile ParticleFilterSettings particleFilterSettings = ParticleFilterSettings.INACTIVE;
+	private static final long DIAGNOSTICS_REFRESH_INTERVAL_NANOS = 250_000_000L;
+	private static long diagnosticsRefreshDeadlineNanos;
+	private static Component[] diagnosticsLines = new Component[0];
 
 	@Override
 	public void onInitializeClient() {
@@ -144,23 +147,33 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return;
 		}
 
-		Diagnostics.Snapshot snapshot = Diagnostics.snapshot();
 		Minecraft client = Minecraft.getInstance();
+		long now = System.nanoTime();
+		if (diagnosticsLines.length == 0 || now >= diagnosticsRefreshDeadlineNanos) {
+			Diagnostics.Snapshot snapshot = Diagnostics.snapshot();
+			diagnosticsLines = new Component[]{
+				Component.literal("Water Optimisation"),
+				Component.literal("mode: " + modeLabel(config)),
+				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
+				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
+				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
+				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
+				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
+				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
+				Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())),
+				Component.literal("particles rejected: " + snapshot.particleRejected() + "/" + snapshot.particleCandidates())
+			};
+			diagnosticsRefreshDeadlineNanos = now + DIAGNOSTICS_REFRESH_INTERVAL_NANOS;
+		}
+
 		int x = 6;
 		int y = 6;
 		int lineHeight = client.font.lineHeight + 2;
-		int lines = 10;
+		int lines = diagnosticsLines.length;
 		graphics.fill(x - 3, y - 3, x + 290, y + lineHeight * lines + 2, 0x90000000);
-		graphics.text(client.font, Component.literal("Water Optimisation"), x, y, 0xFFFFFFFF, true);
-		graphics.text(client.font, Component.literal("mode: " + modeLabel(config)), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("fluid compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("particles rejected: " + snapshot.particleRejected() + "/" + snapshot.particleCandidates()), x, y += lineHeight, 0xFFFFFFFF, false);
+		for (int index = 0; index < lines; index++) {
+			graphics.text(client.font, diagnosticsLines[index], x, y + lineHeight * index, 0xFFFFFFFF, index == 0);
+		}
 	}
 
 	private static String modeLabel(WaterOptimisationConfig config) {

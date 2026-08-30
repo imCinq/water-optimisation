@@ -132,9 +132,9 @@ public final class WaterOptimisationConfig {
 			case PERFORMANCE -> {
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 				this.flatWaterFastPath = true;
-				this.waterParticles = true;
-				this.particleDistance = 24;
-				this.particleFogCulling = false;
+				this.waterParticles = false;
+				this.particleDistance = 16;
+				this.particleFogCulling = true;
 				this.diagnosticsHud = false;
 				this.debugFallbackLogging = false;
 			}

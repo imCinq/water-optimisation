@@ -17,7 +17,7 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | --- | --- |
 | Vanilla | Disables the master switch and all optimization paths. Use it as the reference state. |
 | Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
-| Performance | Keeps vanilla fluid-face decisions and enables the explicitly labelled flat source-water fast path plus a 24-block particle bound. |
+| Performance | Keeps vanilla fluid-face decisions, enables the explicitly labelled flat source-water fast path, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. |
 
 Selecting a preset resets its More settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
@@ -27,9 +27,9 @@ Selecting a preset resets its More settings values. Choosing Vanilla also turns 
 | --- | --- | --- |
 | fluidCullingMode | conservative | Disabled, Conservative, or Experimental (currently the same safe subset). It gates the interior fast path; vanilla remains responsible for ordinary same-fluid face culling. |
 | flatWaterFastPath | false | Skips only an ordinary source-water block surrounded on all six sides by ordinary source-water blocks. |
-| waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. |
-| particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. During camera initialization, the player position is used as a lifecycle fallback. |
-| particleFogCulling | false | Tightens the camera-relative distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. |
+| waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. The Performance preset sets this to false. |
+| particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. The Performance preset uses 16. During camera initialization, the player position is used as a lifecycle fallback. |
+| particleFogCulling | false | Tightens the camera-relative distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. The Performance preset enables it. |
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, and translucent-resort averages. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
