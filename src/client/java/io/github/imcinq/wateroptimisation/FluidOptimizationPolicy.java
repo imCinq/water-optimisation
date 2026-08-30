@@ -1,27 +1,11 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public final class FluidOptimizationPolicy {
-	/*
-	 * Check the open-facing side first. Most surface water fails here, so the
-	 * conservative probe returns before visiting the remaining neighbors.
-	 */
-	private static final Direction[] DIRECTIONS = {
-			Direction.UP,
-			Direction.DOWN,
-			Direction.NORTH,
-			Direction.SOUTH,
-			Direction.WEST,
-			Direction.EAST
-	};
-	private static final ThreadLocal<BlockPos.MutableBlockPos> NEIGHBOR_POS = ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
 
@@ -51,59 +35,43 @@ public final class FluidOptimizationPolicy {
 	}
 
 	/**
-	 * Skips only a complete source-water cube whose six neighboring block states
-	 * are also ordinary full water blocks. Any boundary, flow, waterlogged block,
-	 * overlay, or unusual transparency case falls back to vanilla tessellation.
+	 * Skips only a complete source-water cube whose six neighboring block and
+	 * fluid states are also ordinary full water blocks. The caller supplies the
+	 * states already loaded by vanilla, so this predicate does not repeat chunk
+	 * lookups. Any boundary, flow, waterlogged block, overlay, or unusual
+	 * transparency case falls back to vanilla tessellation.
 	 */
-	public static boolean shouldSkipInteriorSourceWater(BlockAndTintGetter level, BlockPos pos, BlockState blockState, FluidState fluidState) {
-		if (!flatWaterFastPathActive
-				|| fluidState.getType() != Fluids.WATER
-				|| !fluidState.isSource()
-				|| !blockState.is(Blocks.WATER)) {
+	public static boolean shouldSkipInteriorSourceWater(
+			BlockState blockState,
+			FluidState fluidState,
+			BlockState blockStateDown,
+			FluidState fluidStateDown,
+			BlockState blockStateUp,
+			FluidState fluidStateUp,
+			BlockState blockStateNorth,
+			FluidState fluidStateNorth,
+			BlockState blockStateSouth,
+			FluidState fluidStateSouth,
+			BlockState blockStateWest,
+			FluidState fluidStateWest,
+			BlockState blockStateEast,
+			FluidState fluidStateEast
+	) {
+		if (!isOrdinarySourceWater(blockState, fluidState)
+				|| !isOrdinarySourceWater(blockStateUp, fluidStateUp)) {
 			return false;
 		}
 
-		BlockPos.MutableBlockPos neighbor = NEIGHBOR_POS.get();
-		for (Direction direction : DIRECTIONS) {
-			neighbor.setWithOffset(pos, direction);
-			BlockState neighborState = level.getBlockState(neighbor);
-			if (!neighborState.is(Blocks.WATER)) {
-				return false;
-			}
-
-			/*
-			 * The ordinary water block state already owns the fluid state needed by
-			 * this exact predicate. Reusing it avoids a second region lookup and
-			 * keeps non-water neighbors on the fast failure path.
-			 */
-			FluidState neighborFluid = neighborState.getFluidState();
-			if (neighborFluid.getType() != Fluids.WATER || !neighborFluid.isSource()) {
-				return false;
-			}
-		}
-		return true;
+		return isOrdinarySourceWater(blockStateDown, fluidStateDown)
+				&& isOrdinarySourceWater(blockStateNorth, fluidStateNorth)
+				&& isOrdinarySourceWater(blockStateSouth, fluidStateSouth)
+				&& isOrdinarySourceWater(blockStateWest, fluidStateWest)
+				&& isOrdinarySourceWater(blockStateEast, fluidStateEast);
 	}
 
-	/**
-	 * The face override is intentionally limited to equal full source-water
-	 * states, which is the information available to vanilla Fabric's face
-	 * predicate. Partial levels and other fluid types remain on vanilla logic.
-	 */
-	public static Boolean overrideFaceDecision(
-			FluidState fluidState,
-			BlockState selfState,
-			Direction direction,
-			FluidState otherFluidState
-	) {
-		if (!fluidHooksActive
-				|| fluidState.getType() != Fluids.WATER
-				|| !fluidState.isSource()
-				|| !selfState.is(Blocks.WATER)
-				|| otherFluidState.getType() != Fluids.WATER
-				|| !otherFluidState.isSource()) {
-			return null;
-		}
-
-		return Boolean.FALSE;
+	private static boolean isOrdinarySourceWater(BlockState blockState, FluidState fluidState) {
+		return blockState.is(Blocks.WATER)
+				&& fluidState.getType() == Fluids.WATER
+				&& fluidState.isSource();
 	}
 }

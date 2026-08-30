@@ -24,6 +24,9 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
+		if (!Diagnostics.isEnabled()) {
+			return;
+		}
 		Diagnostics.beginSectionCompile();
 	}
 
@@ -38,6 +41,9 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
+		if (!Diagnostics.isEnabled()) {
+			return;
+		}
 		Diagnostics.endSectionCompile();
 	}
 }

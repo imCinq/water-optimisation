@@ -69,7 +69,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		if (!isWaterParticle(particle)) {
 			return true;
 		}
-		Diagnostics.recordParticleCandidate();
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (diagnosticsEnabled) {
+			Diagnostics.recordParticleCandidate();
+		}
 
 		WaterOptimisationConfig config = ConfigManager.get();
 		if (!config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
@@ -79,7 +82,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return true;
 		}
 		if (!config.isWaterParticles()) {
-			Diagnostics.recordParticleRejected(false);
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleRejected(false);
+			}
 			return false;
 		}
 
@@ -100,7 +105,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		}
 
 		if (!WaterParticleDistancePolicy.isWithinDistance(config, referenceX, referenceY, referenceZ, x, y, z)) {
-			Diagnostics.recordParticleRejected(true);
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleRejected(true);
+			}
 			return false;
 		}
 		return true;
@@ -129,15 +136,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		int x = 6;
 		int y = 6;
 		int lineHeight = client.font.lineHeight + 2;
-		int lines = 12;
+		int lines = 10;
 		graphics.fill(x - 3, y - 3, x + 290, y + lineHeight * lines + 2, 0x90000000);
 		graphics.text(client.font, Component.literal("Water Optimisation"), x, y, 0xFFFFFFFF, true);
 		graphics.text(client.font, Component.literal("mode: " + modeLabel(config)), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("faces kept/cut: " + snapshot.fluidFacesAccepted() + "/" + snapshot.fluidFacesCulled()), x, y += lineHeight, 0xFFFFFFFF, false);
-		graphics.text(client.font, Component.literal("face overrides: " + snapshot.fluidFaceOverrides()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("fluid compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);
 		graphics.text(client.font, Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())), x, y += lineHeight, 0xFFFFFFFF, false);

@@ -8,7 +8,7 @@ The 0.1.0 preview contains the first complete implementation for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
-- exact source-water face decisions;
+- vanilla same-fluid face decisions with no duplicate face hook;
 - an interior source-water fast path;
 - section and translucent-resort diagnostics;
 - Sodium renderer-ownership protection;
@@ -20,7 +20,7 @@ The implementation is build-verified. Local visual, performance, backend, compan
 
 ### Phase 0 — Instrumentation
 
-Opt-in counters and timings cover fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering. Benchmark templates define repeatable scenes and metrics.
+Opt-in counters and timings cover fluid tessellation, section compilation, translucent resorting, interior fast-path skips, and particle filtering. Face counts remain an external Tracy or mesh-statistics metric so instrumentation does not add a callback to every vanilla face decision. Benchmark templates define repeatable scenes and metrics.
 
 ### Phase 1 — Configuration and UI
 

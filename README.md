@@ -23,9 +23,9 @@ The mod adds an opt-in rendering layer for Minecraft 26.2 with three configurati
 
 ### Fluid geometry
 
-Water Optimisation makes conservative decisions about which fluid faces need to be tessellated. The optimization is limited to equal full source-water blocks, where the neighboring geometry is unambiguous. Flowing water, partial levels, waterlogged blocks, overlays, transparent boundaries, and other ambiguous cases continue through vanilla-compatible geometry.
+Water Optimisation leaves vanilla's fluid-face predicate in charge. Minecraft already culls faces between equal fluids, so adding a second face hook only adds CPU work without changing the mesh.
 
-A separate fast path recognizes ordinary source-water blocks enclosed by ordinary source-water blocks on all six sides. Those interior blocks do not contribute visible surfaces and can skip unnecessary fluid mesh work.
+A separate fast path recognizes ordinary source-water blocks enclosed by ordinary source-water blocks on all six sides. It reuses the six block and fluid states that vanilla has already loaded, then skips the rest of tessellation for that interior block. Flowing water, partial levels, waterlogged blocks, overlays, transparent boundaries, and other ambiguous cases continue through vanilla-compatible geometry.
 
 ### Water particles
 
@@ -33,7 +33,7 @@ Water-particle admission is filtered using camera-relative distance. During came
 
 ### Diagnostics
 
-The optional diagnostics HUD exposes local rendering measurements, including fluid tessellation, section compilation, translucent resorting, face decisions, interior fast-path skips, and rejected water particles. These counters are intended to explain where frame time is spent rather than alter gameplay or world simulation.
+The optional diagnostics HUD exposes local rendering measurements, including fluid tessellation, section compilation, translucent resorting, interior fast-path skips, and rejected water particles. Face counts should come from Tracy or mesh statistics so the diagnostic hook itself does not add a callback to every vanilla face decision. These counters are intended to explain where frame time is spent rather than alter gameplay or world simulation.
 
 ### Renderer integration
 

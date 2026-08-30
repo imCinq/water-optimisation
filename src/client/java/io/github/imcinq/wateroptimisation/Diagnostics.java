@@ -32,32 +32,6 @@ public final class Diagnostics {
 		ACTIVE_COUNTERS.set(new Counters());
 	}
 
-	public static void recordFluidBlock() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.fluidBlocksVisited.increment();
-		}
-	}
-
-	public static void recordFluidFace(boolean accepted) {
-		Counters counters = activeCounters();
-		if (counters == null) {
-			return;
-		}
-		if (accepted) {
-			counters.fluidFacesAccepted.increment();
-		} else {
-			counters.fluidFacesCulled.increment();
-		}
-	}
-
-	public static void recordFluidFaceOverride() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.fluidFaceOverrides.increment();
-		}
-	}
-
 	public static void recordFluidFastPathSkip() {
 		Counters counters = activeCounters();
 		if (counters != null) {
@@ -94,11 +68,16 @@ public final class Diagnostics {
 		}
 	}
 
+	/**
+	 * Starts timing one vanilla fluid tessellation and records the visited block
+	 * in the same counter lookup used by the timing holder.
+	 */
 	public static void beginFluidCompile() {
 		Counters counters = activeCounters();
 		if (counters == null) {
 			return;
 		}
+		counters.fluidBlocksVisited.increment();
 		FluidTiming timing = FLUID_TIMING.get();
 		timing.startNanos = System.nanoTime();
 		timing.counters = counters;
@@ -182,9 +161,6 @@ public final class Diagnostics {
 		long resortNanos = counters.translucentResortNanos.sum();
 		return new Snapshot(
 				counters.fluidBlocksVisited.sum(),
-				counters.fluidFacesAccepted.sum(),
-				counters.fluidFacesCulled.sum(),
-				counters.fluidFaceOverrides.sum(),
 				counters.fluidFastPathSkips.sum(),
 				counters.fluidFallbacks.sum(),
 				counters.particleCandidates.sum(),
@@ -212,9 +188,6 @@ public final class Diagnostics {
 
 	private static final class Counters {
 		private final LongAdder fluidBlocksVisited = new LongAdder();
-		private final LongAdder fluidFacesAccepted = new LongAdder();
-		private final LongAdder fluidFacesCulled = new LongAdder();
-		private final LongAdder fluidFaceOverrides = new LongAdder();
 		private final LongAdder fluidFastPathSkips = new LongAdder();
 		private final LongAdder fluidFallbacks = new LongAdder();
 		private final LongAdder particleCandidates = new LongAdder();
@@ -245,9 +218,6 @@ public final class Diagnostics {
 
 	public record Snapshot(
 			long fluidBlocksVisited,
-			long fluidFacesAccepted,
-			long fluidFacesCulled,
-			long fluidFaceOverrides,
 			long fluidFastPathSkips,
 			long fluidFallbacks,
 			long particleCandidates,

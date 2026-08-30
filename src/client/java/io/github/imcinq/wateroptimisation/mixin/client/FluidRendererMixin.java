@@ -5,18 +5,17 @@ import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FluidRenderer.class)
 public abstract class FluidRendererMixin {
-	@Inject(method = "tesselate", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "tesselate", at = @At("HEAD"))
 	private void wateroptimisation$beforeTesselate(
 			BlockAndTintGetter level,
 			BlockPos pos,
@@ -25,18 +24,69 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
-		if (!fastPathActive && !Diagnostics.isEnabled()) {
+		if (!Diagnostics.isEnabled()) {
 			return;
 		}
 
-		Diagnostics.recordFluidBlock();
 		Diagnostics.beginFluidCompile();
-		if (fastPathActive && FluidOptimizationPolicy.shouldSkipInteriorSourceWater(level, pos, blockState, fluidState)) {
+	}
+
+	@Inject(
+			method = "tesselate",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/renderer/block/FluidRenderer;shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
+					ordinal = 0
+			),
+			cancellable = true,
+			locals = LocalCapture.CAPTURE_FAILHARD
+	)
+	private void wateroptimisation$skipInteriorSourceWater(
+			BlockAndTintGetter level,
+			BlockPos pos,
+			FluidRenderer.Output output,
+			BlockState blockState,
+			FluidState fluidState,
+			CallbackInfo callback,
+			BlockState blockStateDown,
+			FluidState fluidStateDown,
+			BlockState blockStateUp,
+			FluidState fluidStateUp,
+			BlockState blockStateNorth,
+			FluidState fluidStateNorth,
+			BlockState blockStateSouth,
+			FluidState fluidStateSouth,
+			BlockState blockStateWest,
+			FluidState fluidStateWest,
+			BlockState blockStateEast,
+			FluidState fluidStateEast,
+			boolean renderUp
+	) {
+		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
+				|| !FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
+						blockState,
+						fluidState,
+						blockStateDown,
+						fluidStateDown,
+						blockStateUp,
+						fluidStateUp,
+						blockStateNorth,
+						fluidStateNorth,
+						blockStateSouth,
+						fluidStateSouth,
+						blockStateWest,
+						fluidStateWest,
+						blockStateEast,
+						fluidStateEast
+				)) {
+			return;
+		}
+
+		if (Diagnostics.isEnabled()) {
 			Diagnostics.recordFluidFastPathSkip();
 			Diagnostics.endFluidCompile();
-			callback.cancel();
 		}
+		callback.cancel();
 	}
 
 	@Inject(method = "tesselate", at = @At("RETURN"))
@@ -48,43 +98,9 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		Diagnostics.endFluidCompile();
-	}
-
-	@Inject(
-			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
-			at = @At("HEAD"),
-			cancellable = true
-	)
-	private static void wateroptimisation$overrideFaceDecision(
-			FluidState fluidState,
-			BlockState selfState,
-			Direction direction,
-			FluidState otherFluidState,
-			CallbackInfoReturnable<Boolean> callback
-	) {
-		if (!FluidOptimizationPolicy.fluidHooksActive() && !Diagnostics.isEnabled()) {
+		if (!Diagnostics.isEnabled()) {
 			return;
 		}
-
-		Boolean decision = FluidOptimizationPolicy.overrideFaceDecision(fluidState, selfState, direction, otherFluidState);
-		if (decision != null) {
-			Diagnostics.recordFluidFaceOverride();
-			callback.setReturnValue(decision);
-		}
-	}
-
-	@Inject(
-			method = "shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
-			at = @At("RETURN")
-	)
-	private static void wateroptimisation$recordFaceDecision(
-			FluidState fluidState,
-			BlockState selfState,
-			Direction direction,
-			FluidState otherFluidState,
-			CallbackInfoReturnable<Boolean> callback
-	) {
-		Diagnostics.recordFluidFace(callback.getReturnValueZ());
+		Diagnostics.endFluidCompile();
 	}
 }

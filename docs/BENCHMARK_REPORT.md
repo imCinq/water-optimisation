@@ -28,7 +28,7 @@ A successful build proves compilation and packaging. It does not prove an FPS ga
 
 Warm up each scene first and record multiple samples.
 
-| Scene | Mode | Avg FPS | 1% low | p95 ms | p99 ms | Hitches | Fluid compile ms | Section compile ms | Resort ms | Water blocks/faces | Particle candidates/rejected | Visual result |
+| Scene | Mode | Avg FPS | 1% low | p95 ms | p99 ms | Hitches | Fluid compile ms | Section compile ms | Resort ms | Water blocks/skips/faces | Particle candidates/rejected | Visual result |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
 | Flat ocean | Disabled | | | | | | | | | | | |
 | Flat ocean | Balanced | | | | | | | | | | | |
