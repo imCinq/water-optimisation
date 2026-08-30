@@ -5,7 +5,10 @@ plugins {
 
 repositories {
 	// Loom provides the repositories needed for Minecraft and Fabric dependencies.
-	// Add another repository here only when a future dependency requires it.
+	maven {
+		name = "Terraformers"
+		url = "https://maven.terraformersmc.com/"
+	}
 }
 
 loom {
@@ -23,6 +26,8 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+	testImplementation "org.junit.jupiter:junit-jupiter:5.13.4"
 }
 
 processResources {
@@ -36,6 +41,10 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
+}
+
+tasks.test {
+	useJUnitPlatform()
 }
 
 java {

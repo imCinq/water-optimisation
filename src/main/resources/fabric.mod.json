@@ -3,7 +3,7 @@
 	"id": "wateroptimisation",
 	"version": "${version}",
 	"name": "Water Optimisation",
-	"description": "Client-side rendering diagnostics and water performance experiments.",
+	"description": "Client-side rendering diagnostics and conservative water performance options.",
 	"authors": [
 		"imCinq"
 	],
@@ -15,7 +15,19 @@
 	"entrypoints": {
 		"client": [
 			"io.github.imcinq.wateroptimisation.WaterOptimisationClient"
+		],
+		"modmenu": [
+			"io.github.imcinq.wateroptimisation.ModMenuIntegration"
 		]
+	},
+	"mixins": [
+		{
+			"config": "wateroptimisation.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"suggests": {
+		"modmenu": ">=19.0.0-alpha.1"
 	},
 	"depends": {
 		"fabricloader": ">=0.19.3",
