@@ -25,9 +25,14 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
+		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
+		if (!fastPathActive && !Diagnostics.isEnabled()) {
+			return;
+		}
+
 		Diagnostics.recordFluidBlock();
 		Diagnostics.beginFluidCompile();
-		if (FluidOptimizationPolicy.shouldSkipInteriorSourceWater(level, pos, blockState, fluidState)) {
+		if (fastPathActive && FluidOptimizationPolicy.shouldSkipInteriorSourceWater(level, pos, blockState, fluidState)) {
 			Diagnostics.recordFluidFastPathSkip();
 			Diagnostics.endFluidCompile();
 			callback.cancel();
@@ -58,6 +63,10 @@ public abstract class FluidRendererMixin {
 			FluidState otherFluidState,
 			CallbackInfoReturnable<Boolean> callback
 	) {
+		if (!FluidOptimizationPolicy.fluidHooksActive() && !Diagnostics.isEnabled()) {
+			return;
+		}
+
 		Boolean decision = FluidOptimizationPolicy.overrideFaceDecision(fluidState, selfState, direction, otherFluidState);
 		if (decision != null) {
 			Diagnostics.recordFluidFaceOverride();
