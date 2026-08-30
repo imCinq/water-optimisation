@@ -2,6 +2,12 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.1.0-preview.4
+
+- Sampled fluid timing in the diagnostics HUD to reduce measurement overhead.
+- Made the Performance preset disable cosmetic water particles by default and enable its conservative fog-tightened bound.
+- Clarified that diagnostics are for cross-checking and should be disabled for final FPS samples.
+
 ## 0.1.0-preview.3
 
 - Added the Fabric 26.2 client-only project scaffold.

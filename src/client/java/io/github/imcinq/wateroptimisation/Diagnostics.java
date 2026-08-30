@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 public final class Diagnostics {
+	private static final int FLUID_TIMING_SAMPLE_MASK = 0x0F;
 	private static final AtomicReference<Counters> ACTIVE_COUNTERS = new AtomicReference<>(new Counters());
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
 	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
@@ -69,8 +70,9 @@ public final class Diagnostics {
 	}
 
 	/**
-	 * Starts timing one vanilla fluid tessellation and records the visited block
-	 * in the same counter lookup used by the timing holder.
+	 * Records a visited fluid block and samples one in sixteen tessellations for
+	 * timing. Sampling keeps the optional diagnostics HUD from adding two clock
+	 * reads to every fluid block while retaining a representative average.
 	 */
 	public static void beginFluidCompile() {
 		Counters counters = activeCounters();
@@ -79,6 +81,9 @@ public final class Diagnostics {
 		}
 		counters.fluidBlocksVisited.increment();
 		FluidTiming timing = FLUID_TIMING.get();
+		if ((timing.sampleIndex++ & FLUID_TIMING_SAMPLE_MASK) != 0) {
+			return;
+		}
 		timing.startNanos = System.nanoTime();
 		timing.counters = counters;
 		timing.active = true;
@@ -202,6 +207,7 @@ public final class Diagnostics {
 	}
 
 	private static final class FluidTiming {
+		private int sampleIndex;
 		private long startNanos;
 		private Counters counters;
 		private boolean active;

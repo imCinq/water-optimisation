@@ -4,7 +4,7 @@ Water Optimisation is developed as a conservative, client-only rendering mod. Ev
 
 ## Current preview
 
-The 0.1.0-preview.3 build contains the first complete implementation for Minecraft 26.2:
+The 0.1.0-preview.4 build contains the first complete implementation for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;

@@ -2,13 +2,13 @@
 
 ## Current status
 
-Water Optimisation 0.1.0-preview.3 is an experimental Minecraft 26.2 preview. The repository is prepared for a public release candidate, but no stable artifact has been published. Build artifacts from GitHub Actions are temporary verification outputs.
+Water Optimisation 0.1.0-preview.4 is an experimental Minecraft 26.2 preview. The repository is prepared for a public release candidate, but no stable artifact has been published. Build artifacts from GitHub Actions are temporary verification outputs.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
-| Mod version | 0.1.0-preview.3 |
+| Mod version | 0.1.0-preview.4 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3 or newer |
 | Fabric API | 0.158.0+26.2 |
