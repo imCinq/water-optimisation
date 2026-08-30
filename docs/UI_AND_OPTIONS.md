@@ -13,11 +13,8 @@ The main screen contains:
 1. an enable switch;
 2. a Vanilla, Balanced, or Performance preset selector;
 3. a short client-only explanation;
-4. a visible apply/visual-trade-off warning;
-5. an Advanced settings button;
-6. Done and Cancel buttons.
-
-It also identifies whether Vanilla or Sodium owns fluid geometry, so a user can tell immediately whether the experimental face control can affect the current renderer.
+4. an Advanced settings button;
+5. Done and Cancel buttons.
 
 Done saves the working copy. Cancel and Escape return to the parent screen without saving. The screen never changes a server or world setting.
 
@@ -25,16 +22,16 @@ Done saves the working copy. Cancel and Escape return to the parent screen witho
 
 Advanced controls are separate from the main screen and are grouped into three sections:
 
-- Safe performance: fully hidden water fast path, water particles, particle distance, and particle fog culling;
-- Experimental GPU: fluid-geometry mode, including the optional reduced reverse-face experiment;
-- Diagnostics: performance HUD and fallback logging.
+- Performance: skipping hidden water blocks, water particles, particle distance, and particle fog culling;
+- Water rendering: the fluid-geometry mode, including the optional reduced-face setting;
+- Diagnostics: performance statistics and fallback logging.
 
 Reset preset is kept with the bottom action buttons because it changes the whole
 working copy rather than enabling a diagnostic.
 
 The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
 
-The labels communicate the choice without requiring knowledge of renderer internals. The fully hidden-water fast path and Experimental reduced-face choice remain explicit; the warning explains that the latter applies only to ordinary source water and can look different underwater. Sodium ownership disables the fluid controls because Sodium controls its own fluid renderer.
+The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the two vanilla fluid controls because Sodium controls its own fluid renderer; the remaining local particle and diagnostic controls stay available.
 
 ## Recovery
 

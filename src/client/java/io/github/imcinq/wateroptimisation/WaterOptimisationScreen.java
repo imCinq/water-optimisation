@@ -23,8 +23,6 @@ public final class WaterOptimisationScreen extends Screen {
 	private int buttonLeft;
 	private int buttonWidth;
 	private int descriptionY;
-	private int warningY;
-	private int rendererY;
 
 	public WaterOptimisationScreen(Screen parent) {
 		this(parent, ConfigManager.copy());
@@ -68,11 +66,6 @@ public final class WaterOptimisationScreen extends Screen {
 				button -> this.minecraft.gui.setScreen(new AdvancedWaterOptimisationScreen(this, this.workingCopy))
 		).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
 
-		y += BUTTON_HEIGHT;
-		this.warningY = y + 8;
-		this.rendererY = this.warningY
-				+ wrappedHeight(Component.translatable("screen.wateroptimisation.warning")) + 4;
-
 		int actionWidth = Math.max(1, (this.buttonWidth - 10) / 2);
 		int actionY = this.height - 34;
 		this.addRenderableWidget(Button.builder(
@@ -90,8 +83,6 @@ public final class WaterOptimisationScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.description"), this.descriptionY, 0xFFFFFFFF);
-		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.warning"), this.warningY, 0xFFFFCC66);
-		drawCenteredWrapped(graphics, rendererStatus(), this.rendererY, 0xFFAAAAAA);
 	}
 
 	@Override
@@ -120,14 +111,6 @@ public final class WaterOptimisationScreen extends Screen {
 		return Component.translatable(
 				"screen.wateroptimisation.profile",
 				Component.translatable(this.workingCopy.getPerformanceProfile().translationKey())
-		);
-	}
-
-	private Component rendererStatus() {
-		return Component.translatable(
-				WaterOptimisationClient.isSodiumLoaded()
-						? "screen.wateroptimisation.renderer.sodium"
-						: "screen.wateroptimisation.renderer.vanilla"
 		);
 	}
 

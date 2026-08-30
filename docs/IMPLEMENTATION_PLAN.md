@@ -4,14 +4,14 @@ Water Optimisation is developed as a conservative, client-only rendering mod. Ev
 
 ## Current preview
 
-The 0.1.0-preview.6 build contains the first GPU-focused experiment for Minecraft 26.2:
+The 0.1.0-preview.7 build contains the first GPU-focused experiment for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
 - vanilla same-fluid face decisions with no duplicate face hook;
 - a fully hidden source-water fast path;
 - an explicitly opt-in vanilla reduced-face mode;
-- grouped native settings screens with renderer ownership status;
+- grouped native settings screens with plain-language controls and responsive layout;
 - section and translucent-resort diagnostics;
 - Sodium renderer-ownership protection;
 - automated tests and repository audits.
