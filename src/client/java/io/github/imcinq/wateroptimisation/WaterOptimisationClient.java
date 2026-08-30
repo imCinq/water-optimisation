@@ -26,10 +26,12 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			Identifier.fromNamespaceAndPath(MOD_ID, "general")
 	);
 	private static KeyMapping openConfigKey;
+	private static volatile boolean sodiumLoaded;
 
 	@Override
 	public void onInitializeClient() {
 		ConfigManager.load();
+		sodiumLoaded = FabricLoader.getInstance().isModLoaded("sodium");
 		openConfigKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.wateroptimisation.open_config",
 				InputConstants.Type.KEYSYM,
@@ -50,14 +52,14 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				WaterOptimisationClient::extractDiagnostics
 		);
 
-		if (FabricLoader.getInstance().isModLoaded("sodium")) {
+		if (sodiumLoaded) {
 			LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled for renderer ownership compatibility.");
 		}
 		LOGGER.info("Water Optimisation initialized; rendering changes are opt-in and default to safe no-op behavior.");
 	}
 
 	public static boolean isSodiumLoaded() {
-		return FabricLoader.getInstance().isModLoaded("sodium");
+		return sodiumLoaded;
 	}
 
 	public static boolean shouldKeepWaterParticle(ParticleOptions particle, boolean alwaysShow, double x, double y, double z) {

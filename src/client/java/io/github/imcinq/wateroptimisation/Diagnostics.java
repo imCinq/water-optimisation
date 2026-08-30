@@ -53,7 +53,7 @@ public final class Diagnostics {
 			return;
 		}
 		fluidFallbacks.increment();
-		if (WaterOptimisationConfig.defaults().isDebugFallbackLogging() || ConfigManager.get().isDebugFallbackLogging()) {
+		if (ConfigManager.get().isDebugFallbackLogging()) {
 			WaterOptimisationClient.LOGGER.debug("Fluid optimization fallback: {}", reason);
 		}
 	}
@@ -65,7 +65,7 @@ public final class Diagnostics {
 	}
 
 	public static void recordParticleRejected(boolean distance) {
-		if (!enabled()) {
+		if (enabled()) {
 			particleRejected.increment();
 			if (distance) {
 				particleDistanceRejected.increment();
