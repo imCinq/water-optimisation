@@ -17,6 +17,7 @@ All notable changes to this project will be documented here.
 - Implemented native main and Advanced settings screens, a registered configuration keybind, optional Mod Menu integration, and English translations.
 - Implemented opt-in diagnostics for fluid tessellation, section compilation, translucent resort timing, face decisions, fast-path skips, and particle filtering.
 - Implemented camera-relative water-particle admission filtering with a player-position lifecycle fallback and an explicitly conservative fog/distance mode.
+- Extracted particle distance math into a common allocation-free policy with unit coverage and avoided disabled diagnostics timing initialization on the fluid hot path.
 - Implemented exact source-water face culling and an explicit full-interior source-water fast path with vanilla fallbacks.
 - Added Sodium renderer-ownership detection that disables vanilla fluid hooks without replacing the active renderer.
 - Added configuration unit tests and updated the client-only audit to distinguish local chat components from packet APIs.

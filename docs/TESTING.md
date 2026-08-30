@@ -17,6 +17,7 @@ Implemented unit coverage includes:
 - profile reset behavior;
 - Vanilla master-switch recovery;
 - particle-distance clamping;
+- camera-relative particle distance math and conservative fog scaling;
 - null enum recovery;
 - independent configuration copies.
 

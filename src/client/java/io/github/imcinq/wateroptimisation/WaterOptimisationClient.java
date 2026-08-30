@@ -98,16 +98,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			referenceZ = cameraPosition.z;
 		}
 
-		double maxDistance = config.getParticleDistance();
-		if (config.isParticleFogCulling()) {
-			// The fog option is deliberately conservative: it tightens the local
-			// distance bound without trying to reproduce renderer-specific fog math.
-			maxDistance *= 0.75D;
-		}
-		double dx = referenceX - x;
-		double dy = referenceY - y;
-		double dz = referenceZ - z;
-		if (dx * dx + dy * dy + dz * dz > maxDistance * maxDistance) {
+		if (!WaterParticleDistancePolicy.isWithinDistance(config, referenceX, referenceY, referenceZ, x, y, z)) {
 			Diagnostics.recordParticleRejected(true);
 			return false;
 		}

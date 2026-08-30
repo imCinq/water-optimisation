@@ -28,9 +28,9 @@ Selecting a profile resets its Advanced values. Choosing Vanilla also turns off 
 | fluidCullingMode | conservative | Disabled, Conservative, or Experimental (safe subset). Only equal full source-water blocks can be forced hidden. |
 | flatWaterFastPath | false | Skips only an ordinary source-water block surrounded on all six sides by ordinary source-water blocks. |
 | waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. |
-| particleDistance | 32 | Maximum admission distance in blocks; clamped to 8–128. |
-| particleFogCulling | false | Tightens the distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. |
-| diagnosticsHud | false | Shows local counters and fluid tessellation timing. |
+| particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. During camera initialization, the player position is used as a lifecycle fallback. |
+| particleFogCulling | false | Tightens the camera-relative distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. |
+| diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, and translucent-resort averages. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
 The experimental label is intentional. The current safe subset is narrow; ambiguous shapes are not classified by this mod.

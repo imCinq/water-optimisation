@@ -88,6 +88,9 @@ public final class Diagnostics {
 	}
 
 	public static void endFluidCompile() {
+		if (!enabled()) {
+			return;
+		}
 		FluidTiming timing = FLUID_TIMING.get();
 		if (!timing.active) {
 			return;

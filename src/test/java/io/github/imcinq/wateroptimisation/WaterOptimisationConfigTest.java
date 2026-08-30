@@ -65,6 +65,25 @@ class WaterOptimisationConfigTest {
 	}
 
 	@Test
+	void particleDistancePolicyUsesCameraReferenceAndEuclideanBounds() {
+		WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
+
+		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 42.0D, 20.0D, 30.0D));
+		assertFalse(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 42.001D, 20.0D, 30.0D));
+		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 10.0D, 20.0D, 30.0D, 10.0D, 20.0D, 62.0D));
+	}
+
+	@Test
+	void particleFogPolicyTightensTheAdmissionDistance() {
+		WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
+		config.setParticleFogCulling(true);
+
+		assertEquals(24.0D, WaterParticleDistancePolicy.effectiveDistance(config), 0.000001D);
+		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 0.0D, 0.0D, 0.0D, 24.0D, 0.0D, 0.0D));
+		assertFalse(WaterParticleDistancePolicy.isWithinDistance(config, 0.0D, 0.0D, 0.0D, 24.001D, 0.0D, 0.0D));
+	}
+
+	@Test
 	void copiesAreIndependent() {
 		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
 		WaterOptimisationConfig copy = original.copy();
