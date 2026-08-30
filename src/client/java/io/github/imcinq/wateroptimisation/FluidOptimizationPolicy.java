@@ -1,9 +1,8 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -15,16 +14,12 @@ public final class FluidOptimizationPolicy {
 	private FluidOptimizationPolicy() {
 	}
 
-	public static boolean isSodiumLoaded() {
-		return FabricLoader.getInstance().isModLoaded("sodium");
-	}
-
 	public static boolean fluidHooksActive() {
 		WaterOptimisationConfig config = ConfigManager.get();
 		return config.isEnabled()
 				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
 				&& config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
-				&& !isSodiumLoaded();
+				&& !WaterOptimisationClient.isSodiumLoaded();
 	}
 
 	public static boolean flatWaterFastPathActive() {
@@ -42,17 +37,13 @@ public final class FluidOptimizationPolicy {
 
 		BlockPos.MutableBlockPos neighbor = NEIGHBOR_POS.get();
 		for (Direction direction : Direction.values()) {
-			if (direction == Direction.DOWN || direction == Direction.UP
-					|| direction == Direction.NORTH || direction == Direction.SOUTH
-					|| direction == Direction.WEST || direction == Direction.EAST) {
-				neighbor.setWithOffset(pos, direction);
-				BlockState neighborState = level.getBlockState(neighbor);
-				FluidState neighborFluid = level.getFluidState(neighbor);
-				if (!neighborState.is(Blocks.WATER)
-						|| neighborFluid.getType() != Fluids.WATER
-						|| !neighborFluid.isSource()) {
-					return false;
-				}
+			neighbor.setWithOffset(pos, direction);
+			BlockState neighborState = level.getBlockState(neighbor);
+			FluidState neighborFluid = level.getFluidState(neighbor);
+			if (!neighborState.is(Blocks.WATER)
+					|| neighborFluid.getType() != Fluids.WATER
+					|| !neighborFluid.isSource()) {
+				return false;
 			}
 		}
 		return true;

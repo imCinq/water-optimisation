@@ -11,6 +11,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -36,7 +39,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (openConfigKey.consumeClick()) {
-				if (client.screen == null) {
+				if (client.gui.screen() == null) {
 					client.gui.setScreen(new WaterOptimisationScreen(null));
 				}
 			}
@@ -55,6 +58,59 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 
 	public static boolean isSodiumLoaded() {
 		return FabricLoader.getInstance().isModLoaded("sodium");
+	}
+
+	public static boolean shouldKeepWaterParticle(ParticleOptions particle, boolean alwaysShow, double x, double y, double z) {
+		if (!isWaterParticle(particle)) {
+			return true;
+		}
+		Diagnostics.recordParticleCandidate();
+
+		WaterOptimisationConfig config = ConfigManager.get();
+		if (!config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
+			return true;
+		}
+		if (alwaysShow) {
+			return true;
+		}
+		if (!config.isWaterParticles()) {
+			Diagnostics.recordParticleRejected(false);
+			return false;
+		}
+
+		Minecraft client = Minecraft.getInstance();
+		if (client.player == null) {
+			return true;
+		}
+
+		double maxDistance = config.getParticleDistance();
+		if (config.isParticleFogCulling()) {
+			// The fog option is deliberately conservative: it tightens the local
+			// distance bound without trying to reproduce renderer-specific fog math.
+			maxDistance *= 0.75D;
+		}
+		double dx = client.player.getX() - x;
+		double dy = client.player.getY() - y;
+		double dz = client.player.getZ() - z;
+		if (dx * dx + dy * dy + dz * dz > maxDistance * maxDistance) {
+			Diagnostics.recordParticleRejected(true);
+			return false;
+		}
+		return true;
+	}
+
+	private static boolean isWaterParticle(ParticleOptions particle) {
+		ParticleType<?> type = particle.getType();
+		return type == ParticleTypes.BUBBLE
+				|| type == ParticleTypes.BUBBLE_COLUMN_UP
+				|| type == ParticleTypes.BUBBLE_POP
+				|| type == ParticleTypes.CURRENT_DOWN
+				|| type == ParticleTypes.DRIPPING_WATER
+				|| type == ParticleTypes.FALLING_WATER
+				|| type == ParticleTypes.LANDING_WATER
+				|| type == ParticleTypes.SPLASH
+				|| type == ParticleTypes.UNDERWATER
+				|| type == ParticleTypes.WAKE;
 	}
 
 	private static void extractDiagnostics(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
