@@ -26,9 +26,21 @@ public final class WaterParticleDistancePolicy {
 			double particleZ
 	) {
 		double maxDistance = effectiveDistance(config);
+		return isWithinDistanceSquared(maxDistance * maxDistance, referenceX, referenceY, referenceZ, particleX, particleY, particleZ);
+	}
+
+	public static boolean isWithinDistanceSquared(
+			double maxDistanceSquared,
+			double referenceX,
+			double referenceY,
+			double referenceZ,
+			double particleX,
+			double particleY,
+			double particleZ
+	) {
 		double dx = referenceX - particleX;
 		double dy = referenceY - particleY;
 		double dz = referenceZ - particleZ;
-		return dx * dx + dy * dy + dz * dz <= maxDistance * maxDistance;
+		return dx * dx + dy * dy + dz * dz <= maxDistanceSquared;
 	}
 }

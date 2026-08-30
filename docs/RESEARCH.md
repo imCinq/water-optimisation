@@ -40,3 +40,18 @@ Minecraft 26.2 supports an optional Vulkan backend in addition to OpenGL. The mo
 - Do not globally disable translucent sorting.
 - Do not aggressively cull through waterlogged blocks, leaves, overlays, or unusual transparency without shape-aware tests.
 - Add instrumentation before claiming an FPS improvement.
+
+## Upstream rendering findings
+
+The Minecraft 26.2 rendering guidance requires the Blaze3D abstraction because the release has an optional Vulkan backend; this project therefore does not use raw OpenGL: https://docs.fabricmc.net/develop/rendering/basic-concepts
+
+Sodium's current `DefaultFluidRenderer` performs shape-aware face visibility, same-fluid culling, cached occlusion comparisons, fluid-height sampling, and an optional flooded-cave heuristic. Its `TranslucentGeometryCollector` gathers translucent quads and chooses sorting data for each section. Those optimizations depend on Sodium's renderer, level slice, and shape-cache ownership, so this mod does not copy or duplicate them. Sodium remains the owner of fluid rendering when detected:
+
+- https://raw.githubusercontent.com/CaffeineMC/sodium/dev/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer.java
+- https://raw.githubusercontent.com/CaffeineMC/sodium/dev/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/translucent_sorting/TranslucentGeometryCollector.java
+
+Sodium's particle fog-occlusion work reports large but highly situational gains for long-distance particle effects, while noting that water fog reduced particle counts less in its testing. That supports bounded water-particle admission, but not a universal FPS claim: https://github.com/CaffeineMC/sodium/pull/2766
+
+No safe, renderer-independent GPU shortcut was identified for this mixin-based implementation. Vanilla already removes faces between equal fluids; the current fast path removes CPU tessellation work for fully enclosed source-water blocks but does not reduce visible surface geometry. Global translucent-sort bypasses remain unsafe because they can change ordering around waterlogged blocks, glass, leaves, overlays, and other translucent quads.
+
+MoreCulling was reviewed as a comparable culling project, but its source is GPL-3.0 and its implementation is not suitable for copying into this MIT project without permission: https://github.com/FxMorin/MoreCulling

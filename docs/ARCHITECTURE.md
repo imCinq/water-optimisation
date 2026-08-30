@@ -26,6 +26,8 @@ Initializes the local configuration, keybind, native screens, HUD element, and S
 
 The common configuration model is independent of Minecraft client classes so defaults, profile reset, clamping, and copy isolation can be unit-tested. ConfigManager loads and atomically saves the JSON file on the client.
 
+Only settings that can change compiled fluid geometry invalidate rendered sections. Particle-distance, particle-enable, fog, diagnostics, and fallback-logging changes take effect at their own hooks and do not trigger a full section rebuild.
+
 ### Fluid hooks
 
 FluidRendererMixin targets Minecraft 26.2's public FluidRenderer tessellation method. The policy is intentionally narrow:
@@ -38,7 +40,7 @@ The optimization is injected immediately before vanilla's first face decision, a
 
 ### Particle filter
 
-ClientLevelMixin intercepts only the client-side addParticle overload. It recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies the local camera-relative distance policy only when the master switch is enabled. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
+ClientLevelMixin intercepts only the client-side addParticle overload. It exits immediately while the mod is disabled or on the Vanilla preset, then recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies a cached camera-relative distance policy only when the master switch is enabled. The filter snapshot is rebuilt only when configuration changes. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
 
 ### Diagnostics
 
