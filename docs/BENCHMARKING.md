@@ -6,11 +6,12 @@ Compare the same client, world, camera, resolution, render distance, simulation 
 
 Use:
 
-1. vanilla or feature-disabled;
-2. conservative mode;
-3. aggressive or experimental mode;
-4. Sodium absent and present where relevant;
-5. OpenGL and Vulkan as separate comparisons on 26.2.
+1. feature disabled;
+2. Balanced;
+3. Performance;
+4. Advanced particle settings where relevant;
+5. Sodium absent and present where relevant;
+6. OpenGL and Vulkan as separate comparisons on 26.2.
 
 Warm the scene before measuring. Use multiple captures rather than a single F3 screenshot.
 
@@ -27,9 +28,9 @@ Warm the scene before measuring. Use multiple captures rather than a single F3 s
 
 ## Metrics
 
-Record average FPS, 1% low FPS, p95 and p99 frame time, hitch count, fluid section compilation time, translucent resort time, number of water blocks visited, faces emitted by category, particle counts and rejected particles, and memory or allocation changes when measurable.
+Record average FPS, 1% low FPS, p95 and p99 frame time, hitch count, fluid tessellation time, section compilation time, translucent resort time, number of water blocks visited, faces emitted by category, particle candidates and rejected particles, and memory or allocation changes when measurable.
 
-Minecraft 26.2's Tracy support and particle_render_stats can assist with profiling. Keep the backend fixed within each before-and-after comparison.
+The diagnostics HUD reports local fluid and particle counters. Minecraft 26.2's Tracy support and particle_render_stats can provide section, resort, frame-time, and particle details that the mod intentionally does not infer. Keep the backend fixed within each before-and-after comparison.
 
 ## Reporting
 

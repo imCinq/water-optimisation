@@ -2,21 +2,17 @@
 
 ## Minecraft
 
-The first implementation target is Minecraft 26.2 with Java 25 and Fabric. Version-specific rendering internals must be isolated because mappings and pipeline APIs can change.
+The implementation target is Minecraft 26.2 with Java 25 and Fabric. Version-specific rendering internals are isolated in a client-only mixin configuration because mappings and pipeline APIs can change.
 
 ## Mod Menu
 
-Mod Menu is an optional integration:
-
-- the core mod must load without it;
-- its version should be pinned only after checking the exact Minecraft 26.2 toolchain;
-- its entrypoint should only connect Mod Menu to the native configuration screen;
-- no renderer or gameplay code should depend on Mod Menu;
-- the settings screen and local defaults must recover safely if Mod Menu is removed.
+Mod Menu 19.0.0-alpha.1 is a suggested, compile-only dependency for the target. The core mod loads without it and retains the keybind and native screen. The adapter only returns the native configuration screen.
 
 ## Sodium
 
-Sodium has its own optimized fluid renderer. When Sodium is installed, Water Optimisation must not blindly replace or duplicate Sodium's fluid mesh path. Compatibility should be tested explicitly and documented by version.
+Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables its vanilla FluidRenderer face and tessellation hooks. It does not force a renderer replacement or attempt to call Sodium internals. The particle and configuration paths remain independent.
+
+This guard is a compatibility boundary, not proof of a complete Sodium integration. Test the exact Sodium build with the target Minecraft version before enabling any fluid optimization.
 
 ## DonutSMP
 
@@ -29,8 +25,8 @@ References:
 - DonutSMP listing: https://modrinth.com/server/donutsmp
 - DonutSMP store and rules: https://store.donutsmp.net/
 
-The mod should not assume the server's internal version matches the client's renderer. It must work from the fluid and block state available to the client.
+The mod should not assume the server's internal version matches the client's renderer. It works only from the fluid and block state already available to the client.
 
 ## Fallback behavior
 
-If a hook is unavailable, another renderer owns the section, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature must disable itself for that case and preserve normal rendering. The absence of Mod Menu must never prevent the core mod from launching.
+If a hook is unavailable, another renderer owns the section, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature disables itself for that case and preserves normal behavior. The absence of Mod Menu never prevents the core mod from launching.

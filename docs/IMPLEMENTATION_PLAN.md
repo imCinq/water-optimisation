@@ -8,7 +8,7 @@ The goal is to determine how much of the project Codex can complete without usin
 
 ### Remote tasks
 
-Codex should be able to:
+Codex can:
 
 - create and modify the Fabric project in a temporary remote workspace;
 - create branches and commits directly against the private GitHub repository;
@@ -19,7 +19,7 @@ Codex should be able to:
 
 ### Local-only tasks
 
-The user should only need to run the final client locally for:
+The user still needs to run the final client locally for:
 
 - M2 GPU and macOS graphics-backend behavior;
 - real frame-time and FPS measurements;
@@ -29,87 +29,47 @@ The user should only need to run the final client locally for:
 
 ### Evaluation checklist
 
-- [ ] Create a Codex feature branch without cloning to the Mac.
-- [ ] Add the minimal Fabric 26.2 scaffold remotely.
-- [ ] Run the remote build and unit tests successfully.
-- [ ] Run repository privacy and client-only audits remotely.
-- [ ] Review the diff and commit only source, tests, docs, and configuration.
-- [ ] Produce a temporary JAR without adding build output to Git.
-- [ ] Confirm the Mac needs no Java or Gradle installation for the workflow.
-- [ ] Download only the JAR required for local Minecraft testing.
-- [ ] Record which results are remote and which are M2/DonutSMP-specific.
-- [ ] Decide whether remote-first remains the default after the first implementation cycle.
+- [x] Create a Codex feature branch without cloning to the Mac.
+- [x] Add the minimal Fabric 26.2 scaffold remotely.
+- [x] Run the remote build and unit tests successfully for the current implementation.
+- [x] Run repository privacy and client-only audits remotely.
+- [x] Review the diff and commit only source, tests, docs, and configuration.
+- [x] Produce a temporary JAR without adding build output to Git.
+- [x] Confirm the Mac needs no Java or Gradle installation for the remote workflow.
+- [ ] Download only the current implementation JAR required for local Minecraft testing.
+- [ ] Record local M2/backend/visual/DonutSMP results.
+- [ ] Decide whether remote-first remains the default after the first full implementation cycle.
 
 ### Known limitations
 
-Remote builds may use different operating-system, Java, GPU, driver, and dependency-cache conditions. They can prove compilation and automated behavior but cannot prove M2 rendering performance or server acceptance. Remote work also uses Codex execution time and requires regular commits because a temporary workspace may be discarded.
+Remote builds use different operating-system, Java, GPU, driver, and dependency-cache conditions. They prove compilation and automated behavior but cannot prove M2 rendering performance or server acceptance. Remote work also uses Codex execution time and requires regular commits because a temporary workspace may be discarded.
 
-## Phase 0 — Baseline
+## Phase 0 — Baseline and instrumentation
 
-Create repeatable test scenes and record average FPS, 1% lows, long-tail frame time, chunk compilation time, translucent resort time, water blocks and faces emitted, particle counts, backend, render distance, resolution, Java, and companion mods.
+The code includes opt-in local fluid and particle counters and fluid tessellation timing. The report template defines repeatable scenes and the required environment fields. Section compiler time, translucent resort time, and frame-time distribution must be recorded with Minecraft's profiler/Tracy output during the local run.
 
-Deliverable: a baseline report with no optimisation enabled.
+Status: remote instrumentation and reporting template complete; baseline measurements pending.
 
 ## Phase 1 — Scaffold, configuration, and Mod Menu
 
-Add the smallest buildable Fabric 26.2 client mod. Add local configuration, a native Minecraft settings screen, simple profiles, an opt-in diagnostics overlay, and a separate optional Mod Menu adapter.
-
-Acceptance criteria:
-
-- builds with Java 25;
-- Mod Menu provides a Configure button when installed;
-- the mod loads and remains usable without Mod Menu;
-- the main screen exposes only the master switch and profile;
-- Advanced settings are separate and clearly labelled;
-- Done, Cancel, Escape, reset, and invalid-config recovery work;
-- no server/network code;
-- disabled mode is behaviorally unchanged;
-- diagnostics contain no personal or server identifiers.
+Status: implemented and remotely build-verified. The native screen, atomic local JSON, profile reset, optional Mod Menu adapter, keybind, invalid-config recovery, and disabled no-op behavior are present. Local GUI and Mod Menu checks remain pending.
 
 ## Phase 2 — Particle filtering
 
-Add optional water-particle distance and fog filtering. Keep nearby particles prioritized and provide a clear visual trade-off in settings.
-
-Acceptance criteria:
-
-- no changes to fluid state or particle physics;
-- underwater and near-player effects remain understandable;
-- measurable reduction in particle work in stress scenes;
-- particle settings are understandable from the UI without technical knowledge.
+Status: implemented behind the opt-in master switch. Water-specific client particle admission is limited by distance, with an explicitly conservative fog/distance tightening option. Fluid state, particle physics, and non-water particles are untouched. Local visual and stress-scene measurements remain pending.
 
 ## Phase 3 — Conservative face culling
 
-Cull only faces proven hidden by identical fluid or fully occluding block shapes. Preserve overlays and waterlogged geometry.
-
-Acceptance criteria:
-
-- flat oceans, waterfalls, caves, leaves, stairs, doors, and transparent blocks match the reference within documented limitations;
-- no missing surface planes in flooded caves;
-- measurable reduction in emitted translucent geometry;
-- Balanced profile remains conservative and stable.
+Status: implemented for exact full source-water neighbors. The policy does not classify partial shapes, waterlogged blocks, overlays, transparent neighbors, or flowing boundaries. Local visual comparison remains required.
 
 ## Phase 4 — Flat source-water fast path
 
-Detect uniform source-water regions and use precomputed geometry only when every required condition is satisfied.
-
-Acceptance criteria:
-
-- irregular levels and flowing edges fall back automatically;
-- no visible changes in the reference scenes;
-- section compilation time improves under a water-heavy workload;
-- the feature is off in Balanced and explicitly labelled in Advanced settings until validated.
+Status: implemented as an explicit opt-in cancellation only for fully interior ordinary source-water blocks. Irregular levels and boundaries fall back to the vanilla tessellator. Local compile-time and visual comparison remain required.
 
 ## Phase 5 — Sodium compatibility
 
-Test with Sodium present and absent. If Sodium owns fluid compilation, avoid duplicate work and limit the mod to supported extension points or diagnostics.
-
-Acceptance criteria:
-
-- no crashes or duplicate geometry;
-- no forced renderer replacement;
-- behavior is documented for each tested combination;
-- Mod Menu configuration remains usable in both combinations.
+Status: renderer-ownership detection is implemented. When Sodium is loaded, the vanilla FluidRenderer optimizations are disabled and no replacement renderer is installed. The Sodium-present/absent and backend matrix remains pending.
 
 ## Phase 6 — Release review
 
-Review DonutSMP rules, privacy, client-only audits, benchmark limitations, version metadata, UI wording, and distribution wording before any public artifact is created.
+Status: privacy, client-only, version, distribution, and server-boundary documentation is present. DonutSMP rule review, public distribution, and release decisions remain intentionally pending.
