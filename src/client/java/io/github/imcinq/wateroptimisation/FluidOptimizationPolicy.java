@@ -18,21 +18,32 @@ public final class FluidOptimizationPolicy {
 			Direction.EAST
 	};
 	private static final ThreadLocal<BlockPos.MutableBlockPos> NEIGHBOR_POS = ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
+	private static volatile boolean fluidHooksActive;
+	private static volatile boolean flatWaterFastPathActive;
 
 	private FluidOptimizationPolicy() {
 	}
 
-	public static boolean fluidHooksActive() {
+	/**
+	 * Refreshes the cached active flags after configuration or renderer ownership changes.
+	 * The mixin hot paths then avoid repeated configuration reads for every fluid block/face.
+	 */
+	public static void refresh() {
 		WaterOptimisationConfig config = ConfigManager.get();
-		return config.isEnabled()
+		boolean hooksActive = config.isEnabled()
 				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
 				&& config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
 				&& !WaterOptimisationClient.isSodiumLoaded();
+		fluidHooksActive = hooksActive;
+		flatWaterFastPathActive = hooksActive && config.isFlatWaterFastPath();
+	}
+
+	public static boolean fluidHooksActive() {
+		return fluidHooksActive;
 	}
 
 	public static boolean flatWaterFastPathActive() {
-		WaterOptimisationConfig config = ConfigManager.get();
-		return fluidHooksActive() && config.isFlatWaterFastPath();
+		return flatWaterFastPathActive;
 	}
 
 	/**
@@ -41,7 +52,7 @@ public final class FluidOptimizationPolicy {
 	 * overlay, or unusual transparency case falls back to vanilla tessellation.
 	 */
 	public static boolean shouldSkipInteriorSourceWater(BlockAndTintGetter level, BlockPos pos, BlockState blockState, FluidState fluidState) {
-		if (!flatWaterFastPathActive()
+		if (!flatWaterFastPathActive
 				|| fluidState.getType() != Fluids.WATER
 				|| !fluidState.isSource()
 				|| !blockState.is(Blocks.WATER)) {
@@ -73,7 +84,7 @@ public final class FluidOptimizationPolicy {
 			Direction direction,
 			FluidState otherFluidState
 	) {
-		if (!fluidHooksActive()
+		if (!fluidHooksActive
 				|| fluidState.getType() != Fluids.WATER
 				|| !fluidState.isSource()
 				|| !selfState.is(Blocks.WATER)
