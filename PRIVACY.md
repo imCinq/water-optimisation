@@ -1,17 +1,14 @@
 # Privacy
 
-Water Optimisation is intended to run entirely locally.
+Water Optimisation runs locally on the Minecraft client.
 
-The planned mod must not collect, transmit, store, or upload:
+The project does not collect, transmit, or upload:
 
 - account identifiers;
-- server addresses;
-- world names;
-- chat;
-- screenshots;
-- telemetry;
-- performance logs outside the local configuration or explicitly requested local diagnostics.
+- server addresses or world names;
+- chat or player information;
+- screenshots or runtime logs;
+- telemetry or analytics;
+- remote configuration data.
 
-There should be no analytics, update checker, remote configuration, or external service dependency.
-
-Any local diagnostics must be opt-in, understandable, and removable by deleting the local configuration file.
+The mod does not include an update checker, telemetry service, outbound network call, or publishing credential. Configuration and optional diagnostics remain local to the client. Generated runtime files and benchmark captures are excluded from version control.

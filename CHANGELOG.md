@@ -1,24 +1,18 @@
 # Changelog
 
-All notable changes to this project will be documented here.
+All notable changes to Water Optimisation are documented here.
 
-## Unreleased
+## 0.1.0-preview
 
-- Created the private planning and research workspace.
-- Documented the Minecraft 26.2 water-rendering pipeline.
-- Added the initial implementation roadmap and benchmark methodology.
-- Added the MIT license and project conduct policy.
-- Added maintenance, distribution, and repository privacy-audit guidance.
-- Added the optional Mod Menu, simple-profile, and Advanced-settings plan.
-- Added the remote-first Codex implementation and verification plan.
-- Added the initial Fabric 26.2 client-only build scaffold and remote build workflow on the issue #7 branch.
-- Added a client-only boundary audit for the scaffold.
-- Implemented local JSON configuration with safe defaults, atomic replacement, clamping, profile reset, and invalid-file recovery.
-- Implemented native main and Advanced settings screens, a registered configuration keybind, optional Mod Menu integration, and English translations.
-- Implemented opt-in diagnostics for fluid tessellation, section compilation, translucent resort timing, face decisions, fast-path skips, and particle filtering.
-- Implemented camera-relative water-particle admission filtering with a player-position lifecycle fallback and an explicitly conservative fog/distance mode.
-- Extracted particle distance math into a common allocation-free policy with unit coverage and avoided disabled diagnostics timing initialization on the fluid hot path.
-- Implemented exact source-water face culling and an explicit full-interior source-water fast path with vanilla fallbacks.
-- Added Sodium renderer-ownership detection that disables vanilla fluid hooks without replacing the active renderer.
-- Added configuration unit tests and updated the client-only audit to distinguish local chat components from packet APIs.
-- Local Minecraft visual/performance, OpenGL/Vulkan, Sodium, modpack, and DonutSMP validation remain required before release.
+- Added the Fabric 26.2 client-only project scaffold.
+- Added native settings screens with Vanilla, Balanced, and Performance profiles.
+- Added local JSON configuration with safe defaults, atomic replacement, clamping, profile reset, and invalid-file recovery.
+- Added optional Mod Menu integration and a configuration keybind.
+- Added conservative source-water face culling and an interior full-source-water fast path.
+- Added camera-relative water-particle admission filtering with a lifecycle-safe player fallback.
+- Added opt-in diagnostics for fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering.
+- Added Sodium renderer-ownership detection so the mod does not compete with an active Sodium fluid renderer.
+- Added configuration and particle-distance unit tests, privacy audits, and client-only boundary audits.
+- Added public documentation, benchmark templates, and Cinq branding assets.
+
+This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.

@@ -1,45 +1,38 @@
-# Repository Setup
+# Development Setup
 
-This repository was created as a private planning workspace based on the structure and maintenance standards used by FPS Tune.
+## Requirements
 
-## Current state
+- Git
+- Java Development Kit 25
+- A Minecraft 26.2 Fabric client for local runtime validation
+- Fabric Loader 0.19.3 or newer
+- Fabric API matching Minecraft 26.2
 
-The repository now has a minimal Fabric 26.2 client-only build scaffold. It includes the official 26.2 Gradle wrapper/toolchain structure, a client entrypoint, mod metadata, a remote build workflow, and a client-only boundary audit. No rendering optimisation, configuration, or Mod Menu implementation is active yet.
+The repository includes the Gradle wrapper, so a separate Gradle installation is not required.
 
-## Planned project baseline
+## Build and test
 
-- Minecraft 26.2
-- Java 25
-- Fabric Loader and Fabric API versions matching the target
-- Optional Mod Menu integration through a suggested dependency
-- Native Minecraft configuration screen
-- Optional Sodium compatibility
-- Official Mojang mappings where supported by the selected toolchain
-- No runtime dependency on DonutSMP
+```bash
+./gradlew test build
+bash scripts/audit-repository.sh
+bash scripts/audit-client-only.sh
+```
 
-## Remote-first development
+The build produces client and sources JARs under `build/libs/`. Build output, caches, runtime data, logs, screenshots, and benchmark results are ignored by Git.
 
-The preferred development experiment is:
+## Project layout
 
-1. Codex creates a feature branch and works in a temporary remote workspace.
-2. Java, Gradle, tests, audits, and builds run remotely.
-3. Only source, documentation, tests, and configuration are committed to GitHub.
-4. Build caches, runtime folders, generated JARs, and benchmark artifacts remain outside the repository.
-5. A final JAR is downloaded only when a local Minecraft test is needed.
+- `src/main` — shared configuration and pure policies.
+- `src/client` — Minecraft client screens, diagnostics, renderer hooks, and mixins.
+- `src/test` — unit tests for configuration and pure policy logic.
+- `docs` — architecture, compatibility, benchmarking, and release documentation.
+- `scripts` — repository and client-only audits.
 
-This avoids local Java and Gradle setup on the Mac. It does not remove the need to run Minecraft locally for M2 graphics, frame-time, visual, and DonutSMP validation.
+## Change checklist
 
-## User experience baseline
-
-The main screen should contain only the master switch and a profile selector. Advanced renderer and particle controls should be separated, documented, and disabled by default when experimental.
-
-## Development order
-
-1. Establish the reproducible benchmark scene and diagnostics.
-2. Add the smallest buildable client-only scaffold.
-3. Add configuration, profiles, and the optional Mod Menu adapter.
-4. Evaluate the remote-first Codex workflow.
-5. Implement low-risk particle controls.
-6. Add conservative fluid geometry optimisation.
-7. Add fast paths only after correctness tests exist.
-8. Validate companion-mod behavior and DonutSMP safety.
+1. Identify a measured rendering or diagnostics problem.
+2. Keep the implementation within Minecraft's Blaze3D/Fabric abstractions.
+3. Preserve vanilla fallbacks for ambiguous cases.
+4. Add or update tests and documentation.
+5. Run the build and both repository audits.
+6. Validate the exact JAR in a local Minecraft client before release.

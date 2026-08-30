@@ -1,64 +1,57 @@
 # Testing
 
-## Automated tests
+## Automated checks
 
-The current remote workflow runs:
+Run:
 
-- Gradle wrapper validation;
-- repository privacy audit;
-- client-only boundary audit;
-- Java 25 Minecraft 26.2 compilation;
-- JUnit configuration tests;
-- client and sources JAR packaging.
+```bash
+./gradlew test build
+bash scripts/audit-repository.sh
+bash scripts/audit-client-only.sh
+```
 
-Implemented unit coverage includes:
+The CI workflow validates the Gradle wrapper, Java 25 toolchain, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
 
-- safe defaults and Balanced profile;
+Unit coverage includes:
+
+- safe configuration defaults;
 - profile reset behavior;
-- Vanilla master-switch recovery;
+- master-switch recovery;
 - particle-distance clamping;
-- camera-relative particle distance math and conservative fog scaling;
+- camera-relative particle-distance math;
+- conservative fog scaling;
 - null enum recovery;
 - independent configuration copies.
 
-Minecraft runtime behavior still needs the manual matrix below. More classifier tests should be added if the policy grows beyond the exact source-water subset.
+## Manual visual matrix
 
-## Manual visual tests
-
-Run with the feature disabled and enabled in:
+Test with the feature disabled and enabled in:
 
 - flat source-water pools and large oceans;
 - flowing water and waterfalls;
 - waterlogged stairs, doors, slabs, and signs;
 - leaves and transparent blocks;
 - flooded caves and enclosed surfaces;
-- underwater view;
+- underwater views;
 - chunk loading and block updates;
 - Sodium absent and present;
 - Mod Menu installed and absent;
-- OpenGL and Vulkan on Minecraft 26.2.
+- OpenGL and Vulkan where available.
 
-Look for missing top planes, disappearing sides, incorrect overlays, seams, z-fighting, wrong flow orientation, lighting differences, stale geometry after updates, unreadable labels, clipped descriptions, and settings that do not persist correctly.
+Look for missing planes, seams, z-fighting, incorrect overlays, wrong flow orientation, lighting differences, stale geometry, unreadable labels, clipped descriptions, and settings that fail to persist.
 
 ## Performance measurements
 
-Use the report template and compare identical warmed scenes with:
+Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks/faces, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
 
-- feature disabled;
-- Balanced;
-- Performance;
-- Advanced particle settings;
-- Sodium absent/present;
-- OpenGL/Vulkan separately.
-
-Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation time, section compilation time, translucent resort time, water blocks/faces, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods. Use the diagnostics HUD averages as a local cross-check, not as a substitute for frame-time profiling.
+Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
 
 ## Multiplayer smoke test
 
-Use a normal client-only session. Verify that the mod sends no custom packets, changes no controls, does not affect collision or movement, and exposes no player-information features. Check the current server rules before connecting.
+Verify that the mod sends no custom packets, changes no controls, does not affect collision or movement, and exposes no player-information features. Check the current server rules before connecting.
 
-Do not use private server logs or screenshots containing account information in the repository.
+Do not commit private server logs or screenshots containing account information.
 
-## Verification boundary
+## Release boundary
 
-The current evidence is remote build/test/audit success, including compilation of the section and translucent-resort diagnostics hooks. The counters have not yet been validated in a live client. The local M2, graphics backend, visual, modpack, and DonutSMP checks are not marked complete until they are run.
+CI can prove build and static checks. A stable release also needs a live Minecraft client run on the target hardware and the exact intended modpack/backend combination.

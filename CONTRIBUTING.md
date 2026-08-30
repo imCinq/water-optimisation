@@ -1,23 +1,34 @@
 # Contributing
 
-This repository is currently a private development workspace.
+Thanks for helping improve Water Optimisation.
 
-## Before making changes
+## Before opening a change
 
-- Read AGENTS.md and the relevant documentation.
-- Identify the measured bottleneck the change is intended to address.
-- Define the visual and compatibility risks.
-- Keep client-only boundaries intact.
+- Confirm the problem is measurable in a water-heavy scene.
+- Keep the change client-side and render-only.
+- Preserve vanilla behavior for ambiguous shapes, fluid states, overlays, and transparency cases.
+- Document visual trade-offs and compatibility assumptions.
+- Do not include personal information, credentials, private server data, generated runtime files, or screenshots containing account information.
+
+## Build and audit
+
+Use Java 25 and run:
+
+```bash
+./gradlew test build
+bash scripts/audit-repository.sh
+bash scripts/audit-client-only.sh
+```
 
 ## Pull requests
 
-A change should include:
+Include:
 
-- a concise explanation of the problem;
+- a concise problem statement;
 - the chosen hook or rendering path;
-- benchmark results before and after;
-- visual-correctness checks;
-- compatibility notes for Fabric, Sodium, and multiplayer use;
-- documentation updates where behavior or settings changed.
+- tests and CI results;
+- visual comparison notes;
+- benchmark results when performance is the goal;
+- Fabric, Sodium, resource-pack, and backend compatibility notes.
 
-Do not include personal information, private server logs, credentials, or unrelated refactors.
+Keep commits focused and update the relevant documentation and changelog.
