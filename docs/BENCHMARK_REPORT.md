@@ -33,6 +33,7 @@ Warm up each scene first and record multiple samples.
 | Flat ocean | Disabled | | | | | | | | | | | |
 | Flat ocean | Balanced | | | | | | | | | | | |
 | Flat ocean | Performance | | | | | | | | | | | |
+| Flat ocean | Maximum FPS | | | | | | | | | | | |
 | Waterfall | Disabled | | | | | | | | | | | |
 | Waterfall | Balanced | | | | | | | | | | | |
 | Flooded cave | Disabled | | | | | | | | | | | |

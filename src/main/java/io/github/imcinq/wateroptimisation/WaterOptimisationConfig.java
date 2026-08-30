@@ -7,7 +7,8 @@ public final class WaterOptimisationConfig {
 	public enum PerformanceProfile {
 		VANILLA("wateroptimisation.profile.vanilla"),
 		BALANCED("wateroptimisation.profile.balanced"),
-		PERFORMANCE("wateroptimisation.profile.performance");
+		PERFORMANCE("wateroptimisation.profile.performance"),
+		MAXIMUM("wateroptimisation.profile.maximum");
 
 		private final String translationKey;
 
@@ -131,6 +132,15 @@ public final class WaterOptimisationConfig {
 			}
 			case PERFORMANCE -> {
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
+				this.flatWaterFastPath = true;
+				this.waterParticles = false;
+				this.particleDistance = 16;
+				this.particleFogCulling = true;
+				this.diagnosticsHud = false;
+				this.debugFallbackLogging = false;
+			}
+			case MAXIMUM -> {
+				this.fluidCullingMode = FluidCullingMode.EXPERIMENTAL;
 				this.flatWaterFastPath = true;
 				this.waterParticles = false;
 				this.particleDistance = 16;

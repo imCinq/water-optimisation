@@ -74,8 +74,10 @@ public final class FluidOptimizationPolicy {
 			return false;
 		}
 
-		return hidesFluidFace(blockStateDown, fluidStateDown)
-				&& hidesFluidFace(blockStateUp, fluidStateUp)
+		// Surface water is the common case in oceans and open pools. Check the
+		// upward face first so visible water fails before testing every neighbor.
+		return hidesFluidFace(blockStateUp, fluidStateUp)
+				&& hidesFluidFace(blockStateDown, fluidStateDown)
 				&& hidesFluidFace(blockStateNorth, fluidStateNorth)
 				&& hidesFluidFace(blockStateSouth, fluidStateSouth)
 				&& hidesFluidFace(blockStateWest, fluidStateWest)

@@ -2,6 +2,13 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.1.0-preview.8
+
+- Added a clear Maximum FPS profile that enables the existing reduced-face GPU path together with the hidden-water fast path.
+- Kept the normal Performance profile conservative and vanilla-compatible.
+- Reordered the hidden-water predicate to reject common open-surface water before checking all six neighbors, reducing avoidable section-compile work.
+- Kept flowing, waterlogged, transparent, overlay, and ambiguous cases on vanilla behavior; Sodium remains the fluid-renderer owner when present.
+
 ## 0.1.0-preview.7
 
 - Fixed the Advanced settings action row so the lower controls cannot be covered by the bottom buttons, including compact-height layouts.

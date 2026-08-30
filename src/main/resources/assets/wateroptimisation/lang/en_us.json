@@ -23,6 +23,7 @@
 	"wateroptimisation.profile.vanilla": "Vanilla",
 	"wateroptimisation.profile.balanced": "Balanced",
 	"wateroptimisation.profile.performance": "Performance",
+	"wateroptimisation.profile.maximum": "Maximum FPS",
 	"wateroptimisation.culling.disabled": "Keep vanilla",
 	"wateroptimisation.culling.conservative": "Hide unseen water",
 	"wateroptimisation.culling.experimental": "Hide inward faces too"
