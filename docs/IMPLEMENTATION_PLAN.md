@@ -1,75 +1,54 @@
-# Implementation Plan
+# Roadmap
 
-Remote-first Codex development is evaluated throughout this plan. It is a delivery method, not a replacement for local Minecraft validation.
+Water Optimisation is developed as a conservative, client-only rendering mod. Every optimization must be measurable, visually reviewable, and safe to disable.
 
-## Cross-cutting workstream — Remote-first Codex evaluation
+## Current preview
 
-The goal is to determine how much of the project Codex can complete without using storage or Java/Gradle processes on the Mac.
+The 0.1.0 preview contains the first complete implementation for Minecraft 26.2:
 
-### Remote tasks
+- local configuration and native settings screens;
+- opt-in particle filtering;
+- exact source-water face decisions;
+- an interior source-water fast path;
+- section and translucent-resort diagnostics;
+- Sodium renderer-ownership protection;
+- automated tests and repository audits.
 
-Codex can:
+The implementation is build-verified. Local visual, performance, backend, companion-mod, and multiplayer validation remain part of release acceptance.
 
-- create and modify the Fabric project in a temporary remote workspace;
-- create branches and commits directly against the private GitHub repository;
-- run Java, Gradle, unit tests, repository audits, and build tasks remotely;
-- inspect build output and dependency changes;
-- produce a temporary test JAR without committing generated artifacts;
-- update documentation and issue plans.
+## Completed phases
 
-### Local-only tasks
+### Phase 0 — Instrumentation
 
-The user still needs to run the final client locally for:
+Opt-in counters and timings cover fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering. Benchmark templates define repeatable scenes and metrics.
 
-- M2 GPU and macOS graphics-backend behavior;
-- real frame-time and FPS measurements;
-- visual comparison in the exact Minecraft instance;
-- Sodium/resource-pack/modpack interaction;
-- DonutSMP connection and server-rule smoke testing.
+### Phase 1 — Configuration and UI
 
-### Evaluation checklist
+Native Minecraft screens, profiles, Advanced settings, atomic JSON persistence, invalid-file recovery, a keybind, and optional Mod Menu integration are implemented.
 
-- [x] Create a Codex feature branch without cloning to the Mac.
-- [x] Add the minimal Fabric 26.2 scaffold remotely.
-- [x] Run the remote build and unit tests successfully for the current implementation.
-- [x] Run repository privacy and client-only audits remotely.
-- [x] Review the diff and commit only source, tests, docs, and configuration.
-- [x] Produce a temporary JAR without adding build output to Git.
-- [x] Confirm the Mac needs no Java or Gradle installation for the remote workflow.
-- [ ] Download only the current implementation JAR required for local Minecraft testing.
-- [ ] Record local M2/backend/visual/DonutSMP results.
-- [ ] Decide whether remote-first remains the default after the first full implementation cycle.
+### Phase 2 — Particle filtering
 
-### Known limitations
+Water-specific particle admission can use camera-relative distance, with a lifecycle-safe player fallback and conservative fog/distance tightening. Fluid state, particle physics, and non-water particles are untouched.
 
-Remote builds use different operating-system, Java, GPU, driver, and dependency-cache conditions. They prove compilation and automated behavior but cannot prove M2 rendering performance or server acceptance. Remote work also uses Codex execution time and requires regular commits because a temporary workspace may be discarded.
+### Phase 3 — Conservative fluid visibility
 
-## Phase 0 — Baseline and instrumentation
+Only exact ordinary full source-water cases can be forced hidden. Flowing, partial, waterlogged, overlay, transparent, and ambiguous states use vanilla behavior.
 
-The code includes opt-in local fluid, particle, section-compilation, and translucent-resort counters/timing. The report template defines repeatable scenes and the required environment fields. Frame-time distributions and tail latency must still be recorded with Minecraft's profiler/Tracy output during the local run.
+### Phase 4 — Interior source-water fast path
 
-Status: remote instrumentation and reporting template complete; live counter sanity checks and baseline measurements pending.
+Only blocks surrounded on all six sides by ordinary full source-water blocks can skip fluid tessellation.
 
-## Phase 1 — Scaffold, configuration, and Mod Menu
+### Phase 5 — Renderer compatibility
 
-Status: implemented and remotely build-verified. The native screen, atomic local JSON, profile reset, optional Mod Menu adapter, keybind, invalid-config recovery, and disabled no-op behavior are present. Local GUI and Mod Menu checks remain pending.
+Sodium ownership detection disables the vanilla fluid hooks rather than replacing or duplicating another renderer.
 
-## Phase 2 — Particle filtering
+## Next priorities
 
-Status: implemented behind the opt-in master switch. Water-specific client particle admission is limited by distance, with an explicitly conservative fog/distance tightening option. Fluid state, particle physics, and non-water particles are untouched. Local visual and stress-scene measurements remain pending.
+- Complete local visual and performance validation.
+- Add direct tests if the fluid classifier expands beyond the exact source-water subset.
+- Consider rolling diagnostics and fallback reason reporting.
+- Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.
 
-## Phase 3 — Conservative face culling
+## Release gate
 
-Status: implemented for exact full source-water neighbors. The policy does not classify partial shapes, waterlogged blocks, overlays, transparent neighbors, or flowing boundaries. Local visual comparison remains required.
-
-## Phase 4 — Flat source-water fast path
-
-Status: implemented as an explicit opt-in cancellation only for fully interior ordinary source-water blocks. Irregular levels and boundaries fall back to the vanilla tessellator. Local compile-time and visual comparison remain required.
-
-## Phase 5 — Sodium compatibility
-
-Status: renderer-ownership detection is implemented. When Sodium is loaded, the vanilla FluidRenderer optimizations are disabled and no replacement renderer is installed. The Sodium-present/absent and backend matrix remains pending.
-
-## Phase 6 — Release review
-
-Status: privacy, client-only, version, distribution, and server-boundary documentation is present. DonutSMP rule review, public distribution, and release decisions remain intentionally pending.
+A stable release requires a tagged, audited artifact; documented benchmark results; disabled-mode comparison; visual checks across water-heavy scenes; backend and companion-mod checks; and a client-only multiplayer smoke test with current server-rule review.

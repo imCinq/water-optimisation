@@ -1,22 +1,10 @@
 # Benchmark Report
 
-This file is a human-completed report template. It intentionally contains no generated screenshots, runtime logs, world data, account information, or performance claim.
+Use this template for reproducible local measurements. Do not commit generated screenshots, runtime logs, world data, account information, or private server details.
 
-## Current evidence
+## Evidence boundary
 
-Remote evidence for the implementation branch:
-
-- Minecraft target: 26.2
-- Java build: 25
-- Fabric Loader: 0.19.3
-- Fabric API: 0.158.0+26.2
-- Gradle/Loom: Gradle 9.5.1 and Loom 1.17.20
-- repository privacy audit: passed remotely
-- client-only audit: passed remotely
-- unit tests and client build: passed remotely
-- local M2, OpenGL/Vulkan, visual, Sodium, modpack, and DonutSMP validation: pending
-
-The current remote build proves that the source compiles and packages. It does not prove an FPS gain or visual equivalence.
+A successful build proves compilation and packaging. It does not prove an FPS gain, visual equivalence, or server compatibility.
 
 ## Environment
 
@@ -38,7 +26,7 @@ The current remote build proves that the source compiles and packages. It does n
 
 ## Scene runs
 
-For each scene, warm up first and record multiple samples.
+Warm up each scene first and record multiple samples.
 
 | Scene | Mode | Avg FPS | 1% low | p95 ms | p99 ms | Hitches | Fluid compile ms | Section compile ms | Resort ms | Water blocks/faces | Particle candidates/rejected | Visual result |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
@@ -57,10 +45,10 @@ For each scene, warm up first and record multiple samples.
 ## Acceptance notes
 
 - [ ] No missing planes, seams, z-fighting, overlay errors, or stale geometry
-- [ ] Flowing water orientation and lighting match the disabled reference
+- [ ] Flowing-water orientation and lighting match the disabled reference
 - [ ] Waterlogged, leaves, transparent, partial, and cave cases fall back safely
 - [ ] Sodium-present and Sodium-absent runs are stable
-- [ ] OpenGL and Vulkan runs are stable
-- [ ] Non-water scene does not regress
+- [ ] OpenGL and Vulkan runs are stable where available
+- [ ] Non-water scenes do not regress
 - [ ] Client-only multiplayer smoke test passes
-- [ ] Current DonutSMP rules permit the client-only mod
+- [ ] Current server rules permit the mod

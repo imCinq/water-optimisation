@@ -23,11 +23,13 @@ Handle a Minecraft update in a dedicated branch and pull request:
 5. Keep version-specific sources isolated.
 6. Add tests for changed visibility, culling, particle, or configuration behavior.
 7. Run a graphical client with the feature disabled and enabled.
-8. Update README.md, AGENTS.md, docs/COMPATIBILITY.md, docs/DISTRIBUTION.md, and CHANGELOG.md.
+8. Update README.md, docs/COMPATIBILITY.md, docs/DISTRIBUTION.md, and CHANGELOG.md.
 
 Compilation alone is not sufficient evidence of Minecraft-version support.
 
 ## Release process
+
+Start with the [public release checklist](RELEASE_CHECKLIST.md) and keep its acceptance record with the tagged release.
 
 Before any public artifact:
 

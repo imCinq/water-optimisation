@@ -71,6 +71,6 @@ publishing {
 	}
 
 	repositories {
-		// Publishing is intentionally not configured for this private development project.
+		// Publishing is intentionally not configured for this project.
 	}
 }

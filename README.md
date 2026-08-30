@@ -1,80 +1,138 @@
-# Water Optimisation
+<p align="center">
+  <img src="assets/cinq-water-optimisation-logo.webp" alt="Cinq creator logo" width="180">
+</p>
 
-Private research and development workspace for a client-side Minecraft Fabric mod focused on water-rendering performance.
+<h1 align="center">Water Optimisation</h1>
 
-## Status
+<p align="center">
+  A client-side Fabric mod for Minecraft 26.2 focused on water-rendering performance.
+</p>
 
-The first opt-in implementation is now on the remote feature branch. It builds and passes automated tests and repository audits remotely, but it is not a public release and still needs the local Minecraft visual/performance matrix.
+<p align="center">
+  <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2f6fed.svg" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/Minecraft-26.2-2f6fed.svg" alt="Minecraft 26.2">
+  <img src="https://img.shields.io/badge/Fabric-client--side-2f6fed.svg" alt="Fabric client-side mod">
+</p>
 
-## Goal
+Water rendering can add frame-time cost in large oceans, waterfalls, flooded caves, waterlogged builds, and particle-heavy scenes. Water Optimisation targets that client-side rendering work while leaving fluid physics and gameplay unchanged.
 
-Improve frame-time stability in Minecraft 26.2 water-heavy scenes, including large oceans, waterfalls, flooded caves, farms, and particle-heavy areas, while preserving vanilla gameplay behavior and visual correctness.
+## Current status
 
-The mod is client-only and render-focused. It must not change server simulation, collision, movement, combat, inventory, networking, or player-information features.
+The 0.1.0 preview implementation is present and builds successfully. Automated tests and repository audits run in GitHub Actions. Live Minecraft testing is intentionally still pending, so this is an experimental preview rather than a stable release or a guaranteed FPS improvement.
 
-## Implemented opt-in features
+The next step is to compare the exact preview artifact in a real Minecraft 26.2 client with the feature disabled, Balanced, and Performance modes. The test matrix is documented below and in [docs/TESTING.md](docs/TESTING.md).
 
-- Native Minecraft settings screens with a master switch, Vanilla/Balanced/Performance profiles, Advanced controls, Reset to profile, and atomic local configuration.
-- Optional local diagnostics HUD for fluid tessellation counters, face decisions, fast-path skips, fluid/section compile timing, translucent-resort timing, and rejected water particles.
-- Optional water-particle admission filtering by camera-relative distance, with a player-position fallback during camera initialization and a conservative fog/distance tightening mode.
+## What is implemented
+
+- Native Minecraft settings screens with Vanilla, Balanced, and Performance profiles.
+- Advanced controls for fluid culling, the flat source-water fast path, water particles, particle distance, conservative fog/distance tightening, diagnostics, and fallback logging.
 - Conservative fluid-face decisions limited to equal full source-water blocks.
-- An explicit flat source-water fast path that skips only fully interior ordinary source-water blocks.
-- Sodium detection that disables the vanilla fluid hooks so the mod does not compete with a renderer-owned fluid path.
-- Optional Mod Menu Configure integration; Mod Menu is not required at runtime.
+- An interior fast path that skips only ordinary source-water blocks surrounded on all six sides by ordinary source-water blocks.
+- Camera-relative water-particle admission filtering with a player-position fallback during camera initialization.
+- Local diagnostics for fluid tessellation, section compilation, translucent resorting, face decisions, fast-path skips, and particle filtering.
+- Sodium renderer-ownership detection that disables the vanilla fluid hooks when Sodium is active.
+- Optional Mod Menu Configure integration; the core mod remains usable without Mod Menu.
 
-Every rendering shortcut falls back to vanilla behavior for flowing, partial, waterlogged, overlay, transparent, or otherwise ambiguous cases. The master switch is disabled by default.
+## How it stays safe
 
-## Simple user experience
+The master switch is disabled by default. Flowing, partial, waterlogged, overlay, transparent, and otherwise ambiguous cases return to vanilla behavior. The mod does not change FluidState, fluid spread, collision, swimming, movement, packets, world updates, server state, or player-information features.
 
-Open Water Optimisation from Mod Menu when it is installed, or use the registered keybind from the Controls menu. The main screen exposes the master switch and profile. Advanced settings contain the experimental controls and diagnostics.
+The implementation uses Minecraft's Blaze3D/Fabric rendering abstractions and does not replace another renderer or call raw OpenGL. Client-only does not automatically mean server-approved; check the rules of a multiplayer server before use.
 
-The settings describe trade-offs but do not promise a universal FPS increase. Compare the same scene with the feature disabled before drawing conclusions.
+## Automated tests already run
 
-## Roadmap status
+Every push and pull request runs the following checks:
 
-| Phase | Focus | Status |
-| --- | --- | --- |
-| 0 | Reproducible water benchmarks and instrumentation | Remote instrumentation and report template complete; local measurements pending |
-| 1 | Fabric 26.2 scaffold, configuration, and Mod Menu screen | Implemented and remotely build-verified; local UI checks pending |
-| 2 | Water-particle distance and fog filtering | Implemented behind the opt-in master switch; local visual and metric checks pending |
-| 3 | Conservative fluid-face culling | Implemented for the exact safe source-water subset; local visual and metric checks pending |
-| 4 | Flat source-water fast path | Implemented as an explicit opt-in path; local visual and compile-time checks pending |
-| 5 | Sodium compatibility and broader validation | Renderer-ownership guard implemented; Sodium/backend/modpack matrix pending |
-| 6 | Release review and server-rule documentation | Documentation is in place; DonutSMP rule review and distribution decision pending |
+- Gradle wrapper validation and a Java 25 toolchain check.
+- Repository privacy audit for secrets, personal information, local paths, generated output, and unwanted runtime data.
+- Client-only boundary audit for networking, movement, world simulation, and disallowed player-information behavior.
+- Unit tests for safe configuration defaults, profile reset, master-switch recovery, value clamping, camera-relative particle-distance math, conservative fog scaling, null recovery, and independent configuration copies.
+- `./gradlew test build`, including runtime and sources JAR packaging.
 
-## Remote-first development
+These checks prove that the project compiles, packages, and stays within its static boundaries. They do not prove visual equivalence, an FPS improvement, renderer compatibility, or server approval.
 
-The implementation branch is built and audited through GitHub Actions with Java 25 and the Minecraft 26.2 Fabric toolchain. This avoids requiring Java, Gradle, or a local clone merely to implement and compile the mod. The final local run is still required for the M2 GPU, OpenGL/Vulkan, visual, modpack, and DonutSMP checks.
+## Local Minecraft tests still required
 
-See [docs/REMOTE_CODEX_WORKFLOW.md](docs/REMOTE_CODEX_WORKFLOW.md) and [docs/BENCHMARK_REPORT.md](docs/BENCHMARK_REPORT.md).
+Use the exact preview JAR and compare identical warmed scenes in this order:
 
-## Safety boundary
+1. Feature disabled as the reference.
+2. Balanced profile.
+3. Performance profile.
+4. Advanced particle and culling settings only when their trade-offs are being measured.
 
-This project is render-only. It must not add packets, automation, movement changes, combat assistance, ESP, radar, freecam, x-ray behavior, or changes to fluid collision and world state. Client-only does not automatically mean server-approved; current server rules must be checked before use.
+Check flat water and oceans, flowing water and waterfalls, waterlogged stairs/doors/slabs/signs, leaves and transparent blocks, flooded caves, underwater views, chunk loading, block updates, and a normal non-water scene.
+
+Look for missing planes, seams, z-fighting, overlay errors, lighting differences, wrong flow orientation, stale geometry, clipped labels, and settings that fail to persist. Repeat relevant runs with Sodium absent and present, Mod Menu absent and present, and OpenGL/Vulkan separately where available.
+
+Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water blocks/faces, and particle candidates/rejections. Keep generated screenshots, logs, world data, account information, and server data out of the repository.
+
+## Installation
+
+Requirements:
+
+- Minecraft 26.2
+- Fabric Loader 0.19.3 or newer
+- Fabric API 0.158.0+26.2
+- Java 25
+
+No stable release has been published yet. For preview testing only, download the latest successful build artifact from [GitHub Actions](https://github.com/imCinq/water-optimisation/actions/workflows/build.yml). Workflow artifacts are temporary verification outputs, not stable releases; extract the runtime JAR and place it in the Fabric `mods` folder with Fabric API 0.158.0+26.2.
+
+Mod Menu 19.0.0-alpha.1 is optional.
+
+## Usage
+
+1. Open Water Optimisation from Mod Menu, or use the `O` keybind from Minecraft's Controls menu.
+2. Enable the master switch.
+3. Start with Balanced.
+4. Use Advanced settings only when measuring a stated visual trade-off.
+5. Disable the Diagnostics HUD for normal play after measurements are complete.
+
+## Compatibility
+
+- The target is Minecraft 26.2 with Fabric Loader 0.19.3 or newer, Fabric API 0.158.0+26.2, and Java 25.
+- Sodium is treated as a renderer-ownership boundary; vanilla fluid hooks are disabled when Sodium is loaded.
+- Mod Menu is a soft dependency.
+- Resource packs, shaders, companion performance mods, and rendering backends can change results.
+- Test current multiplayer server rules before use.
+
+## Development
+
+Use Java 25 and run:
+
+```bash
+./gradlew test build
+bash scripts/audit-repository.sh
+bash scripts/audit-client-only.sh
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for change expectations and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) for the release gate.
 
 ## Documentation
 
-- [AGENTS.md](AGENTS.md) — development and maintenance rules
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — project conduct
-- [docs/RESEARCH.md](docs/RESEARCH.md) — Minecraft 26.2 water findings
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — implemented design and fallbacks
-- [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — staged work plan
-- [docs/REMOTE_CODEX_WORKFLOW.md](docs/REMOTE_CODEX_WORKFLOW.md) — remote implementation and verification limits
-- [docs/UI_AND_OPTIONS.md](docs/UI_AND_OPTIONS.md) — settings behavior and Mod Menu
-- [docs/BENCHMARKING.md](docs/BENCHMARKING.md) — measurement methodology
-- [docs/BENCHMARK_REPORT.md](docs/BENCHMARK_REPORT.md) — report template and current evidence boundary
-- [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — Fabric, Sodium, Mod Menu, and DonutSMP boundaries
-- [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — active settings
-- [docs/TESTING.md](docs/TESTING.md) — verification matrix
-- [docs/MAINTENANCE.md](docs/MAINTENANCE.md) — update and release process
-- [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) — future distribution plan
+- [Contributing](CONTRIBUTING.md)
+- [Privacy](PRIVACY.md)
+- [Security](SECURITY.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Compatibility](docs/COMPATIBILITY.md)
+- [Benchmarking](docs/BENCHMARKING.md)
+- [Benchmark report template](docs/BENCHMARK_REPORT.md)
+- [Testing matrix](docs/TESTING.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Distribution](docs/DISTRIBUTION.md)
+- [Maintenance](docs/MAINTENANCE.md)
 
-## Current target
+## Release status
 
-- Minecraft: 26.2
-- Java: 25
-- Mod loader: Fabric
-- Mod id: wateroptimisation
-- Optional integration: Mod Menu 19.0.0-alpha.1
-- Intended distribution: private development first
-- License: MIT
+| Area | Status |
+| --- | --- |
+| Fabric 26.2 client-only implementation | Implemented |
+| Automated tests, build, and audits | Passing in CI |
+| Local visual and performance validation | Pending |
+| Sodium, backend, and companion-mod matrix | Pending |
+| Stable release artifact | Not published |
+
+## License
+
+Water Optimisation is released under the [MIT License](LICENSE). Created by Cinq.
