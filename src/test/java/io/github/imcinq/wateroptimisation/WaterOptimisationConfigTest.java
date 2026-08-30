@@ -34,7 +34,7 @@ class WaterOptimisationConfigTest {
 		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.PERFORMANCE);
 		assertTrue(config.isEnabled());
 		assertTrue(config.isFlatWaterFastPath());
-		assertEquals(48, config.getParticleDistance());
+		assertEquals(24, config.getParticleDistance());
 	}
 
 	@Test

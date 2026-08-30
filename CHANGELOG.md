@@ -2,7 +2,7 @@
 
 All notable changes to Water Optimisation are documented here.
 
-## 0.1.0-preview
+## 0.1.0-preview.2
 
 - Added the Fabric 26.2 client-only project scaffold.
 - Added native settings screens with Vanilla, Balanced, and Performance profiles.
@@ -26,5 +26,6 @@ All notable changes to Water Optimisation are documented here.
 - Removed the redundant same-fluid face override after confirming vanilla already culls those faces, eliminating the per-face policy and diagnostics callbacks.
 - Moved the interior fast-path decision to vanilla's first face call so it reuses the six neighbor states already loaded by `FluidRenderer` instead of repeating chunk lookups.
 - Combined the fluid-block diagnostic increment with the existing timing counter lookup to reduce diagnostic overhead when profiling is enabled.
+- Reduced the Performance profile's cosmetic water-particle admission radius from 48 to 24 blocks to lower particle work while retaining nearby effects.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
