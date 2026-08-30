@@ -85,7 +85,7 @@ public final class ConfigManager {
 		if (!sameConfiguration(previous, updated)) {
 			Minecraft client = Minecraft.getInstance();
 			if (client.level != null && client.levelRenderer != null) {
-				client.levelRenderer.allChanged();
+				client.levelRenderer.invalidateCompiledGeometry();
 			}
 		}
 	}
