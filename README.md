@@ -19,7 +19,7 @@ Water Optimisation reduces client-side rendering work in water-heavy Minecraft s
 
 ## What the mod does
 
-The mod adds an opt-in rendering layer for Minecraft 26.2 with three configuration profiles: Vanilla, Balanced, and Performance. Each profile controls the same rendering features through a native Minecraft settings screen. Advanced controls are grouped into safe performance, experimental GPU rendering, and diagnostics so visual trade-offs are easy to find. Performance also disables cosmetic water particles by default and enables the conservative fog-tightened particle bound if particles are turned back on.
+The mod adds an opt-in rendering layer for Minecraft 26.2 with three configuration profiles: Vanilla, Balanced, and Performance. Each profile controls the same rendering features through a native Minecraft settings screen. Advanced controls are grouped into Performance, Water rendering, and Diagnostics so visual trade-offs are easy to find. Performance also disables cosmetic water particles by default and enables the conservative fog-tightened particle bound if particles are turned back on.
 
 ### Fluid geometry
 
@@ -61,7 +61,7 @@ These checks establish that the project compiles, packages, and remains within i
 
 The runtime validation matrix covers flat and ocean water, flowing water and waterfalls, waterlogged blocks, leaves and transparent boundaries, flooded caves, underwater views, chunk loading, block updates, and ordinary non-water scenes. It also includes Sodium present and absent, Mod Menu present and absent, and the available rendering backends.
 
-Runtime evidence is based on visual comparison with the feature disabled and measurements such as average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water geometry counts, and particle admission counts. The automated suite is complete; the target-hardware runtime matrix is the remaining source of visual and performance evidence for the 0.1.0-preview.6 build.
+Runtime evidence is based on visual comparison with the feature disabled and measurements such as average FPS, 1% lows, p95/p99 frame time, hitches, fluid and section compilation time, translucent resorting time, water geometry counts, and particle admission counts. The automated suite is complete; the target-hardware runtime matrix is the remaining source of visual and performance evidence for the 0.1.0-preview.7 build.
 
 ## Compatibility
 
@@ -71,7 +71,7 @@ The implementation uses Minecraft's Blaze3D, RenderPipeline, RenderType, and Fab
 
 ## Project state
 
-Water Optimisation is a 0.1.0-preview.6 build. The client-side implementation, organized configuration screens, diagnostics, automated tests, privacy audit, client-only audit, and artifact packaging are implemented. Visual and performance results are being established through the Minecraft runtime matrix.
+Water Optimisation is a 0.1.0-preview.7 build. The client-side implementation, organized configuration screens, diagnostics, automated tests, privacy audit, client-only audit, and artifact packaging are implemented. Visual and performance results are being established through the Minecraft runtime matrix.
 
 ## Reference
 

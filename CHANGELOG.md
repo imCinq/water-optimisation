@@ -2,6 +2,13 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.1.0-preview.7
+
+- Fixed the Advanced settings action row so the lower controls cannot be covered by the bottom buttons, including compact-height layouts.
+- Removed the yellow warning copy and the redundant renderer-status line from the in-game screens.
+- Reworded settings as plain-language questions, including “Skip hidden water blocks?” and “Reduce water geometry?”.
+- Kept the existing conservative fallback behavior and the opt-in reduced-face GPU experiment unchanged.
+
 ## 0.1.0-preview.6
 
 - Reorganized the native settings screens into Safe performance, Experimental GPU, and Diagnostics sections, with a compact two-column layout at normal widths and a narrow-screen fallback.
