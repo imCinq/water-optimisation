@@ -5,7 +5,7 @@
 Client fluid state
 → version-isolated FluidRenderer hook
 → already-loaded neighbor-state classifier
-→ vanilla fluid mesh path or explicit interior fast-path skip
+→ vanilla fluid mesh path or explicit fully-hidden source-water skip
 → translucent section buffer
 → section compilation and translucent resort diagnostics
 
@@ -33,11 +33,11 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 FluidRendererMixin targets Minecraft 26.2's public FluidRenderer tessellation method. The policy is intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
-- the flat path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when they are ordinary full source-water blocks;
-- Experimental reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace`, preserving the outward face while reducing translucent geometry. It is off by default and inactive when Sodium owns fluid rendering;
+- the flat path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
+- Experimental reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is off by default and inactive when Sodium owns fluid rendering;
 - flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
 
-The interior optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
+The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 ### Particle filter
 
@@ -45,7 +45,7 @@ ClientLevelMixin intercepts only the client-side addParticle overload. It exits 
 
 ### Diagnostics
 
-	Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread; fluid timing samples one in sixteen calls to avoid adding clock reads to every fluid block while the HUD remains open. The HUD snapshots and formats its lines at most four times per second, then reuses the immutable components between refreshes. Face decisions are deliberately not instrumented because a per-face callback costs more than the redundant optimization it replaced. Tracy is still required for frame-time distributions, tail latency, face counts, and independent verification.
+	Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread; fluid timing samples one in sixteen calls to avoid adding clock reads to every fluid block while the HUD remains open. The HUD snapshots and formats its lines at most four times per second, then reuses the immutable components between refreshes. Only removed reverse faces are counted, so the measurement does not add a callback to every vanilla face decision. Tracy is still required for frame-time distributions, tail latency, total face counts, and independent verification.
 
 ## Compatibility strategy
 

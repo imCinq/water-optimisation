@@ -13,26 +13,28 @@ The main screen contains:
 1. an enable switch;
 2. a Vanilla, Balanced, or Performance preset selector;
 3. a short client-only explanation;
-4. a visible visual-trade-off warning;
-5. a More settings button;
+4. a visible apply/visual-trade-off warning;
+5. an Advanced settings button;
 6. Done and Cancel buttons.
+
+It also identifies whether Vanilla or Sodium owns fluid geometry, so a user can tell immediately whether the experimental face control can affect the current renderer.
 
 Done saves the working copy. Cancel and Escape return to the parent screen without saving. The screen never changes a server or world setting.
 
 ## Advanced screen
 
-Advanced controls are separate from the main screen:
+Advanced controls are separate from the main screen and are grouped into three sections:
 
-- water culling mode;
-- enclosed-water fast path;
-- water particles;
-- particle distance;
-- distant-effect culling;
-- performance stats;
-- fallback logging;
-- Reset preset.
+- Safe performance: fully hidden water fast path, water particles, particle distance, and particle fog culling;
+- Experimental GPU: fluid-geometry mode, including the optional reduced reverse-face experiment;
+- Diagnostics: performance HUD and fallback logging.
 
-The labels communicate the choice without requiring knowledge of renderer internals. The enclosed-water fast path and Experimental reduced-face choice remain explicit; the warning explains that the latter can look different underwater. Sodium ownership keeps the choice inactive because Sodium controls its own fluid renderer.
+Reset preset is kept with the bottom action buttons because it changes the whole
+working copy rather than enabling a diagnostic.
+
+The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
+
+The labels communicate the choice without requiring knowledge of renderer internals. The fully hidden-water fast path and Experimental reduced-face choice remain explicit; the warning explains that the latter applies only to ordinary source water and can look different underwater. Sodium ownership disables the fluid controls because Sodium controls its own fluid renderer.
 
 ## Recovery
 

@@ -10,8 +10,10 @@ import net.minecraft.util.FormattedCharSequence;
 
 public final class AdvancedWaterOptimisationScreen extends Screen {
 	private static final int SIDE_MARGIN = 24;
-	private static final int MAX_TEXT_WIDTH = 520;
-	private static final int MAX_BUTTON_WIDTH = 310;
+	private static final int MAX_TEXT_WIDTH = 660;
+	private static final int MAX_BUTTON_WIDTH = 660;
+	private static final int COLUMN_GAP = 12;
+	private static final int SECTION_GAP = 12;
 	private static final int BUTTON_HEIGHT = 20;
 	private static final int BUTTON_GAP = 6;
 
@@ -27,9 +29,16 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private int contentWidth;
 	private int buttonLeft;
 	private int buttonWidth;
+	private int columnWidth;
+	private int rightColumnLeft;
 	private int descriptionY;
+	private int rendererY;
+	private int safeSectionY;
+	private int experimentalSectionY;
+	private int diagnosticsSectionY;
 	private int warningY;
 	private int actionY;
+	private boolean columns;
 
 	public AdvancedWaterOptimisationScreen(Screen parent, WaterOptimisationConfig workingCopy) {
 		super(Component.translatable("screen.wateroptimisation.advanced.title"));
@@ -40,58 +49,30 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	@Override
 	protected void init() {
 		this.contentWidth = Math.max(1, Math.min(MAX_TEXT_WIDTH, this.width - SIDE_MARGIN * 2));
-		this.buttonWidth = Math.max(1, Math.min(MAX_BUTTON_WIDTH, this.width - SIDE_MARGIN * 2));
+		this.buttonWidth = Math.max(1, Math.min(MAX_BUTTON_WIDTH, this.contentWidth));
 		this.buttonLeft = (this.width - this.buttonWidth) / 2;
 		this.descriptionY = 16;
 
-		int y = this.descriptionY + wrappedHeight(Component.translatable("screen.wateroptimisation.advanced.description")) + 8;
-		this.cullingButton = this.addRenderableWidget(Button.builder(cullingLabel(), button -> {
-			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
-			button.setMessage(cullingLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
+		int y = this.descriptionY
+				+ wrappedHeight(Component.translatable("screen.wateroptimisation.advanced.description"))
+				+ 4;
+		this.rendererY = y;
+		y += lineHeight() + 8;
+		this.columns = this.contentWidth >= 600;
+		if (this.columns) {
+			this.columnWidth = (this.contentWidth - COLUMN_GAP) / 2;
+			this.buttonWidth = this.columnWidth;
+			this.buttonLeft = (this.width - (this.columnWidth * 2 + COLUMN_GAP)) / 2;
+			this.rightColumnLeft = this.buttonLeft + this.columnWidth + COLUMN_GAP;
+			initColumns(y);
+		} else {
+			this.columnWidth = this.buttonWidth;
+			this.rightColumnLeft = this.buttonLeft;
+			initSingleColumn(y);
+		}
 
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.fastPathButton = this.addRenderableWidget(Button.builder(fastPathLabel(), button -> {
-			this.workingCopy.setFlatWaterFastPath(!this.workingCopy.isFlatWaterFastPath());
-			button.setMessage(fastPathLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.particlesButton = this.addRenderableWidget(Button.builder(particlesLabel(), button -> {
-			this.workingCopy.setWaterParticles(!this.workingCopy.isWaterParticles());
-			button.setMessage(particlesLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.particleDistanceButton = this.addRenderableWidget(Button.builder(particleDistanceLabel(), button -> {
-			int distance = this.workingCopy.getParticleDistance();
-			this.workingCopy.setParticleDistance(distance >= 128 ? 8 : distance * 2);
-			button.setMessage(particleDistanceLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.fogButton = this.addRenderableWidget(Button.builder(fogLabel(), button -> {
-			this.workingCopy.setParticleFogCulling(!this.workingCopy.isParticleFogCulling());
-			button.setMessage(fogLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.diagnosticsButton = this.addRenderableWidget(Button.builder(diagnosticsLabel(), button -> {
-			this.workingCopy.setDiagnosticsHud(!this.workingCopy.isDiagnosticsHud());
-			button.setMessage(diagnosticsLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT + BUTTON_GAP;
-		this.fallbackButton = this.addRenderableWidget(Button.builder(fallbackLabel(), button -> {
-			this.workingCopy.setDebugFallbackLogging(!this.workingCopy.isDebugFallbackLogging());
-			button.setMessage(fallbackLabel());
-		}).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
-
-		y += BUTTON_HEIGHT;
-		this.warningY = y + 8;
-		this.actionY = this.warningY + wrappedHeight(Component.translatable("screen.wateroptimisation.advanced.warning")) + 8;
+		this.actionY = this.height - 34;
 		int actionWidth = Math.max(1, (this.buttonWidth - 10) / 2);
-
 		this.addRenderableWidget(Button.builder(
 				Component.translatable("screen.wateroptimisation.reset"),
 				button -> {
@@ -106,16 +87,130 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		).bounds(this.buttonLeft + actionWidth + 10, this.actionY, this.buttonWidth - actionWidth - 10, BUTTON_HEIGHT).build());
 	}
 
+	private void initColumns(int top) {
+		this.safeSectionY = top;
+		this.experimentalSectionY = top;
+		int controlsY = top + lineHeight() + 4;
+		int safeBottom = controlsY + 4 * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
+
+		this.fastPathButton = addFastPathButton(this.buttonLeft, controlsY);
+		this.particlesButton = addParticlesButton(this.buttonLeft, controlsY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.particleDistanceButton = addParticleDistanceButton(this.buttonLeft, controlsY + 2 * (BUTTON_HEIGHT + BUTTON_GAP));
+		this.fogButton = addFogButton(this.buttonLeft, controlsY + 3 * (BUTTON_HEIGHT + BUTTON_GAP));
+
+		this.cullingButton = addCullingButton(this.rightColumnLeft, controlsY);
+		this.diagnosticsSectionY = controlsY + BUTTON_HEIGHT + BUTTON_GAP + 8;
+		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
+		this.diagnosticsButton = addDiagnosticsButton(this.rightColumnLeft, diagnosticsY);
+		this.fallbackButton = addFallbackButton(this.rightColumnLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
+		int diagnosticsBottom = diagnosticsY + 2 * BUTTON_HEIGHT + BUTTON_GAP;
+		this.warningY = Math.max(safeBottom, diagnosticsBottom) + SECTION_GAP;
+	}
+
+	private void initSingleColumn(int top) {
+		this.safeSectionY = top;
+		int controlsY = top + lineHeight() + 4;
+		this.fastPathButton = addFastPathButton(this.buttonLeft, controlsY);
+		this.particlesButton = addParticlesButton(this.buttonLeft, controlsY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.particleDistanceButton = addParticleDistanceButton(this.buttonLeft, controlsY + 2 * (BUTTON_HEIGHT + BUTTON_GAP));
+		this.fogButton = addFogButton(this.buttonLeft, controlsY + 3 * (BUTTON_HEIGHT + BUTTON_GAP));
+		int safeBottom = controlsY + 4 * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
+
+		this.experimentalSectionY = safeBottom + SECTION_GAP;
+		int cullingY = this.experimentalSectionY + lineHeight() + 4;
+		this.cullingButton = addCullingButton(this.buttonLeft, cullingY);
+
+		this.diagnosticsSectionY = cullingY + BUTTON_HEIGHT + SECTION_GAP;
+		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
+		this.diagnosticsButton = addDiagnosticsButton(this.buttonLeft, diagnosticsY);
+		this.fallbackButton = addFallbackButton(this.buttonLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.warningY = diagnosticsY + 2 * BUTTON_HEIGHT + BUTTON_GAP + SECTION_GAP;
+	}
+
+	private Button addCullingButton(int left, int top) {
+		Button button = this.addRenderableWidget(Button.builder(cullingLabel(), clicked -> {
+			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
+			clicked.setMessage(cullingLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.active = !WaterOptimisationClient.isSodiumLoaded();
+		return button;
+	}
+
+	private Button addFastPathButton(int left, int top) {
+		Button button = this.addRenderableWidget(Button.builder(fastPathLabel(), clicked -> {
+			this.workingCopy.setFlatWaterFastPath(!this.workingCopy.isFlatWaterFastPath());
+			clicked.setMessage(fastPathLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.active = !WaterOptimisationClient.isSodiumLoaded();
+		return button;
+	}
+
+	private Button addParticlesButton(int left, int top) {
+		return this.addRenderableWidget(Button.builder(particlesLabel(), button -> {
+			this.workingCopy.setWaterParticles(!this.workingCopy.isWaterParticles());
+			button.setMessage(particlesLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+	}
+
+	private Button addParticleDistanceButton(int left, int top) {
+		return this.addRenderableWidget(Button.builder(particleDistanceLabel(), button -> {
+			int distance = this.workingCopy.getParticleDistance();
+			this.workingCopy.setParticleDistance(distance >= WaterOptimisationConfig.MAX_PARTICLE_DISTANCE
+					? WaterOptimisationConfig.MIN_PARTICLE_DISTANCE
+					: distance * 2);
+			button.setMessage(particleDistanceLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+	}
+
+	private Button addFogButton(int left, int top) {
+		return this.addRenderableWidget(Button.builder(fogLabel(), button -> {
+			this.workingCopy.setParticleFogCulling(!this.workingCopy.isParticleFogCulling());
+			button.setMessage(fogLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+	}
+
+	private Button addDiagnosticsButton(int left, int top) {
+		return this.addRenderableWidget(Button.builder(diagnosticsLabel(), button -> {
+			this.workingCopy.setDiagnosticsHud(!this.workingCopy.isDiagnosticsHud());
+			button.setMessage(diagnosticsLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+	}
+
+	private Button addFallbackButton(int left, int top) {
+		return this.addRenderableWidget(Button.builder(fallbackLabel(), button -> {
+			this.workingCopy.setDebugFallbackLogging(!this.workingCopy.isDebugFallbackLogging());
+			button.setMessage(fallbackLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+	}
+
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.advanced.description"), this.descriptionY, 0xFFFFFFFF);
+		drawCenteredWrapped(graphics, rendererStatus(), this.rendererY, 0xFFAAAAAA);
+		if (this.columns) {
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.safe"), this.buttonLeft, this.safeSectionY, this.columnWidth);
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.experimental"), this.rightColumnLeft, this.experimentalSectionY, this.columnWidth);
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.diagnostics"), this.rightColumnLeft, this.diagnosticsSectionY, this.columnWidth);
+		} else {
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.safe"), this.buttonLeft, this.safeSectionY, this.buttonWidth);
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.experimental"), this.buttonLeft, this.experimentalSectionY, this.buttonWidth);
+			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.diagnostics"), this.buttonLeft, this.diagnosticsSectionY, this.buttonWidth);
+		}
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.advanced.warning"), this.warningY, 0xFFFFCC66);
 	}
 
 	@Override
 	public void onClose() {
 		this.minecraft.gui.setScreen(this.parent);
+	}
+
+	private Component rendererStatus() {
+		return Component.translatable(
+				WaterOptimisationClient.isSodiumLoaded()
+						? "screen.wateroptimisation.renderer.sodium"
+						: "screen.wateroptimisation.renderer.vanilla"
+		);
 	}
 
 	private Component cullingLabel() {
@@ -156,6 +251,12 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private int wrappedHeight(Component text) {
 		return Math.max(1, this.font.split(text, this.contentWidth).size()) * lineHeight();
+	}
+
+	private void drawSectionLabel(GuiGraphicsExtractor graphics, Component text, int left, int top, int width) {
+		graphics.text(this.font, text, left, top, 0xFF80B0FF, true);
+		int lineY = top + lineHeight() - 2;
+		graphics.fill(left, lineY, left + width, lineY + 1, 0x663B82F6);
 	}
 
 	private void drawCenteredWrapped(GuiGraphicsExtractor graphics, Component text, int top, int color) {

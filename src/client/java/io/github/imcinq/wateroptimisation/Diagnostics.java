@@ -40,6 +40,13 @@ public final class Diagnostics {
 		}
 	}
 
+	public static void recordReducedWaterBackface() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.reducedWaterBackfaces.increment();
+		}
+	}
+
 	public static void recordFluidFallback(String reason) {
 		Counters counters = activeCounters();
 		if (counters == null) {
@@ -167,6 +174,7 @@ public final class Diagnostics {
 		return new Snapshot(
 				counters.fluidBlocksVisited.sum(),
 				counters.fluidFastPathSkips.sum(),
+				counters.reducedWaterBackfaces.sum(),
 				counters.fluidFallbacks.sum(),
 				counters.particleCandidates.sum(),
 				counters.particleRejected.sum(),
@@ -194,6 +202,7 @@ public final class Diagnostics {
 	private static final class Counters {
 		private final LongAdder fluidBlocksVisited = new LongAdder();
 		private final LongAdder fluidFastPathSkips = new LongAdder();
+		private final LongAdder reducedWaterBackfaces = new LongAdder();
 		private final LongAdder fluidFallbacks = new LongAdder();
 		private final LongAdder particleCandidates = new LongAdder();
 		private final LongAdder particleRejected = new LongAdder();
@@ -225,6 +234,7 @@ public final class Diagnostics {
 	public record Snapshot(
 			long fluidBlocksVisited,
 			long fluidFastPathSkips,
+			long reducedWaterBackfaces,
 			long fluidFallbacks,
 			long particleCandidates,
 			long particleRejected,

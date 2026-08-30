@@ -5,7 +5,6 @@ import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +30,13 @@ public abstract class FluidRendererMixin {
 		if (!addBackFace || !FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			return addBackFace;
 		}
-		return Boolean.TRUE.equals(wateroptimisation$waterTessellation.get()) ? false : addBackFace;
+		if (!Boolean.TRUE.equals(wateroptimisation$waterTessellation.get())) {
+			return addBackFace;
+		}
+		if (Diagnostics.isEnabled()) {
+			Diagnostics.recordReducedWaterBackface();
+		}
+		return false;
 	}
 
 	@Inject(method = "tesselate", at = @At("HEAD"))
@@ -44,7 +49,11 @@ public abstract class FluidRendererMixin {
 			CallbackInfo callback
 	) {
 		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
-			wateroptimisation$waterTessellation.set(fluidState.is(FluidTags.WATER));
+			if (FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
+				wateroptimisation$waterTessellation.set(Boolean.TRUE);
+			} else {
+				wateroptimisation$waterTessellation.set(Boolean.FALSE);
+			}
 		}
 		if (!Diagnostics.isEnabled()) {
 			return;
@@ -108,9 +117,6 @@ public abstract class FluidRendererMixin {
 			Diagnostics.recordFluidFastPathSkip();
 			Diagnostics.endFluidCompile();
 		}
-		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
-			wateroptimisation$waterTessellation.remove();
-		}
 		callback.cancel();
 	}
 
@@ -123,9 +129,6 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
-			wateroptimisation$waterTessellation.remove();
-		}
 		if (!Diagnostics.isEnabled()) {
 			return;
 		}

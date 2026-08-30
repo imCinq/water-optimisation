@@ -39,13 +39,13 @@ Test with the feature disabled and enabled in:
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.
 
-For the Experimental reduced-face mode, additionally compare above-water, underwater, waterlogged, glass/leaves, cave, and surface-transition views. Confirm the outward water face remains present, note any missing reverse faces, and verify that switching back to Conservative rebuilds the sections.
+For the Experimental reduced-face mode, additionally compare above-water, underwater, waterlogged, glass/leaves, cave, and surface-transition views. Confirm that flowing and waterlogged water remain vanilla, the outward source-water face remains present, note any missing reverse faces, and verify that switching back to Conservative rebuilds the sections.
 
 Look for missing planes, seams, z-fighting, incorrect overlays, wrong flow orientation, lighting differences, stale geometry, unreadable labels, clipped descriptions, and settings that fail to persist.
 
 ## Performance measurements
 
-Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks, interior fast-path skips, face counts from Tracy or mesh statistics, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
+Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks, fully hidden fast-path skips, removed reverse faces, total face counts from Tracy or mesh statistics, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
 
 Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
 
