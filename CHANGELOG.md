@@ -11,4 +11,6 @@ All notable changes to this project will be documented here.
 - Added maintenance, distribution, and repository privacy-audit guidance.
 - Added the optional Mod Menu, simple-profile, and Advanced-settings plan.
 - Added the remote-first Codex implementation and verification plan.
-- No runtime mod implementation has been added yet.
+- Added the initial Fabric 26.2 client-only build scaffold and remote build workflow on the issue #7 branch.
+- Added a client-only boundary audit for the scaffold.
+- No rendering optimisation, configuration, or Mod Menu implementation is active yet.
