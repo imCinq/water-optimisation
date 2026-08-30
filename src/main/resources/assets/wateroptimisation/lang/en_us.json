@@ -9,6 +9,7 @@
 	"screen.wateroptimisation.advanced": "Advanced settings",
 	"screen.wateroptimisation.advanced.title": "Water Optimisation — Advanced",
 	"screen.wateroptimisation.advanced.description": "Want better performance? Start with Performance. Some water options can change how underwater views look.",
+	"screen.wateroptimisation.sodium_notice": "Some options may be replaced by the Sodium renderer.",
 	"screen.wateroptimisation.section.safe": "Performance",
 	"screen.wateroptimisation.section.experimental": "Water rendering",
 	"screen.wateroptimisation.section.diagnostics": "Diagnostics",
