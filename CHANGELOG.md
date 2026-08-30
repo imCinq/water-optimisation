@@ -2,6 +2,17 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.0.1 — 2026-08-30
+
+The first official release of Water Optimisation for Minecraft 26.2.
+
+- Published the client-only rendering and cosmetic-particle optimization package with Fabric-compatible metadata.
+- Added clear Vanilla, Balanced, Performance, and Maximum FPS profiles with native Minecraft settings screens.
+- Added the Cinq water-block logo to the public project presentation and refreshed the README for installation, configuration, compatibility, and testing.
+- Kept the conservative hidden source-water fast path as the recommended performance option.
+- Kept Maximum FPS opt-in because reduced inward water faces can change unusual inside-water or transparent-boundary views.
+- Preserved Sodium renderer ownership and vanilla fallbacks for flowing, waterlogged, partial, transparent, overlay, and ambiguous cases.
+
 ## 0.1.0-preview.8
 
 - Added a clear Maximum FPS profile that enables the existing reduced-face GPU path together with the hidden-water fast path.
@@ -70,4 +81,4 @@ All notable changes to Water Optimisation are documented here.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
+The preview entries below are retained as development history. The 0.0.1 package is the canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.

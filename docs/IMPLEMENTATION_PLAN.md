@@ -2,9 +2,9 @@
 
 Water Optimisation is developed as a conservative, client-only rendering mod. Every optimization must be measurable, visually reviewable, and safe to disable.
 
-## Current preview
+## Current release
 
-The 0.1.0-preview.8 build contains the first GPU-focused experiment for Minecraft 26.2:
+The 0.0.1 release contains the current client-only implementation for Minecraft 26.2:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
@@ -17,7 +17,7 @@ The 0.1.0-preview.8 build contains the first GPU-focused experiment for Minecraf
 - Sodium renderer-ownership protection;
 - automated tests and repository audits.
 
-The implementation is build-verified. Local visual, performance, backend, companion-mod, and multiplayer validation remain part of release acceptance.
+The implementation is build-verified and packaged as the first official GitHub release. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
 
 ## Completed phases
 

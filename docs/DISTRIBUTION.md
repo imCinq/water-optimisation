@@ -2,13 +2,13 @@
 
 ## Current status
 
-Water Optimisation 0.1.0-preview.8 is an experimental Minecraft 26.2 preview. The repository is prepared for a public release candidate, but no stable artifact has been published. Build artifacts from GitHub Actions are temporary verification outputs.
+Water Optimisation 0.0.1 is the first official stable GitHub release for Minecraft 26.2. The development previews remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
-| Mod version | 0.1.0-preview.8 |
+| Mod version | 0.0.1 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3 or newer |
 | Fabric API | 0.158.0+26.2 |
@@ -18,11 +18,11 @@ Water Optimisation 0.1.0-preview.8 is an experimental Minecraft 26.2 preview. Th
 | License | MIT |
 | Creator attribution | Cinq |
 
-## Preview artifacts
+## Release artifacts
 
-For temporary preview testing, use the latest successful [GitHub Actions build](https://github.com/imCinq/water-optimisation/actions/workflows/build.yml). Verify that the artifact is from the reviewed commit, extract the runtime JAR, and pair it with the matching Fabric API build.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.1) for the canonical runtime JAR and matching sources JAR. Verify the tag, accepted commit, and SHA-256 checksum before distributing the artifact.
 
-Workflow artifacts expire and are not the canonical distribution format. Do not describe an Actions artifact as a stable release or rely on it as a permanent download.
+GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
 ## Stable release requirements
 
@@ -41,13 +41,13 @@ Before publishing a stable artifact:
 
 Use the [public release checklist](RELEASE_CHECKLIST.md) as the acceptance record.
 
-## Publishing sequence
+## Publishing sequence for future releases
 
 1. Complete and review the release checklist.
 2. Create the version tag from the accepted commit.
 3. Rebuild and test the exact tagged commit.
 4. Publish a GitHub Release with the runtime JAR, optional sources JAR, SHA-256 checksum, changelog, compatibility notes, and known limitations.
-5. Mark the artifact as a pre-release until the documented validation supports a stable release.
+5. Mark the artifact as a pre-release when the documented validation is not yet sufficient for a stable release.
 6. Publish to Modrinth only after the release package and project permissions are reviewed.
 
 Publishing is intentionally manual. No publishing automation or update checker is enabled.
