@@ -17,5 +17,6 @@ All notable changes to Water Optimisation are documented here.
 - Added public release checklist and exact preview build-profile documentation.
 - Removed redundant setup and agent-only repository files from the public tree.
 - Replaced the plan-oriented README with an implementation and testing guide.
+- Fixed the SectionCompiler mixin target to match vanilla Minecraft 26.2.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
