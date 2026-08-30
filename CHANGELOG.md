@@ -89,4 +89,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.1 package is the canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.2 package is the current canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.
