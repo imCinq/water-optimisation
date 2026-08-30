@@ -33,6 +33,10 @@ public final class Diagnostics {
 		instrumentationEnabled = config != null && (config.isDiagnosticsHud() || config.isDebugFallbackLogging());
 	}
 
+	public static boolean isEnabled() {
+		return instrumentationEnabled;
+	}
+
 	/**
 	 * Clears counters so a new settings/benchmark run starts from zero.
 	 */
