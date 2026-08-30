@@ -16,5 +16,6 @@ All notable changes to Water Optimisation are documented here.
 - Added public documentation, benchmark templates, and the creator logo asset.
 - Added public release checklist and exact preview build-profile documentation.
 - Removed redundant setup and agent-only repository files from the public tree.
+- Replaced the plan-oriented README with an implementation and testing guide.
 
 This preview still requires visual, performance, renderer, and multiplayer compatibility validation before a stable release.
