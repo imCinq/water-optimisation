@@ -20,7 +20,10 @@ if grep -Eq '"(main|server|preLaunch)"[[:space:]]*:' "$metadata_file"; then
 	exit 1
 fi
 
-forbidden_pattern='ClientPlayNetworking|ServerPlayNetworking|net\.minecraft\.network\.|net\.minecraft\.server\.|ServerTickEvents|ServerLifecycleEvents|setBlockAndUpdate|setDeltaMovement|setVelocity|teleportTo|clickSlot|sendChat'
+# net.minecraft.network.chat.Component is local UI text in official mappings.
+# The audit therefore rejects packet/buffer/listener namespaces rather than the
+# entire network package.
+forbidden_pattern='ClientPlayNetworking|ServerPlayNetworking|ClientPacket|ServerPacket|net\.minecraft\.network\.(protocol|Connection|FriendlyByteBuf|RegistryFriendlyByteBuf|Packet|PacketListener)|net\.minecraft\.server\.|ServerTickEvents|ServerLifecycleEvents|setBlockAndUpdate|setDeltaMovement|setVelocity|teleportTo|clickSlot|sendChat'
 
 if grep -RInE \
 	--include='*.java' \
