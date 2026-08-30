@@ -107,10 +107,8 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				|| type == ParticleTypes.CURRENT_DOWN
 				|| type == ParticleTypes.DRIPPING_WATER
 				|| type == ParticleTypes.FALLING_WATER
-				|| type == ParticleTypes.LANDING_WATER
 				|| type == ParticleTypes.SPLASH
-				|| type == ParticleTypes.UNDERWATER
-				|| type == ParticleTypes.WAKE;
+				|| type == ParticleTypes.UNDERWATER;
 	}
 
 	private static void extractDiagnostics(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
