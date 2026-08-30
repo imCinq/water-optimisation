@@ -24,7 +24,6 @@ public final class WaterOptimisationScreen extends Screen {
 	private int buttonWidth;
 	private int descriptionY;
 	private int warningY;
-	private int keybindY;
 
 	public WaterOptimisationScreen(Screen parent) {
 		this(parent, ConfigManager.copy());
@@ -70,7 +69,6 @@ public final class WaterOptimisationScreen extends Screen {
 
 		y += BUTTON_HEIGHT;
 		this.warningY = y + 8;
-		this.keybindY = this.warningY + wrappedHeight(Component.translatable("screen.wateroptimisation.warning")) + 4;
 
 		int actionWidth = Math.max(1, (this.buttonWidth - 10) / 2);
 		int actionY = this.height - 34;
@@ -90,7 +88,6 @@ public final class WaterOptimisationScreen extends Screen {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.description"), this.descriptionY, 0xFFFFFFFF);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.warning"), this.warningY, 0xFFFFCC66);
-		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.keybind"), this.keybindY, 0xFFAAAAAA);
 	}
 
 	@Override
