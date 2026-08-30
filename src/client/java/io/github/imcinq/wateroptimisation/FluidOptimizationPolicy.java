@@ -47,11 +47,12 @@ public final class FluidOptimizationPolicy {
 	}
 
 	/**
-	 * Skips only a complete source-water cube whose six neighboring block and
-	 * fluid states are also ordinary full water blocks. The caller supplies the
-	 * states already loaded by vanilla, so this predicate does not repeat chunk
-	 * lookups. Any boundary, flow, waterlogged block, overlay, or unusual
-	 * transparency case falls back to vanilla tessellation.
+	 * Skips only an ordinary source-water block whose six neighboring faces are
+	 * already known to be hidden by another ordinary source-water block or a
+	 * full solid-rendering block. The caller supplies the states already loaded
+	 * by vanilla, so this predicate does not repeat chunk lookups. Any boundary,
+	 * flowing state, waterlogged block, overlay, or unusual transparency case
+	 * falls back to vanilla tessellation.
 	 */
 	public static boolean shouldSkipInteriorSourceWater(
 			BlockState blockState,
@@ -69,21 +70,29 @@ public final class FluidOptimizationPolicy {
 			BlockState blockStateEast,
 			FluidState fluidStateEast
 	) {
-		if (!isOrdinarySourceWater(blockState, fluidState)
-				|| !isOrdinarySourceWater(blockStateUp, fluidStateUp)) {
+		if (!isOrdinarySourceWater(blockState, fluidState)) {
 			return false;
 		}
 
-		return isOrdinarySourceWater(blockStateDown, fluidStateDown)
-				&& isOrdinarySourceWater(blockStateNorth, fluidStateNorth)
-				&& isOrdinarySourceWater(blockStateSouth, fluidStateSouth)
-				&& isOrdinarySourceWater(blockStateWest, fluidStateWest)
-				&& isOrdinarySourceWater(blockStateEast, fluidStateEast);
+		return hidesFluidFace(blockStateDown, fluidStateDown)
+				&& hidesFluidFace(blockStateUp, fluidStateUp)
+				&& hidesFluidFace(blockStateNorth, fluidStateNorth)
+				&& hidesFluidFace(blockStateSouth, fluidStateSouth)
+				&& hidesFluidFace(blockStateWest, fluidStateWest)
+				&& hidesFluidFace(blockStateEast, fluidStateEast);
 	}
 
-	private static boolean isOrdinarySourceWater(BlockState blockState, FluidState fluidState) {
+	/**
+	 * Identifies the only fluid shape eligible for the experimental reverse-face
+	 * reduction. Flowing water and waterlogged states deliberately stay vanilla.
+	 */
+	public static boolean isOrdinarySourceWater(BlockState blockState, FluidState fluidState) {
 		return blockState.is(Blocks.WATER)
 				&& fluidState.getType() == Fluids.WATER
 				&& fluidState.isSource();
+	}
+
+	private static boolean hidesFluidFace(BlockState blockState, FluidState fluidState) {
+		return blockState.isSolidRender() || isOrdinarySourceWater(blockState, fluidState);
 	}
 }

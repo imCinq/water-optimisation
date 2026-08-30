@@ -19,21 +19,21 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
 | Performance | Keeps vanilla fluid-face decisions, enables the explicitly labelled flat source-water fast path, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. |
 
-Selecting a preset resets its More settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
+Selecting a preset resets its Advanced settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
-## More settings
+## Advanced settings
 
 | Setting | Default | Behavior |
 | --- | --- | --- |
-| fluidCullingMode | conservative | Disabled, Conservative, or Experimental. Disabled turns off fluid hooks; Conservative enables only the enclosed-water fast path; Experimental additionally removes vanilla's optional reverse fluid faces. |
-| flatWaterFastPath | false | Skips only an ordinary source-water block surrounded on all six sides by ordinary source-water blocks. |
+| fluidCullingMode | conservative | Disabled, Conservative, or Experimental. Disabled turns off fluid hooks; Conservative enables only the fully hidden source-water fast path; Experimental additionally removes vanilla's optional reverse fluid faces for ordinary full source-water blocks. |
+| flatWaterFastPath | false | Skips only an ordinary source-water block whose six neighboring faces are hidden by ordinary source-water blocks or full solid-rendering blocks. |
 | waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. The Performance preset sets this to false. |
 | particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. The Performance preset uses 16. During camera initialization, the player position is used as a lifecycle fallback. |
 | particleFogCulling | false | Tightens the camera-relative distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. The Performance preset enables it. |
-| diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, and translucent-resort averages. |
+| diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, translucent-resort averages, and removed reverse-face counts. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
-The experimental label is intentional. Experimental reduced-face mode can change how water looks from inside a fluid volume or through unusual transparent arrangements. It is disabled by all presets and by Sodium ownership. Ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
+The experimental label is intentional. Experimental reduced-face mode can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is disabled by all presets and by Sodium ownership. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
 
 ## Compatibility behavior
 

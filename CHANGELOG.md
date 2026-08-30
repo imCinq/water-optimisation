@@ -2,6 +2,16 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 0.1.0-preview.6
+
+- Reorganized the native settings screens into Safe performance, Experimental GPU, and Diagnostics sections, with a compact two-column layout at normal widths and a narrow-screen fallback.
+- Added clear Vanilla/Sodium renderer ownership status to the settings screens.
+- Expanded the fully hidden source-water fast path to include faces hidden by full solid-rendering blocks while retaining vanilla fallback behavior for flowing, waterlogged, transparent, overlay, and ambiguous cases.
+- Limited experimental reverse-face reduction to ordinary full source-water blocks so flowing and waterlogged water stay vanilla.
+- Added a diagnostics counter for the reverse faces actually removed, making the GPU experiment measurable.
+- Removed redundant thread-local cleanup from the reduced-face fluid path and kept safe/disabled paths free of thread-local work to reduce section-compilation overhead.
+- Kept camera-relative water distance fading and global translucent-sort bypasses deferred because the shared translucent layer cannot safely make them water-only.
+
 ## 0.1.0-preview.5
 
 - Added an explicit Experimental reduced-face mode for vanilla fluid rendering.

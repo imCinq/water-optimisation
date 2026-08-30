@@ -121,4 +121,13 @@ class WaterOptimisationConfigTest {
 
 		assertFalse(original.sameFluidRenderingConfiguration(changed));
 	}
+
+	@Test
+	void experimentalFluidModeRequiresFluidSectionRefresh() {
+		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
+		WaterOptimisationConfig changed = original.copy();
+		changed.setFluidCullingMode(WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL);
+
+		assertFalse(original.sameFluidRenderingConfiguration(changed));
+	}
 }
