@@ -22,9 +22,8 @@ class WaterOptimisationConfigTest {
 	}
 
 	@Test
-	void profileResetKeepsNonVanillaProfilesOptIn() {
+	void selectingNonVanillaProfileActivatesThePreset() {
 		WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
-		config.setEnabled(true);
 
 		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.BALANCED);
 		assertTrue(config.isEnabled());

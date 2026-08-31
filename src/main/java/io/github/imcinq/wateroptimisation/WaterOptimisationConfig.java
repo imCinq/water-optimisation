@@ -122,6 +122,7 @@ public final class WaterOptimisationConfig {
 				this.debugFallbackLogging = false;
 			}
 			case BALANCED -> {
+				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 				this.flatWaterFastPath = false;
 				this.waterParticles = true;
@@ -131,6 +132,7 @@ public final class WaterOptimisationConfig {
 				this.debugFallbackLogging = false;
 			}
 			case PERFORMANCE -> {
+				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 				this.flatWaterFastPath = true;
 				this.waterParticles = false;
@@ -140,6 +142,7 @@ public final class WaterOptimisationConfig {
 				this.debugFallbackLogging = false;
 			}
 			case MAXIMUM -> {
+				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.EXPERIMENTAL;
 				this.flatWaterFastPath = true;
 				this.waterParticles = false;

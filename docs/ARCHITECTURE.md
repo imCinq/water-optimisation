@@ -3,7 +3,7 @@
 ## Data flow
 
 Client fluid state
-→ version-isolated FluidRenderer hook
+→ version-isolated FluidRenderer hook or optional Sodium face bridge
 → already-loaded neighbor-state classifier
 → vanilla fluid mesh path or explicit fully-hidden source-water skip
 → translucent section buffer
@@ -51,7 +51,7 @@ ClientLevelMixin intercepts only the client-side addParticle overload. It exits 
 
 - Fabric API is the primary client integration surface.
 - Mod Menu is optional and contains no renderer logic.
-- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks.
+- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. A separate version-gated bridge can remove only the reversed copy of ordinary source-water quads on reviewed Sodium 0.9.x/Minecraft 26.2 builds; unknown builds fall back to Sodium unchanged.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.
 

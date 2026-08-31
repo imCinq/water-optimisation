@@ -139,7 +139,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
-		button.active = !WaterOptimisationClient.isSodiumLoaded();
+		button.active = !WaterOptimisationClient.isSodiumLoaded()
+				|| SodiumFluidIntegration.geometryHooksAvailable();
 		return button;
 	}
 

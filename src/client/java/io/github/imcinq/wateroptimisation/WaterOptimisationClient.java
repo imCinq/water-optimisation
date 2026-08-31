@@ -60,13 +60,44 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		);
 
 		if (sodiumLoaded) {
-			LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled for renderer ownership compatibility.");
+			if (SodiumFluidIntegration.isSupportedVersion()) {
+				LOGGER.info("Sodium 0.9.x for Minecraft 26.2 detected; vanilla fluid hooks remain disabled and the optional inward-face bridge is available after its hooks match.");
+			} else {
+				LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and this Sodium build remains on the particle-only fallback.");
+			}
 		}
 		LOGGER.info("Water Optimisation initialized; rendering changes are opt-in and default to safe no-op behavior.");
 	}
 
 	public static boolean isSodiumLoaded() {
 		return sodiumLoaded;
+	}
+
+	/**
+	 * Describes the path that the current working configuration can actually
+	 * use. This is intentionally based on the supplied copy rather than the
+	 * saved global policy, so the settings screen stays truthful before Apply.
+	 */
+	public static Component effectivePath(WaterOptimisationConfig config) {
+		if (config == null || !config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
+			return Component.translatable("wateroptimisation.path.disabled");
+		}
+
+		if (isSodiumLoaded()) {
+			if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
+					&& SodiumFluidIntegration.geometryHooksAvailable()) {
+				return Component.translatable("wateroptimisation.path.sodium_reduced_faces");
+			}
+			return Component.translatable("wateroptimisation.path.sodium_particles");
+		}
+
+		if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL) {
+			return Component.translatable("wateroptimisation.path.reduced_faces");
+		}
+		if (config.isFlatWaterFastPath() && config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED) {
+			return Component.translatable("wateroptimisation.path.hidden_compile");
+		}
+		return Component.translatable("wateroptimisation.path.vanilla_particles");
 	}
 
 	public static void refreshParticleFiltering(WaterOptimisationConfig config) {

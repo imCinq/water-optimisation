@@ -48,15 +48,17 @@ Sodium ownership detection disables the vanilla fluid hooks rather than replacin
 
 ### Phase 6 — Experimental reduced faces
 
-The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering.
+The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled in the vanilla hook when Sodium owns fluid rendering. A separate, version-gated Sodium 0.9.x/Minecraft 26.2 bridge applies the same narrow face reduction without replacing Sodium's renderer; unknown builds remain on the fallback.
 
 ## Next priorities
 
 - Complete local visual and performance validation.
+- Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
 - Consider rolling diagnostics and fallback reason reporting.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.
 - Keep camera-relative water-distance fading deferred until a separate water render layer or renderer-specific integration can make it correct.
+- Treat a dedicated far-water pass as a separate renderer experiment: it must separate water from the shared translucent layer before any distance cutoff or half-resolution mode is enabled.
 - Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.
 
 ## Release gate

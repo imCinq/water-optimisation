@@ -23,6 +23,7 @@ public final class WaterOptimisationScreen extends Screen {
 	private int buttonLeft;
 	private int buttonWidth;
 	private int descriptionY;
+	private int effectivePathY;
 
 	public WaterOptimisationScreen(Screen parent) {
 		this(parent, ConfigManager.copy());
@@ -41,7 +42,10 @@ public final class WaterOptimisationScreen extends Screen {
 		this.buttonLeft = (this.width - this.buttonWidth) / 2;
 		this.descriptionY = 34;
 
-		int y = this.descriptionY + wrappedHeight(Component.translatable("screen.wateroptimisation.description")) + 8;
+		Component description = Component.translatable("screen.wateroptimisation.description");
+		int y = this.descriptionY + wrappedHeight(description) + 4;
+		this.effectivePathY = y;
+		y += wrappedHeight(effectivePathLabel()) + 8;
 		this.enabledButton = this.addRenderableWidget(Button.builder(
 				enabledLabel(),
 				button -> {
@@ -83,6 +87,7 @@ public final class WaterOptimisationScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.description"), this.descriptionY, 0xFFFFFFFF);
+		drawCenteredWrapped(graphics, effectivePathLabel(), this.effectivePathY, 0xFFB0B0B0);
 	}
 
 	@Override
@@ -112,6 +117,10 @@ public final class WaterOptimisationScreen extends Screen {
 				"screen.wateroptimisation.profile",
 				Component.translatable(this.workingCopy.getPerformanceProfile().translationKey())
 		);
+	}
+
+	private Component effectivePathLabel() {
+		return Component.translatable("screen.wateroptimisation.effective_path", WaterOptimisationClient.effectivePath(this.workingCopy));
 	}
 
 	private int lineHeight() {
