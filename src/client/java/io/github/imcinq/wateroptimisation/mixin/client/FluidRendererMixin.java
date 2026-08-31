@@ -1,6 +1,7 @@
 package io.github.imcinq.wateroptimisation.mixin.client;
 
 import io.github.imcinq.wateroptimisation.Diagnostics;
+import io.github.imcinq.wateroptimisation.FlatWaterSurfacePolicy;
 import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
