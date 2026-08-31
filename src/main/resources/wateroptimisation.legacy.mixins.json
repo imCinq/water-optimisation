@@ -2,7 +2,7 @@
 	"required": true,
 	"minVersion": "0.8",
 	"package": "io.github.imcinq.wateroptimisation.mixin.client",
-	"compatibilityLevel": "${java_compatibility_level}",
+	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ClientLevelMixin",
 		"FluidRendererMixin",
@@ -10,6 +10,6 @@
 		"ResortTransparencyTaskMixin"
 	],
 	"injectors": {
-		"defaultRequire": ${mixin_default_require}
+		"defaultRequire": 0
 	}
 }

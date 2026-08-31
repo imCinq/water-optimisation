@@ -9,6 +9,7 @@ public final class Diagnostics {
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
 	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
 	private static volatile boolean instrumentationEnabled;
+	private static volatile boolean debugFallbackLogging;
 
 	private Diagnostics() {
 	}
@@ -19,6 +20,7 @@ public final class Diagnostics {
 	 */
 	public static void updateConfig(WaterOptimisationConfig config) {
 		instrumentationEnabled = config != null && (config.isDiagnosticsHud() || config.isDebugFallbackLogging());
+		debugFallbackLogging = config != null && config.isDebugFallbackLogging();
 	}
 
 	public static boolean isEnabled() {
@@ -53,8 +55,8 @@ public final class Diagnostics {
 			return;
 		}
 		counters.fluidFallbacks.increment();
-		if (ConfigManager.get().isDebugFallbackLogging()) {
-			WaterOptimisationClient.LOGGER.debug("Fluid optimization fallback: {}", reason);
+		if (debugFallbackLogging) {
+			WaterOptimisationLog.LOGGER.debug("Fluid optimization fallback: {}", reason);
 		}
 	}
 

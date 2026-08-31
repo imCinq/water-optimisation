@@ -4,19 +4,18 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,7 @@ import org.slf4j.LoggerFactory;
 public final class WaterOptimisationClient implements ClientModInitializer {
 	public static final String MOD_ID = "wateroptimisation";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(
-			Identifier.fromNamespaceAndPath(MOD_ID, "general")
-	);
+	private static final String KEY_CATEGORY = KeyMapping.CATEGORY_MISC;
 	private static KeyMapping openConfigKey;
 	private static volatile boolean sodiumLoaded;
 	private static volatile ParticleFilterSettings particleFilterSettings = ParticleFilterSettings.INACTIVE;
@@ -50,33 +47,27 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			updateParticleReference(client);
 			while (openConfigKey.consumeClick()) {
-				if (client.gui.screen() == null) {
-					client.gui.setScreen(new WaterOptimisationScreen(null));
+				if (client.screen == null) {
+					client.setScreen(new WaterOptimisationScreen(null));
 				}
 			}
 		});
 
-		HudElementRegistry.addLast(
-				Identifier.fromNamespaceAndPath(MOD_ID, "diagnostics"),
-				WaterOptimisationClient::extractDiagnostics
-		);
+		HudRenderCallback.EVENT.register(WaterOptimisationClient::renderDiagnostics);
 
 		if (sodiumLoaded) {
-			if (SodiumFluidIntegration.isSupportedVersion()) {
-				LOGGER.info("Sodium 0.9.x for Minecraft 26.2 detected; vanilla fluid hooks remain disabled and the optional inward-face bridge is available after its hooks match.");
-			} else {
-				LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and this Sodium build remains on the particle-only fallback.");
-			}
+			LOGGER.info("Sodium detected on Minecraft 1.21.1; vanilla fluid optimization hooks are disabled and this target remains on the particle-only fallback.");
 		}
-		LOGGER.info("Water Optimisation initialized; rendering changes are opt-in and default to safe no-op behavior.");
+		LOGGER.info("Water Optimisation initialized for Minecraft 1.21.1; rendering changes are opt-in and default to safe no-op behavior.");
 	}
 
 	public static boolean isSodiumLoaded() {
 		return sodiumLoaded;
 	}
 
+	/** The 1.21.1 renderer has no reviewed reverse-face hook yet. */
 	public static boolean supportsReducedWaterBackfaces() {
-		return true;
+		return false;
 	}
 
 	/**
@@ -88,22 +79,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		if (config == null || !config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
 			return Component.translatable("wateroptimisation.path.disabled");
 		}
-
 		if (isSodiumLoaded()) {
-			if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
-					&& SodiumFluidIntegration.geometryHooksAvailable()) {
-				return Component.translatable("wateroptimisation.path.sodium_reduced_faces");
-			}
 			return Component.translatable("wateroptimisation.path.sodium_particles");
-		}
-
-		if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL) {
-			return Component.translatable("wateroptimisation.path.reduced_faces");
 		}
 		if (config.isFlatWaterFastPath() && config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED) {
 			return Component.translatable("wateroptimisation.path.hidden_compile");
 		}
-		return Component.translatable("wateroptimisation.path.vanilla_particles");
+		return Component.translatable("wateroptimisation.path.legacy_particles");
 	}
 
 	public static void refreshParticleFiltering(WaterOptimisationConfig config) {
@@ -145,7 +127,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		if (!reference.available()) {
 			return true;
 		}
-
 		if (!WaterParticleDistancePolicy.isWithinDistanceSquared(
 				settings.maxDistanceSquared(),
 				reference.x(), reference.y(), reference.z(),
@@ -168,9 +149,9 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		double referenceX = client.player.getX();
 		double referenceY = client.player.getY();
 		double referenceZ = client.player.getZ();
-		Camera camera = client.gameRenderer.mainCamera();
+		Camera camera = client.gameRenderer.getMainCamera();
 		if (camera.isInitialized()) {
-			Vec3 cameraPosition = camera.position();
+			Vec3 cameraPosition = camera.getPosition();
 			referenceX = cameraPosition.x;
 			referenceY = cameraPosition.y;
 			referenceZ = cameraPosition.z;
@@ -190,7 +171,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			|| type == ParticleTypes.UNDERWATER;
 	}
 
-	private static void extractDiagnostics(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+	private static void renderDiagnostics(GuiGraphics graphics, DeltaTracker deltaTracker) {
 		WaterOptimisationConfig config = ConfigManager.get();
 		if (!config.isDiagnosticsHud()) {
 			return;
@@ -205,7 +186,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("mode: " + modeLabel(config)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
-				Component.literal("water backfaces: " + (FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
+				Component.literal("water backfaces: vanilla (1.21.1 compatibility)"),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
@@ -223,7 +204,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		int lines = diagnosticsLines.length;
 		graphics.fill(x - 3, y - 3, x + 290, y + lineHeight * lines + 2, 0x90000000);
 		for (int index = 0; index < lines; index++) {
-			graphics.text(client.font, diagnosticsLines[index], x, y + lineHeight * index, 0xFFFFFFFF, index == 0);
+			graphics.drawString(client.font, diagnosticsLines[index], x, y + lineHeight * index, 0xFFFFFFFF);
 		}
 	}
 

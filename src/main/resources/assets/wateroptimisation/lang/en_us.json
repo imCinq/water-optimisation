@@ -15,6 +15,7 @@
 	"screen.wateroptimisation.section.experimental": "Water rendering",
 	"screen.wateroptimisation.section.diagnostics": "Diagnostics",
 	"screen.wateroptimisation.culling": "Reduce water geometry? %s",
+	"screen.wateroptimisation.culling_unavailable": "Reduce inward water faces? Vanilla (not available on this version)",
 	"screen.wateroptimisation.fast_path": "Skip hidden water blocks? %s",
 	"screen.wateroptimisation.particles": "Show water particles? %s",
 	"screen.wateroptimisation.particle_distance": "Show water particles within %s blocks?",
@@ -34,5 +35,6 @@
 	"wateroptimisation.path.hidden_compile": "Vanilla water geometry with hidden-water compile skipping",
 	"wateroptimisation.path.reduced_faces": "Vanilla water geometry with reduced inward faces",
 	"wateroptimisation.path.sodium_particles": "Sodium water geometry with local particle filtering",
-	"wateroptimisation.path.sodium_reduced_faces": "Sodium water geometry with reduced inward faces"
+	"wateroptimisation.path.sodium_reduced_faces": "Sodium water geometry with reduced inward faces",
+	"wateroptimisation.path.legacy_particles": "Vanilla water geometry with local particle filtering (1.21.1 compatibility)"
 }
