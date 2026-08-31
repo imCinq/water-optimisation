@@ -8,7 +8,6 @@ import net.minecraft.world.level.material.Fluids;
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
-	private static volatile boolean flatWaterSurfaceMeshingActive;
 
 	private FluidOptimizationPolicy() {
 	}
@@ -23,7 +22,6 @@ public final class FluidOptimizationPolicy {
 		EffectiveWaterPolicy policy = WaterOptimisationClient.effectivePolicy(config);
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
-		flatWaterSurfaceMeshingActive = policy.flatWaterSurfaceMeshingActive();
 	}
 
 	public static boolean fluidHooksActive() {
@@ -32,10 +30,6 @@ public final class FluidOptimizationPolicy {
 
 	public static boolean flatWaterFastPathActive() {
 		return flatWaterFastPathActive;
-	}
-
-	public static boolean flatWaterSurfaceMeshingActive() {
-		return flatWaterSurfaceMeshingActive;
 	}
 
 	public static boolean reducedWaterBackfacesActive() {

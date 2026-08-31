@@ -54,7 +54,6 @@ public final class WaterOptimisationConfig {
 	private PerformanceProfile performanceProfile;
 	private FluidCullingMode fluidCullingMode;
 	private boolean flatWaterFastPath;
-	private boolean flatWaterSurfaceMeshing;
 	private boolean farWaterPass;
 	private boolean waterParticles;
 	private int particleDistance;
@@ -71,7 +70,6 @@ public final class WaterOptimisationConfig {
 		this.performanceProfile = PerformanceProfile.BALANCED;
 		this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 		this.flatWaterFastPath = false;
-		this.flatWaterSurfaceMeshing = false;
 		this.farWaterPass = false;
 		this.waterParticles = true;
 		this.particleDistance = 32;
@@ -93,7 +91,6 @@ public final class WaterOptimisationConfig {
 		copy.performanceProfile = this.performanceProfile;
 		copy.fluidCullingMode = this.fluidCullingMode;
 		copy.flatWaterFastPath = this.flatWaterFastPath;
-		copy.flatWaterSurfaceMeshing = this.flatWaterSurfaceMeshing;
 		copy.farWaterPass = this.farWaterPass;
 		copy.waterParticles = this.waterParticles;
 		copy.particleDistance = this.particleDistance;
@@ -115,7 +112,6 @@ public final class WaterOptimisationConfig {
 				&& this.performanceProfile == other.performanceProfile
 				&& this.fluidCullingMode == other.fluidCullingMode
 				&& this.flatWaterFastPath == other.flatWaterFastPath
-				&& this.flatWaterSurfaceMeshing == other.flatWaterSurfaceMeshing
 				&& this.farWaterPass == other.farWaterPass;
 	}
 
@@ -171,7 +167,6 @@ public final class WaterOptimisationConfig {
 				this.enabled = false;
 				this.fluidCullingMode = FluidCullingMode.DISABLED;
 					this.flatWaterFastPath = false;
-					this.flatWaterSurfaceMeshing = false;
 					this.farWaterPass = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
@@ -185,7 +180,6 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 					this.flatWaterFastPath = false;
-					this.flatWaterSurfaceMeshing = false;
 					this.farWaterPass = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
@@ -199,7 +193,6 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 					this.flatWaterFastPath = true;
-					this.flatWaterSurfaceMeshing = false;
 					this.farWaterPass = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
@@ -213,7 +206,6 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.EXPERIMENTAL;
 					this.flatWaterFastPath = true;
-					this.flatWaterSurfaceMeshing = false;
 					this.farWaterPass = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
@@ -262,14 +254,6 @@ public final class WaterOptimisationConfig {
 
 	public void setFlatWaterFastPath(boolean flatWaterFastPath) {
 		this.flatWaterFastPath = flatWaterFastPath;
-	}
-
-	public boolean isFlatWaterSurfaceMeshing() {
-		return this.flatWaterSurfaceMeshing;
-	}
-
-	public void setFlatWaterSurfaceMeshing(boolean flatWaterSurfaceMeshing) {
-		this.flatWaterSurfaceMeshing = flatWaterSurfaceMeshing;
 	}
 
 	public boolean isFarWaterPass() {

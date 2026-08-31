@@ -29,9 +29,7 @@ This pass keeps the original conservative phases intact while adding measurable 
 - version the local configuration and migrate older files without changing explicit user choices;
 - resolve requested settings into renderer capabilities and expose the effective path in the UI and diagnostics;
 - add bounded water-particle admission, including a per-client-tick budget and an explicit policy for particles that normally bypass distance limits;
-- retain a disabled 26.2-only 4x4 flat still-water surface prototype for a future shader-backed implementation. A single atlas quad cannot preserve vanilla's repeated water texture, so exposing this path would create visible distortion or atlas bleed. Any uncertain shape remains vanilla.
-
-The flat-surface prototype is deliberately unavailable and not included in a preset until it can preserve exact vanilla visuals. It is not a usable FPS feature in the current renderer.
+- keep the optional 26.2-only far-water pass isolated behind a hard capability and distance bound. Any uncertain shape remains on the vanilla path.
 
 ## Completed phases
 

@@ -85,13 +85,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return true;
 	}
 
-	public static boolean supportsFlatWaterSurfaceMeshing() {
-		// A single atlas quad cannot reproduce vanilla's tiled water texture
-		// without shader-side support. Keep the prototype retained in source,
-		// but fail closed until it can preserve exact visuals.
-		return false;
-	}
-
 	public static boolean supportsFarWaterPass() {
 		return !sodiumLoaded && !farWaterPassFaulted;
 	}
@@ -100,7 +93,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return new RendererCapabilities(
 				sodiumLoaded,
 				sodiumLoaded && SodiumFluidIntegration.geometryHooksAvailable(),
-				supportsFlatWaterSurfaceMeshing(),
 				supportsFarWaterPass(),
 				sodiumLoaded ? "Sodium" : "Vanilla"
 		);
@@ -265,7 +257,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
-				Component.literal("flat candidates/patches: " + snapshot.flatWaterCandidates() + "/" + snapshot.flatWaterPatches()),
 				Component.literal("far-water candidates: " + snapshot.farWaterCandidateBlocks() + " blocks / " + snapshot.farWaterCandidateFaces() + " faces"),
 				Component.literal("far-water vertices/fallbacks: " + snapshot.farWaterCandidateVertices() + "/" + snapshot.farWaterFallbackBlocks()),
 				Component.literal("far-water uploads/draws: " + snapshot.farWaterUploads() + "/" + snapshot.farWaterDrawnSections() + " sections"),

@@ -5,7 +5,7 @@
 Client fluid state
 → target-isolated FluidRenderer hook or optional 26.2 Sodium face bridge
 → already-loaded neighbor-state classifier
-→ vanilla fluid mesh path, explicit fully-hidden source-water skip, deferred flat-surface prototype, or guarded 26.2-only owned-water mesh
+→ vanilla fluid mesh path, explicit fully-hidden source-water skip, or guarded 26.2-only owned-water mesh
 → shared translucent section buffer and, for eligible far-water sections, a section-owned vertex buffer
 → section compilation and translucent resort diagnostics
 
@@ -37,8 +37,8 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 The 26.2 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.1 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
-- the flat path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
 - Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering;
+- the hidden-water path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
 - flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
 
 The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
@@ -46,8 +46,6 @@ The 1.21.1 adapter does not manufacture a level/position context for its older s
 The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 The 26.2 renderer also has an opt-in far-water ownership path around section compilation and fluid tessellation. A conservative preflight accepts only sections with ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Only upward fluid faces are copied into a `WaterOwnedMesh`; vertical sides and bottoms remain in the shared translucent output because the dedicated pass cannot reproduce vanilla's per-face sort order safely. Owned surfaces are carried from `SectionCompiler.Results` to `CompiledSectionMesh`. A client render callback then draws those meshes after translucent terrain through Minecraft's Blaze3D pipeline, using the current frame camera matrix and translucent target, ordering sections back-to-front, and skipping eligible sections beyond its 320-block bound. Unsupported fluids, mixed translucent sections, Sodium-owned geometry, and the 1.21.1 target remain on their existing paths. The pass is disabled by default and remains an experiment until live visual and frame-time validation proves it safe and useful.
-
-The flat-surface prototype is retained as source but currently disabled for visual safety. A single atlas quad cannot preserve vanilla's repeated water texture without shader-side tiling support; stretching the source sprite or extrapolating atlas UVs produces visible artifacts. It will not be exposed as an active 26.2 capability until an implementation can preserve exact vanilla tiling and patch-boundary geometry.
 
 ### Particle filter
 
@@ -57,7 +55,7 @@ An optional budget resets at the start of each client tick and is reserved only 
 
 ### Diagnostics
 
-	Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread; fluid timing samples one in sixteen calls to avoid adding clock reads to every fluid block while the HUD remains open. The HUD snapshots and formats its lines at most four times per second, then reuses the immutable components between refreshes. Face, patch, and particle-budget counters are diagnostics-only and remain gated. Tracy is still required for frame-time distributions, tail latency, total face counts, and independent verification.
+	Counters use allocation-free LongAdder increments when diagnostics are enabled. Fluid tessellation, section compilation, and translucent resort timing use primitive timing holders per worker thread; fluid timing samples one in sixteen calls to avoid adding clock reads to every fluid block while the HUD remains open. The HUD snapshots and formats its lines at most four times per second, then reuses the immutable components between refreshes. Face and particle-budget counters are diagnostics-only and remain gated. Tracy is still required for frame-time distributions, tail latency, total face counts, and independent verification.
 
 ## Compatibility strategy
 

@@ -60,20 +60,6 @@ public final class Diagnostics {
 		}
 	}
 
-	public static void recordFlatWaterCandidate() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.flatWaterCandidates.increment();
-		}
-	}
-
-	public static void recordFlatWaterPatch() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.flatWaterPatches.increment();
-		}
-	}
-
 	/**
 	 * Records the candidate geometry observed by the 26.2 far-water ownership
 	 * pass. The counters include both compile-time ownership and render-time
@@ -265,8 +251,6 @@ public final class Diagnostics {
 				counters.reducedWaterBackfaces.sum(),
 				counters.fluidFaces.sum(),
 				counters.fluidReverseFaceRequests.sum(),
-				counters.flatWaterCandidates.sum(),
-				counters.flatWaterPatches.sum(),
 				counters.farWaterSections.sum(),
 				counters.farWaterCandidateBlocks.sum(),
 				counters.farWaterCandidateFaces.sum(),
@@ -308,8 +292,6 @@ public final class Diagnostics {
 		private final LongAdder reducedWaterBackfaces = new LongAdder();
 		private final LongAdder fluidFaces = new LongAdder();
 		private final LongAdder fluidReverseFaceRequests = new LongAdder();
-		private final LongAdder flatWaterCandidates = new LongAdder();
-		private final LongAdder flatWaterPatches = new LongAdder();
 		private final LongAdder farWaterSections = new LongAdder();
 		private final LongAdder farWaterCandidateBlocks = new LongAdder();
 		private final LongAdder farWaterCandidateFaces = new LongAdder();
@@ -355,8 +337,6 @@ public final class Diagnostics {
 			long reducedWaterBackfaces,
 			long fluidFaces,
 			long fluidReverseFaceRequests,
-			long flatWaterCandidates,
-			long flatWaterPatches,
 			long farWaterSections,
 			long farWaterCandidateBlocks,
 			long farWaterCandidateFaces,

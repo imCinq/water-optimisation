@@ -74,12 +74,8 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return false;
 	}
 
-	public static boolean supportsFlatWaterSurfaceMeshing() {
-		return false;
-	}
-
 	public static RendererCapabilities rendererCapabilities() {
-		return new RendererCapabilities(sodiumLoaded, false, false, false, sodiumLoaded ? "Sodium" : "Vanilla");
+		return new RendererCapabilities(sodiumLoaded, false, false, sodiumLoaded ? "Sodium" : "Vanilla");
 	}
 
 	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {
@@ -226,7 +222,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
-				Component.literal("flat candidates/patches: " + snapshot.flatWaterCandidates() + "/" + snapshot.flatWaterPatches()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
 				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
 				Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())),
