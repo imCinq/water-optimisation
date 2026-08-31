@@ -91,7 +91,7 @@ public final class FarWaterRenderer {
 					origin.getX(),
 					origin.getY(),
 					origin.getZ(),
-					section.getVisibility(net.minecraft.Util.getMillis()),
+					section.getVisibility(net.minecraft.util.Util.getMillis()),
 					sections.textureView().getWidth(0),
 					sections.textureView().getHeight(0)
 			));
