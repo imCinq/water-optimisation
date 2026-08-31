@@ -1,6 +1,7 @@
 package io.github.imcinq.wateroptimisation;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
@@ -85,7 +86,7 @@ public final class WaterOwnedMesh implements AutoCloseable {
 		private final ByteBufferBuilder stagingBuffer = new ByteBufferBuilder(4096);
 		private final BufferBuilder builder = new BufferBuilder(
 				this.stagingBuffer,
-				VertexFormat.Mode.QUADS,
+				PrimitiveTopology.QUADS,
 				DefaultVertexFormat.BLOCK
 		);
 		private boolean closed;

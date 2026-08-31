@@ -6,6 +6,7 @@ import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import io.github.imcinq.wateroptimisation.FarWaterOwnershipProbe;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;

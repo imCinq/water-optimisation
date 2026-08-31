@@ -2,6 +2,7 @@ package io.github.imcinq.wateroptimisation;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -20,8 +21,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 /**
  * Draws the water-only meshes captured from qualifying sections. The pass is
@@ -56,7 +57,7 @@ public final class FarWaterRenderer {
 		List<WaterDraw> draws = new ArrayList<>();
 		List<DynamicUniforms.ChunkSectionInfo> sectionInfos = new ArrayList<>();
 		int largestIndexCount = 0;
-		ObjectArrayList<?> visibleSections = context.levelRenderer().getVisibleSections();
+		ObjectArrayList<?> visibleSections = context.levelRenderer().visibleSections();
 
 		for (Object sectionObject : visibleSections) {
 			if (!(sectionObject instanceof SectionRenderDispatcher.RenderSection section)) {
@@ -86,7 +87,7 @@ public final class FarWaterRenderer {
 
 			var origin = section.getRenderOrigin();
 			sectionInfos.add(new DynamicUniforms.ChunkSectionInfo(
-					new org.joml.Matrix4f(RenderSystem.getModelViewMatrix()),
+					RenderSystem.getModelViewMatrixCopy(),
 					origin.getX(),
 					origin.getY(),
 					origin.getZ(),
@@ -105,11 +106,11 @@ public final class FarWaterRenderer {
 		GpuBufferSlice[] uniforms = RenderSystem.getDynamicUniforms().writeChunkSections(
 				sectionInfos.toArray(new DynamicUniforms.ChunkSectionInfo[0])
 		);
-		RenderTarget target = client.getMainRenderTarget();
+		RenderTarget target = client.gameRenderer.mainRenderTarget();
 		try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				() -> "Water Optimisation owned water",
 				target.getColorTextureView(),
-				OptionalInt.empty(),
+				Optional.empty(),
 				target.getDepthTextureView(),
 				OptionalDouble.empty()
 		)) {
@@ -121,18 +122,18 @@ public final class FarWaterRenderer {
 			);
 			renderPass.bindTexture(
 					"Sampler2",
-					client.gameRenderer.lightTexture().getTextureView(),
+					client.gameRenderer.levelLightmap(),
 					RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR)
 			);
 			renderPass.setPipeline(RenderPipelines.TRANSLUCENT_TERRAIN);
 
-			RenderSystem.AutoStorageIndexBuffer sequentialIndices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+			RenderSystem.AutoStorageIndexBuffer sequentialIndices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
 			GpuBuffer indexBuffer = sequentialIndices.getBuffer(largestIndexCount);
 			renderPass.setIndexBuffer(indexBuffer, sequentialIndices.type());
 			for (WaterDraw draw : draws) {
 				renderPass.setUniform("ChunkSection", uniforms[draw.uniformIndex()]);
-				renderPass.setVertexBuffer(0, draw.mesh().vertexBuffer());
-				renderPass.drawIndexed(0, 0, draw.mesh().indexCount(), 1);
+				renderPass.setVertexBuffer(0, draw.mesh().vertexBuffer().slice());
+				renderPass.drawIndexed(draw.mesh().indexCount(), 1, 0, 0, 0);
 				Diagnostics.recordFarWaterDraw(draw.mesh().indexCount());
 			}
 		} catch (RuntimeException exception) {

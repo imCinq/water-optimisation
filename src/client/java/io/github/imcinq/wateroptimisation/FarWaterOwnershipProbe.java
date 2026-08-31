@@ -1,7 +1,5 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -142,9 +140,14 @@ public final class FarWaterOwnershipProbe {
 				sawOrdinaryWater = true;
 			}
 
-			if (!ordinarySourceWater
+			// 26.2 no longer exposes the old block render-type lookup. Treat every
+			// non-air, non-solid block as a mixed/ambiguous section instead. This is
+			// intentionally stricter: glass, leaves, plants, overlays, and custom
+			// translucent models remain on vanilla's shared sorted buffer.
+			if (fluidState.isEmpty()
+					&& !blockState.isAir()
 					&& blockState.getRenderShape() == RenderShape.MODEL
-					&& ItemBlockRenderTypes.getChunkRenderType(blockState) == ChunkSectionLayer.TRANSLUCENT) {
+					&& !blockState.isSolidRender()) {
 				return false;
 			}
 		}
