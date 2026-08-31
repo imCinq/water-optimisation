@@ -20,6 +20,8 @@ The 0.0.3 release contains the current client-only implementation for Minecraft 
 
 The implementation is build-verified and packaged as the first official GitHub release. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
 
+The compatibility branch also builds a separate Minecraft 1.21.1 profile with Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative and has no Sodium geometry bridge yet.
+
 ## Completed phases
 
 ### Phase 0 — Instrumentation
@@ -52,13 +54,14 @@ The reduced-face mode keeps vanilla's outward fluid face and removes only its op
 
 ## Next priorities
 
+- Start the dedicated far-water pass prototype early for fill-rate-bound scenes. First separate water ownership from the shared translucent buffer; do not expose a distance/LOD toggle until that representation exists.
+- Define the far-water pass around independent water-only distance, fog, and later LOD/half-resolution controls through the Minecraft rendering abstraction. Keep the prototype separate from both the 26.2 shared translucent path and the 1.21.1 compatibility adapter.
 - Complete local visual and performance validation.
 - Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
 - Consider rolling diagnostics and fallback reason reporting.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.
-- Keep camera-relative water-distance fading deferred until a separate water render layer or renderer-specific integration can make it correct.
-- Treat a dedicated far-water pass as a separate renderer experiment: it must separate water from the shared translucent layer before any distance cutoff or half-resolution mode is enabled.
+- Keep camera-relative water-distance fading deferred until the separate water-owned pass is correct.
 - Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.
 
 ## Release gate

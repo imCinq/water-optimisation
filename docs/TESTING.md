@@ -10,7 +10,9 @@ bash scripts/audit-repository.sh
 bash scripts/audit-client-only.sh
 ```
 
-The CI workflow validates the Gradle wrapper, Java 25 toolchain, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
+The CI workflow validates the Gradle wrapper, Java 25/21 target toolchains, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
+
+The remote build matrix also compiles Minecraft 1.21.1 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
 Unit coverage includes:
 
@@ -36,6 +38,7 @@ Test with the feature disabled and enabled in:
 - underwater views;
 - chunk loading and block updates;
 - Sodium absent and present;
+- Minecraft 1.21.1 compatibility artifact, with Sodium absent and present;
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.
 
@@ -48,6 +51,8 @@ Look for missing planes, seams, z-fighting, incorrect overlays, wrong flow orien
 Compare identical warmed scenes using the report template. Record average FPS, 1% lows, p95/p99 frame time, hitches, fluid tessellation, section compilation, translucent resorting, water blocks, fully hidden fast-path skips, removed reverse faces, total face counts from Tracy or mesh statistics, particle candidates/rejections, render distance, resolution, Java, backend, and companion mods.
 
 Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
+
+The dedicated far-water pass is not yet part of this matrix. When implemented, test its near/far transition, fog, waterlogged boundaries, glass/leaves, underwater views, and Sodium ownership separately.
 
 ## Multiplayer smoke test
 

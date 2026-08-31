@@ -2,18 +2,18 @@
 
 ## Current status
 
-Water Optimisation 0.0.3 is the current stable GitHub release for Minecraft 26.2. It clarifies Sodium renderer ownership in the advanced settings screen; earlier releases remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation 0.0.3 is the current stable GitHub release for Minecraft 26.2. The 1.21.1 support work is built on a separate compatibility branch and is not included in that stable release until a target-specific artifact and visual review are accepted. Earlier releases remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
 | Mod version | 0.0.3 |
-| Minecraft | 26.2 |
-| Fabric Loader | 0.19.3 or newer |
-| Fabric API | 0.158.0+26.2 |
-| Java | 25 |
-| Mod Menu | Optional, 19.0.0-alpha.1 |
+| Minecraft | 26.2 stable; 1.21.1 compatibility branch |
+| Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
+| Fabric API | 0.158.0+26.2; 0.116.12+1.21.1 |
+| Java | 25 for 26.2; 21 for 1.21.1 |
+| Mod Menu | Optional, 19.0.0-alpha.1 for 26.2; 11.0.4 for 1.21.1 |
 | Environment | Client |
 | License | MIT |
 | Creator attribution | Cinq |
@@ -59,8 +59,8 @@ Publishing is intentionally manual. No publishing automation or update checker i
 - Category: Client-side rendering optimisation
 - Loader: Fabric
 - Environment: Client
-- Minecraft target: 26.2
-- Java target: 25
+- Minecraft target: 26.2 and 1.21.1, with target-specific artifacts
+- Java target: 25 for 26.2; 21 for 1.21.1
 - License: MIT
 - Required dependency: matching Fabric API build
 

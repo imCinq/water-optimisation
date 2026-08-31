@@ -1,10 +1,10 @@
 # User Experience and Mod Menu
 
-The settings are implemented with Minecraft 26.2's native screen and extraction-based GUI APIs. Mod Menu is an optional adapter only.
+The settings are implemented with target-specific native Minecraft screen APIs. The 26.2 profile uses extraction-based GUI APIs; the 1.21.1 profile uses that version’s older `GuiGraphics` API. Mod Menu is an optional adapter only.
 
 ## Mod Menu integration
 
-Mod Menu 19.0.0-alpha.1 is a compile-only, suggested dependency for the 26.2 target. The core client entrypoint does not import Mod Menu. If Mod Menu is absent, the mod keeps its keybind and native settings screen and continues to load.
+Mod Menu is compile-only and suggested: version 19.0.0-alpha.1 for 26.2 and 11.0.4 for 1.21.1. The core client entrypoint does not import Mod Menu. If Mod Menu is absent, the mod keeps its keybind and native settings screen and continues to load.
 
 ## Main screen
 
@@ -32,7 +32,9 @@ working copy rather than enabling a diagnostic.
 
 The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
 
-The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the vanilla fluid controls unless the reviewed Sodium 0.9.x/Minecraft 26.2 face bridge has matched; the remaining local particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
+The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the vanilla fluid controls unless the reviewed Sodium 0.9.x/Minecraft 26.2 face bridge has matched; on 1.21.1, the geometry controls remain unavailable while the particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
+
+There is intentionally no far-water toggle yet. A toggle would imply that the shared translucent buffer can safely distance-cull water, which it cannot. The separate pass must exist and be visually reviewed before exposing a user-facing option.
 
 ## Recovery
 

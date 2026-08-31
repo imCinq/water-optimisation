@@ -5,7 +5,7 @@
 <h1 align="center">Water Optimisation</h1>
 
 <p align="center">
-  <strong>Client-side water rendering for Minecraft 26.2</strong><br>
+  <strong>Client-side water rendering for Minecraft 26.2 and 1.21.1</strong><br>
   Reduce water-related rendering work while keeping the world, gameplay, and server unchanged.
 </p>
 
@@ -13,6 +13,7 @@
   <a href="https://github.com/imCinq/water-optimisation/releases/latest"><img src="https://img.shields.io/github/v/release/imCinq/water-optimisation?display_name=tag&sort=semver&color=2563eb&label=latest%20release" alt="Latest release"></a>
   <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <img src="https://img.shields.io/badge/Minecraft-26.2-2563eb.svg" alt="Minecraft 26.2">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.1-2563eb.svg" alt="Minecraft 1.21.1">
   <img src="https://img.shields.io/badge/Fabric-client--side-2563eb.svg" alt="Fabric client-side mod">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
@@ -25,11 +26,16 @@ Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scene
 
 1. Download the [latest release](https://github.com/imCinq/water-optimisation/releases/latest).
 2. Put the runtime JAR in the client’s `mods` folder.
-3. Launch Minecraft 26.2 with Fabric.
+3. Launch a supported Minecraft version with Fabric.
 4. Open the settings from Mod Menu, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current stable release is [0.0.3](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.3). The supplied water-block logo is used in this README and is also packaged as the mod icon. The mod requires Minecraft 26.2, Java 25, Fabric Loader 0.19.3 or newer, and a matching Fabric API build (`0.158.0+26.2`). Mod Menu `19.0.0-alpha.1` is optional.
+The current stable release is [0.0.3](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.3) for Minecraft 26.2. The supplied water-block logo is used in this README and is also packaged as the mod icon. A separate 1.21.1 compatibility artifact is built by the branch workflow while that target is being reviewed; it is not silently presented as part of the 26.2 release. Use the workflow artifact from the compatibility branch for 1.21.1 until a target-specific release is published.
+
+| Minecraft | Java | Build status | Geometry scope |
+| --- | --- | --- | --- |
+| 26.2 | 25+ | Stable release | Conservative vanilla hooks plus the opt-in reviewed Sodium bridge. |
+| 1.21.1 | 21+ | Compatibility build | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 
 ## Pick a preset
 
@@ -66,7 +72,7 @@ Maximum FPS disables ordinary water particles by default. Particle settings cont
 
 ## Sodium and compatibility
 
-Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. On the reviewed Sodium 0.9.x builds for Minecraft 26.2, `Maximum FPS` can additionally ask Sodium to omit only reversed copies of ordinary source-water quads; Sodium still owns visibility, fluid shaping, lighting, and translucent sorting. Unknown Sodium builds stay on the particle-only fallback until their renderer shape is reviewed. The effective path is shown in the main settings screen.
+Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. On the reviewed Sodium 0.9.x builds for Minecraft 26.2, `Maximum FPS` can additionally ask Sodium to omit only reversed copies of ordinary source-water quads; Sodium still owns visibility, fluid shaping, lighting, and translucent sorting. On 1.21.1, Sodium stays on the particle-only fallback until that older renderer is reviewed separately. Unknown Sodium builds stay on the particle-only fallback. The effective path is shown in the main settings screen.
 
 The mod is client-only. It declares no server entrypoint, custom packets, world updates, movement changes, collision changes, player-information features, telemetry, update checker, or outbound network service. Non-water rendering is outside its scope.
 
@@ -74,17 +80,21 @@ The mod is client-only. It declares no server entrypoint, custom packets, world 
 
 The optional diagnostics HUD reports fluid blocks, fully hidden skips, removed reverse faces, section compilation, translucent resorting, and particle admission. It is a cross-check, not a benchmark tool; disable it for final FPS measurements.
 
+## The next GPU track
+
+The research-backed route for fill-rate-bound scenes is a dedicated far-water pass with its own water mesh, distance/fog policy, and later LOD options. Water currently shares Minecraft’s translucent section buffer, so a distance cutoff there could hide glass, leaves, overlays, or other translucent geometry. The project therefore starts this work as a separate architecture track; no unsafe shared-buffer distance cull is enabled yet. See [the far-water design](docs/FAR_WATER_PASS.md).
+
 For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`, and `Maximum FPS` from the same camera. Record average FPS, 1% lows, frame time, and visual correctness above water, underwater, around flowing water, in caves, and with Sodium present and absent. The mod is designed to reduce work, but no universal FPS gain is promised across hardware, shaders, resource packs, or backends.
 
 ## Requirements
 
 | Component | Supported target |
 | --- | --- |
-| Minecraft | 26.2 |
-| Java | 25 or newer |
-| Fabric Loader | 0.19.3 or newer |
-| Fabric API | `0.158.0+26.2` or matching 26.2 build |
-| Mod Menu | Optional: `19.0.0-alpha.1` |
+| Minecraft | 26.2 or 1.21.1 |
+| Java | 25+ for 26.2; 21+ for 1.21.1 |
+| Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
+| Fabric API | `0.158.0+26.2` for 26.2; `0.116.12+1.21.1` for 1.21.1 |
+| Mod Menu | Optional: `19.0.0-alpha.1` for 26.2; `11.0.4` for 1.21.1 |
 | Environment | Client only |
 
 ## Documentation
@@ -94,6 +104,7 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 - [Testing matrix](docs/TESTING.md) — visual and performance checks.
 - [Benchmark template](docs/BENCHMARK_REPORT.md) — repeatable measurements.
 - [Architecture](docs/ARCHITECTURE.md) — renderer and client-boundary details.
+- [Far-water design](docs/FAR_WATER_PASS.md) — the GPU/fill-rate path being prototyped separately from shared translucency.
 - [Privacy](PRIVACY.md) and [security policy](SECURITY.md).
 
 ## Contributing

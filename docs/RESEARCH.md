@@ -1,8 +1,12 @@
-# Minecraft 26.2 Water Research
+# Minecraft Water Rendering Research
 
 ## Executive conclusion
 
 The practical client-side FPS targets are translucent water geometry, chunk-rebuild work, translucent overdraw and sorting, and water-related particles. Fluid simulation is server-authoritative and should remain untouched.
+
+The dedicated far-water pass is now an early architecture track rather than a late UI idea. It remains a prototype boundary: water must be separated from the shared translucent buffer before distance, fog, LOD, or half-resolution decisions can be applied safely. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
+
+The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched until an exact older-renderer bridge is reviewed.
 
 ## Vanilla rendering path
 
@@ -53,5 +57,11 @@ Sodium's current `DefaultFluidRenderer` performs shape-aware face visibility, sa
 Sodium's particle fog-occlusion work reports large but highly situational gains for long-distance particle effects, while noting that water fog reduced particle counts less in its testing. That supports bounded water-particle admission, but not a universal FPS claim: https://github.com/CaffeineMC/sodium/pull/2766
 
 The safe presets still have no renderer-independent GPU shortcut: vanilla already removes faces between equal fluids, and the interior fast path removes CPU tessellation work for fully hidden source-water blocks but does not reduce visible surface geometry. Preview.7 keeps the explicitly optional vanilla-only reduced-face path limited to ordinary source-water blocks and counts the reverse faces it removes. It can reduce translucent vertex work and overdraw, but may change views from inside water; it is disabled when Sodium owns the renderer. A camera-relative water-distance fade remains out of scope because water shares the translucent section layer with other geometry and section meshes are compiled asynchronously. Global translucent-sort bypasses remain unsafe because they can change ordering around waterlogged blocks, glass, leaves, overlays, and other translucent quads.
+
+The practical additions from this review are split by confidence:
+
+- ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, clearer compatibility documentation, and an early far-water ownership design;
+- later prototype: a water submesh and dedicated far-water pass with independent distance/fog policy;
+- not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or a user-facing far-water toggle before the pass exists.
 
 MoreCulling was reviewed as a comparable culling project, but its source is GPL-3.0 and its implementation is not suitable for copying into this MIT project without permission: https://github.com/FxMorin/MoreCulling
