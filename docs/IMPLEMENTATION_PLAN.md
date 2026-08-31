@@ -65,7 +65,7 @@ The reduced-face mode keeps vanilla's outward fluid face and removes only its op
 
 ## Next priorities
 
-- Start the dedicated far-water pass prototype early for fill-rate-bound scenes. First separate water ownership from the shared translucent buffer; do not expose a distance/LOD toggle until that representation exists.
+- Start the dedicated far-water pass prototype early for fill-rate-bound scenes. The 26.2 diagnostics-only ownership probe now measures ordinary source-water candidate faces and vertices without changing the shared buffer. The next step is to attach an owned representation to compiled section lifetime; do not expose a distance/LOD toggle until that representation exists.
 - Define the far-water pass around independent water-only distance, fog, and later LOD/half-resolution controls through the Minecraft rendering abstraction. Keep the prototype separate from both the 26.2 shared translucent path and the 1.21.1 compatibility adapter.
 - Complete local visual and performance validation.
 - Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.
