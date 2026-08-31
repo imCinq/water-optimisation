@@ -1,7 +1,7 @@
 package io.github.imcinq.wateroptimisation;
 
 public final class WaterOptimisationConfig {
-	public static final int CURRENT_CONFIG_VERSION = 1;
+	public static final int CURRENT_CONFIG_VERSION = 2;
 	public static final int MIN_PARTICLE_DISTANCE = 8;
 	public static final int MAX_PARTICLE_DISTANCE = 128;
 	public static final int UNLIMITED_PARTICLE_BUDGET = 0;
@@ -55,6 +55,7 @@ public final class WaterOptimisationConfig {
 	private FluidCullingMode fluidCullingMode;
 	private boolean flatWaterFastPath;
 	private boolean flatWaterSurfaceMeshing;
+	private boolean farWaterPass;
 	private boolean waterParticles;
 	private int particleDistance;
 	private boolean particleFogCulling;
@@ -71,6 +72,7 @@ public final class WaterOptimisationConfig {
 		this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 		this.flatWaterFastPath = false;
 		this.flatWaterSurfaceMeshing = false;
+		this.farWaterPass = false;
 		this.waterParticles = true;
 		this.particleDistance = 32;
 		this.particleFogCulling = false;
@@ -92,6 +94,7 @@ public final class WaterOptimisationConfig {
 		copy.fluidCullingMode = this.fluidCullingMode;
 		copy.flatWaterFastPath = this.flatWaterFastPath;
 		copy.flatWaterSurfaceMeshing = this.flatWaterSurfaceMeshing;
+		copy.farWaterPass = this.farWaterPass;
 		copy.waterParticles = this.waterParticles;
 		copy.particleDistance = this.particleDistance;
 		copy.particleFogCulling = this.particleFogCulling;
@@ -112,7 +115,8 @@ public final class WaterOptimisationConfig {
 				&& this.performanceProfile == other.performanceProfile
 				&& this.fluidCullingMode == other.fluidCullingMode
 				&& this.flatWaterFastPath == other.flatWaterFastPath
-				&& this.flatWaterSurfaceMeshing == other.flatWaterSurfaceMeshing;
+				&& this.flatWaterSurfaceMeshing == other.flatWaterSurfaceMeshing
+				&& this.farWaterPass == other.farWaterPass;
 	}
 
 	public void sanitize() {
@@ -166,8 +170,9 @@ public final class WaterOptimisationConfig {
 			case VANILLA -> {
 				this.enabled = false;
 				this.fluidCullingMode = FluidCullingMode.DISABLED;
-				this.flatWaterFastPath = false;
-				this.flatWaterSurfaceMeshing = false;
+					this.flatWaterFastPath = false;
+					this.flatWaterSurfaceMeshing = false;
+					this.farWaterPass = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
 				this.particleFogCulling = false;
@@ -179,8 +184,9 @@ public final class WaterOptimisationConfig {
 			case BALANCED -> {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
-				this.flatWaterFastPath = false;
-				this.flatWaterSurfaceMeshing = false;
+					this.flatWaterFastPath = false;
+					this.flatWaterSurfaceMeshing = false;
+					this.farWaterPass = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
 				this.particleFogCulling = false;
@@ -192,8 +198,9 @@ public final class WaterOptimisationConfig {
 			case PERFORMANCE -> {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
-				this.flatWaterFastPath = true;
-				this.flatWaterSurfaceMeshing = false;
+					this.flatWaterFastPath = true;
+					this.flatWaterSurfaceMeshing = false;
+					this.farWaterPass = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
 				this.particleFogCulling = true;
@@ -205,8 +212,9 @@ public final class WaterOptimisationConfig {
 			case MAXIMUM -> {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.EXPERIMENTAL;
-				this.flatWaterFastPath = true;
-				this.flatWaterSurfaceMeshing = false;
+					this.flatWaterFastPath = true;
+					this.flatWaterSurfaceMeshing = false;
+					this.farWaterPass = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
 				this.particleFogCulling = true;
@@ -262,6 +270,14 @@ public final class WaterOptimisationConfig {
 
 	public void setFlatWaterSurfaceMeshing(boolean flatWaterSurfaceMeshing) {
 		this.flatWaterSurfaceMeshing = flatWaterSurfaceMeshing;
+	}
+
+	public boolean isFarWaterPass() {
+		return this.farWaterPass;
+	}
+
+	public void setFarWaterPass(boolean farWaterPass) {
+		this.farWaterPass = farWaterPass;
 	}
 
 	public boolean isWaterParticles() {

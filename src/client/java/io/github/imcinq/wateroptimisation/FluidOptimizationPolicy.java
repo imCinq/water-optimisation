@@ -9,6 +9,7 @@ public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
 	private static volatile boolean flatWaterSurfaceMeshingActive;
+	private static volatile boolean farWaterPassActive;
 	private static volatile boolean reducedWaterBackfacesActive;
 
 	private FluidOptimizationPolicy() {
@@ -24,6 +25,7 @@ public final class FluidOptimizationPolicy {
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
 		flatWaterSurfaceMeshingActive = policy.flatWaterSurfaceMeshingActive();
+		farWaterPassActive = policy.farWaterPassActive();
 		reducedWaterBackfacesActive = policy.reducedWaterBackfacesActive();
 	}
 
@@ -39,6 +41,10 @@ public final class FluidOptimizationPolicy {
 		return flatWaterSurfaceMeshingActive;
 	}
 
+	public static boolean farWaterPassActive() {
+		return farWaterPassActive;
+	}
+
 	/**
 	 * The experimental mode removes only vanilla's optional reverse face for a
 	 * fluid quad. The vanilla hook is disabled for Sodium, which owns its fluid
@@ -47,6 +53,9 @@ public final class FluidOptimizationPolicy {
 	 * never enabled by a safe preset.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
+		if (farWaterPassActive) {
+			return false;
+		}
 		if (WaterOptimisationClient.isSodiumLoaded()) {
 			return reducedWaterBackfacesRequested() && SodiumFluidIntegration.geometryHooksAvailable();
 		}

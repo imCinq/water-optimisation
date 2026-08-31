@@ -11,6 +11,7 @@ public record EffectiveWaterPolicy(
 		boolean fluidHooksActive,
 		boolean flatWaterFastPathActive,
 		boolean flatWaterSurfaceMeshingActive,
+		boolean farWaterPassActive,
 		boolean reducedWaterBackfacesActive,
 		boolean particleFilteringActive,
 		int particleBudget,
@@ -22,6 +23,7 @@ public record EffectiveWaterPolicy(
 		HIDDEN_WATER_COMPILE("wateroptimisation.path.hidden_compile"),
 		REDUCED_INWARD_FACES("wateroptimisation.path.reduced_faces"),
 		FLAT_WATER_SURFACE("wateroptimisation.path.flat_water_surface"),
+		FAR_WATER_PASS("wateroptimisation.path.far_water_pass"),
 		SODIUM_PARTICLES("wateroptimisation.path.sodium_particles"),
 		SODIUM_REDUCED_INWARD_FACES("wateroptimisation.path.sodium_reduced_faces");
 
@@ -57,7 +59,11 @@ public record EffectiveWaterPolicy(
 		boolean flatSurfaceActive = fluidHooksActive
 				&& config.isFlatWaterSurfaceMeshing()
 				&& safeCapabilities.flatWaterSurfaceMeshingSupported();
-		boolean reducedBackfacesActive = config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
+		boolean farWaterPassActive = !safeCapabilities.sodiumLoaded()
+				&& config.isFarWaterPass()
+				&& safeCapabilities.farWaterPassSupported();
+		boolean reducedBackfacesActive = !farWaterPassActive
+				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
 				&& (!safeCapabilities.sodiumLoaded() || safeCapabilities.sodiumGeometryHooksAvailable());
 
 		GeometryPath path;
@@ -65,6 +71,8 @@ public record EffectiveWaterPolicy(
 			path = reducedBackfacesActive
 					? GeometryPath.SODIUM_REDUCED_INWARD_FACES
 					: GeometryPath.SODIUM_PARTICLES;
+		} else if (farWaterPassActive) {
+			path = GeometryPath.FAR_WATER_PASS;
 		} else if (flatSurfaceActive) {
 			path = GeometryPath.FLAT_WATER_SURFACE;
 		} else if (reducedBackfacesActive) {
@@ -80,6 +88,7 @@ public record EffectiveWaterPolicy(
 				fluidHooksActive,
 				flatWaterFastPathActive,
 				flatSurfaceActive,
+				farWaterPassActive,
 				reducedBackfacesActive,
 				particleFilteringActive,
 				particleBudget,
@@ -90,6 +99,7 @@ public record EffectiveWaterPolicy(
 	private static EffectiveWaterPolicy disabled() {
 		return new EffectiveWaterPolicy(
 				GeometryPath.DISABLED,
+				false,
 				false,
 				false,
 				false,

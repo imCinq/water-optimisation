@@ -29,6 +29,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Button diagnosticsButton;
 	private Button fallbackButton;
 	private Button flatSurfaceButton;
+	private Button farWaterButton;
 	private int contentWidth;
 	private int buttonLeft;
 	private int buttonWidth;
@@ -107,7 +108,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 		this.cullingButton = addCullingButton(this.rightColumnLeft, controlsY);
 		this.flatSurfaceButton = addFlatSurfaceButton(this.rightColumnLeft, controlsY + BUTTON_HEIGHT + BUTTON_GAP);
-		this.diagnosticsSectionY = controlsY + 2 * (BUTTON_HEIGHT + BUTTON_GAP) + 8;
+		this.farWaterButton = addFarWaterButton(this.rightColumnLeft, controlsY + 2 * (BUTTON_HEIGHT + BUTTON_GAP));
+		this.diagnosticsSectionY = controlsY + 3 * (BUTTON_HEIGHT + BUTTON_GAP) + 8;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
 		this.diagnosticsButton = addDiagnosticsButton(this.rightColumnLeft, diagnosticsY);
 		this.fallbackButton = addFallbackButton(this.rightColumnLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
@@ -128,8 +130,9 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		int cullingY = this.experimentalSectionY + lineHeight() + 4;
 		this.cullingButton = addCullingButton(this.buttonLeft, cullingY);
 		this.flatSurfaceButton = addFlatSurfaceButton(this.buttonLeft, cullingY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.farWaterButton = addFarWaterButton(this.buttonLeft, cullingY + 2 * (BUTTON_HEIGHT + BUTTON_GAP));
 
-		this.diagnosticsSectionY = cullingY + 2 * (BUTTON_HEIGHT + BUTTON_GAP) + SECTION_GAP;
+		this.diagnosticsSectionY = cullingY + 3 * (BUTTON_HEIGHT + BUTTON_GAP) + SECTION_GAP;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
 		this.diagnosticsButton = addDiagnosticsButton(this.buttonLeft, diagnosticsY);
 		this.fallbackButton = addFallbackButton(this.buttonLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
@@ -139,7 +142,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		int controlsY = top + lineHeight() + 4;
 		int safeBottom = controlsY + 6 * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
 		int cullingY = safeBottom + SECTION_GAP + lineHeight() + 4;
-		int diagnosticsY = cullingY + 2 * (BUTTON_HEIGHT + BUTTON_GAP) + SECTION_GAP + lineHeight() + 4;
+		int diagnosticsY = cullingY + 3 * (BUTTON_HEIGHT + BUTTON_GAP) + SECTION_GAP + lineHeight() + 4;
 		return diagnosticsY + 2 * BUTTON_HEIGHT + BUTTON_GAP;
 	}
 
@@ -206,6 +209,16 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			clicked.setMessage(flatSurfaceLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 		button.active = WaterOptimisationClient.supportsFlatWaterSurfaceMeshing()
+				&& !WaterOptimisationClient.isSodiumLoaded();
+		return button;
+	}
+
+	private Button addFarWaterButton(int left, int top) {
+		Button button = this.addRenderableWidget(Button.builder(farWaterLabel(), clicked -> {
+			this.workingCopy.setFarWaterPass(!this.workingCopy.isFarWaterPass());
+			clicked.setMessage(farWaterLabel());
+		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.active = WaterOptimisationClient.supportsFarWaterPass()
 				&& !WaterOptimisationClient.isSodiumLoaded();
 		return button;
 	}
@@ -281,6 +294,14 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			return Component.translatable("screen.wateroptimisation.flat_surface_unavailable");
 		}
 		return Component.translatable("screen.wateroptimisation.flat_surface", yesNo(this.workingCopy.isFlatWaterSurfaceMeshing()));
+	}
+
+	private Component farWaterLabel() {
+		if (!WaterOptimisationClient.supportsFarWaterPass()
+				|| WaterOptimisationClient.isSodiumLoaded()) {
+			return Component.translatable("screen.wateroptimisation.far_water_unavailable");
+		}
+		return Component.translatable("screen.wateroptimisation.far_water", yesNo(this.workingCopy.isFarWaterPass()));
 	}
 
 	private Component particleBudgetValue() {

@@ -1,17 +1,20 @@
 package io.github.imcinq.wateroptimisation;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.chunk.RenderSectionRegion;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 /**
- * Observes the exact fluid geometry that could become water-owned later.
- *
- * <p>This is deliberately a probe rather than a render pass. It runs only
- * while diagnostics are enabled, records no mesh data, and never suppresses
- * vanilla output. That keeps the first ownership step cheap and reversible
- * while exposing whether ordinary source-water geometry is present in the
- * shared translucent section buffer.</p>
+ * Captures ordinary still-water faces while a 26.2 section is compiled.
+ * Sections are preflighted before any face can be cancelled so mixed
+ * translucent terrain remains entirely on vanilla's sorted buffer.
  */
 public final class FarWaterOwnershipProbe {
 	private static final ThreadLocal<SectionCapture> SECTION = new ThreadLocal<>();
@@ -20,13 +23,17 @@ public final class FarWaterOwnershipProbe {
 	private FarWaterOwnershipProbe() {
 	}
 
-	public static void beginSection() {
+	public static void beginSection(SectionPos sectionPos, RenderSectionRegion region) {
 		FLUID.remove();
-		if (!Diagnostics.isEnabled()) {
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		boolean farPassActive = FluidOptimizationPolicy.farWaterPassActive();
+		if (!diagnosticsEnabled && !farPassActive) {
 			SECTION.remove();
 			return;
 		}
-		SECTION.set(new SectionCapture());
+		SECTION.set(new SectionCapture(
+				farPassActive && isFarPassEligible(sectionPos, region)
+		));
 	}
 
 	public static WaterSectionOwnership endSection() {
@@ -42,14 +49,57 @@ public final class FarWaterOwnershipProbe {
 	}
 
 	public static void beginFluid(BlockState blockState, FluidState fluidState) {
-		if (!Diagnostics.isEnabled()) {
+		SectionCapture section = SECTION.get();
+		boolean captureMesh = section != null && section.farPassEligible;
+		if (!Diagnostics.isEnabled() && !captureMesh) {
 			FLUID.remove();
 			return;
 		}
 		FLUID.set(new FluidCapture(
 				fluidState.getType() == Fluids.WATER,
-				FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)
+				FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState),
+				captureMesh
 		));
+	}
+
+	/** Marks that the exact 26.2 addFace hook is present in this section. */
+	public static void markOwnedGeometryHookApplied() {
+		SectionCapture section = SECTION.get();
+		if (section != null && section.farPassEligible) {
+			section.ownedGeometryHookApplied = true;
+		}
+	}
+
+	/**
+	 * Copies one vanilla fluid face into the owned mesh. Returning true tells
+	 * the mixin to cancel the shared-buffer write; every other case stays on
+	 * vanilla and therefore cannot be affected by this experimental path.
+	 */
+	public static boolean captureOwnedFace(
+			float x0, float y0, float z0, float u0, float v0,
+			float x1, float y1, float z1, float u1, float v1,
+			float x2, float y2, float z2, float u2, float v2,
+			float x3, float y3, float z3, float u3, float v3,
+			int color, int lightCoords, boolean addBackFace
+	) {
+		FluidCapture fluid = FLUID.get();
+		SectionCapture section = SECTION.get();
+		if (fluid == null || section == null || !fluid.captureMesh || !fluid.ordinarySourceWater) {
+			return false;
+		}
+		if (section.meshBuilder == null) {
+			section.meshBuilder = WaterOwnedMesh.builder();
+		}
+		section.meshBuilder.addFace(
+				x0, y0, z0, u0, v0,
+				x1, y1, z1, u1, v1,
+				x2, y2, z2, u2, v2,
+				x3, y3, z3, u3, v3,
+				color, lightCoords, addBackFace
+		);
+		fluid.ownedFaces++;
+		fluid.ownedVertices += addBackFace ? 8 : 4;
+		return true;
 	}
 
 	public static void recordFace(boolean reverseFaceRequested) {
@@ -77,21 +127,76 @@ public final class FarWaterOwnershipProbe {
 		}
 	}
 
+	private static boolean isFarPassEligible(SectionPos sectionPos, RenderSectionRegion region) {
+		boolean sawOrdinaryWater = false;
+		BlockPos min = sectionPos.origin();
+		BlockPos max = min.offset(15, 15, 15);
+		for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+			BlockState blockState = region.getBlockState(pos);
+			FluidState fluidState = blockState.getFluidState();
+			boolean ordinarySourceWater = FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState);
+			if (!fluidState.isEmpty()) {
+				if (!ordinarySourceWater || !hasSafeNeighbors(pos, region)) {
+					return false;
+				}
+				sawOrdinaryWater = true;
+			}
+
+			if (!ordinarySourceWater
+					&& blockState.getRenderShape() == RenderShape.MODEL
+					&& ItemBlockRenderTypes.getChunkRenderType(blockState) == ChunkSectionLayer.TRANSLUCENT) {
+				return false;
+			}
+		}
+		return sawOrdinaryWater;
+	}
+
+	private static boolean hasSafeNeighbors(BlockPos pos, RenderSectionRegion region) {
+		for (Direction direction : Direction.values()) {
+			// The open top of a water surface is not an overlay. The other five
+			// directions are kept conservative around glass, leaves, and shapes.
+			if (direction == Direction.UP) {
+				continue;
+			}
+			BlockPos neighborPos = pos.relative(direction);
+			BlockState neighborState = region.getBlockState(neighborPos);
+			FluidState neighborFluid = neighborState.getFluidState();
+			if (!FluidOptimizationPolicy.isOrdinarySourceWater(neighborState, neighborFluid)
+					&& !neighborState.isSolidRender()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private static final class SectionCapture {
+		private final boolean farPassEligible;
+		private boolean ownedGeometryHookApplied;
+		private WaterOwnedMesh.Builder meshBuilder;
 		private long candidateBlocks;
 		private long candidateFaces;
 		private long candidateVertices;
 		private long fallbackBlocks;
 
-		private SectionCapture() {
+		private SectionCapture(boolean farPassEligible) {
+			this.farPassEligible = farPassEligible;
 		}
 
 		private WaterSectionOwnership finish() {
+			WaterOwnedMesh mesh = null;
+			if (this.farPassEligible && this.ownedGeometryHookApplied && this.meshBuilder != null && this.candidateFaces > 0L) {
+				mesh = this.meshBuilder.build();
+				this.meshBuilder = null;
+			} else if (this.meshBuilder != null) {
+				this.meshBuilder.close();
+				this.meshBuilder = null;
+			}
 			return new WaterSectionOwnership(
-					candidateBlocks,
-					candidateFaces,
-					candidateVertices,
-					fallbackBlocks
+					this.candidateBlocks,
+					this.candidateFaces,
+					this.candidateVertices,
+					this.fallbackBlocks,
+					mesh
 			);
 		}
 	}
@@ -99,12 +204,16 @@ public final class FarWaterOwnershipProbe {
 	private static final class FluidCapture {
 		private final boolean water;
 		private final boolean ordinarySourceWater;
+		private final boolean captureMesh;
 		private int faces;
 		private int vertices;
+		private int ownedFaces;
+		private int ownedVertices;
 
-		private FluidCapture(boolean water, boolean ordinarySourceWater) {
+		private FluidCapture(boolean water, boolean ordinarySourceWater, boolean captureMesh) {
 			this.water = water;
 			this.ordinarySourceWater = ordinarySourceWater;
+			this.captureMesh = captureMesh && ordinarySourceWater;
 		}
 	}
 }

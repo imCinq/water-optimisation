@@ -50,6 +50,39 @@ public abstract class FluidRendererMixin {
 	}
 
 	/**
+	 * Mirrors the exact vanilla fluid face into the owned section mesh. This
+	 * injection is optional on purpose: if the method descriptor changes, the
+	 * normal translucent buffer remains authoritative and the far pass never
+	 * activates for that section.
+	 */
+	@Inject(
+			method = "addFace(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFFFFFFFFFFFFFFFIIZ)V",
+			at = @At("HEAD"),
+			cancellable = true,
+			require = 0
+	)
+	private void wateroptimisation$captureOwnedFace(
+			VertexConsumer builder,
+			float x0, float y0, float z0, float u0, float v0,
+			float x1, float y1, float z1, float u1, float v1,
+			float x2, float y2, float z2, float u2, float v2,
+			float x3, float y3, float z3, float u3, float v3,
+			int color, int lightCoords, boolean addBackFace,
+			CallbackInfo callback
+	) {
+		FarWaterOwnershipProbe.markOwnedGeometryHookApplied();
+		if (FarWaterOwnershipProbe.captureOwnedFace(
+				x0, y0, z0, u0, v0,
+				x1, y1, z1, u1, v1,
+				x2, y2, z2, u2, v2,
+				x3, y3, z3, u3, v3,
+				color, lightCoords, addBackFace
+		)) {
+			callback.cancel();
+		}
+	}
+
+	/**
 	 * Reuses the vanilla top-face material and lighting while expanding one
 	 * ordinary one-block quad into a validated 4x4 surface patch. Vanilla emits
 	 * the upward face first when the surface is visible, so this targets only the
