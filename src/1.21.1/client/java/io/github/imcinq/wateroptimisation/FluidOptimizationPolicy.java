@@ -91,6 +91,9 @@ public final class FluidOptimizationPolicy {
 	}
 
 	private static boolean hidesFluidFace(BlockState blockState, FluidState fluidState) {
-		return isOrdinarySourceWater(blockState, fluidState) || blockState.isSolidRender();
+		// The 1.21.1 solid-render query requires a level and position. Do not
+		// manufacture context here: source-water neighbors are sufficient for
+		// the enclosed-water proof, while every other case stays vanilla.
+		return isOrdinarySourceWater(blockState, fluidState);
 	}
 }

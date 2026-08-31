@@ -16,6 +16,8 @@ def targetLoaderVersion = legacyTarget ? project.loader_version_1211 : project.l
 def targetFabricApiVersion = legacyTarget ? project.fabric_api_version_1211 : project.fabric_api_version
 def targetModMenuVersion = legacyTarget ? project.modmenu_version_1211 : project.modmenu_version
 def targetJavaVersion = legacyTarget ? 21 : 25
+def modDependencyConfiguration = legacyTarget ? "modImplementation" : "implementation"
+def modCompileOnlyConfiguration = legacyTarget ? "modCompileOnly" : "compileOnly"
 def targetDescription = legacyTarget
 		? "Client-side water rendering optimisation for Minecraft 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
 		: "Client-side water rendering optimisation for Minecraft 26.2 with conservative geometry culling, particle filtering, and diagnostics."
@@ -72,9 +74,9 @@ dependencies {
 	if (legacyTarget) {
 		mappings loom.officialMojangMappings()
 	}
-	implementation "net.fabricmc:fabric-loader:${targetLoaderVersion}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}"
-	compileOnly "com.terraformersmc:modmenu:${targetModMenuVersion}"
+	add(modDependencyConfiguration, "net.fabricmc:fabric-loader:${targetLoaderVersion}")
+	add(modDependencyConfiguration, "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}")
+	add(modCompileOnlyConfiguration, "com.terraformersmc:modmenu:${targetModMenuVersion}")
 	testImplementation "org.junit.jupiter:junit-jupiter:5.13.4"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.13.4"
 }
