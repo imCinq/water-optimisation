@@ -4,7 +4,7 @@ Water Optimisation is developed as a conservative, client-only rendering mod. Ev
 
 ## Current release
 
-The 0.0.3 release contains the current client-only implementation for Minecraft 26.2:
+The 0.0.4 preview contains the current client-only implementation for Minecraft 26.2 and the target-isolated compatibility implementation for Minecraft 1.21.1:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
@@ -18,9 +18,9 @@ The 0.0.3 release contains the current client-only implementation for Minecraft 
 - automated tests and repository audits.
 - packaged Fabric mod icon matching the public project logo.
 
-The implementation is build-verified and packaged as the first official GitHub release. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
+The 26.2 implementation is the stable 0.0.3 baseline; the 0.0.4 preview packages both target-specific builds from the same reviewed source line. Remote build, test, privacy, client-only, and artifact checks pass. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
 
-The compatibility branch also builds a separate Minecraft 1.21.1 profile with Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative and has no Sodium geometry bridge yet.
+The Minecraft 1.21.1 profile uses Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative and has no Sodium geometry bridge yet.
 
 ## Completed phases
 
