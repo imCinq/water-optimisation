@@ -21,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public final class WaterOptimisationClient implements ClientModInitializer {
 	public static final String MOD_ID = "wateroptimisation";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -31,6 +33,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	private static volatile boolean sodiumLoaded;
 	private static volatile ParticleFilterSettings particleFilterSettings = ParticleFilterSettings.INACTIVE;
 	private static volatile ParticleReference particleReference = ParticleReference.UNAVAILABLE;
+	private static final AtomicInteger PARTICLE_BUDGET_USED = new AtomicInteger();
 	private static final long DIAGNOSTICS_REFRESH_INTERVAL_NANOS = 250_000_000L;
 	private static long diagnosticsRefreshDeadlineNanos;
 	private static Component[] diagnosticsLines = new Component[0];
@@ -47,6 +50,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				KEY_CATEGORY
 		));
 
+		ClientTickEvents.START_CLIENT_TICK.register(client -> beginParticleTick());
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			updateParticleReference(client);
 			while (openConfigKey.consumeClick()) {
@@ -79,31 +83,30 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return true;
 	}
 
+	public static boolean supportsFlatWaterSurfaceMeshing() {
+		return true;
+	}
+
+	public static RendererCapabilities rendererCapabilities() {
+		return new RendererCapabilities(
+				sodiumLoaded,
+				sodiumLoaded && SodiumFluidIntegration.geometryHooksAvailable(),
+				!sodiumLoaded,
+				sodiumLoaded ? "Sodium" : "Vanilla"
+		);
+	}
+
+	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {
+		return EffectiveWaterPolicy.resolve(config, rendererCapabilities());
+	}
+
 	/**
 	 * Describes the path that the current working configuration can actually
 	 * use. This is intentionally based on the supplied copy rather than the
 	 * saved global policy, so the settings screen stays truthful before Apply.
 	 */
 	public static Component effectivePath(WaterOptimisationConfig config) {
-		if (config == null || !config.isEnabled() || config.getPerformanceProfile() == WaterOptimisationConfig.PerformanceProfile.VANILLA) {
-			return Component.translatable("wateroptimisation.path.disabled");
-		}
-
-		if (isSodiumLoaded()) {
-			if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
-					&& SodiumFluidIntegration.geometryHooksAvailable()) {
-				return Component.translatable("wateroptimisation.path.sodium_reduced_faces");
-			}
-			return Component.translatable("wateroptimisation.path.sodium_particles");
-		}
-
-		if (config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL) {
-			return Component.translatable("wateroptimisation.path.reduced_faces");
-		}
-		if (config.isFlatWaterFastPath() && config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED) {
-			return Component.translatable("wateroptimisation.path.hidden_compile");
-		}
-		return Component.translatable("wateroptimisation.path.vanilla_particles");
+		return Component.translatable(effectivePolicy(config).geometryPath().translationKey());
 	}
 
 	public static void refreshParticleFiltering(WaterOptimisationConfig config) {
@@ -112,10 +115,15 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			return;
 		}
 
-		boolean active = config.isEnabled()
-				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA;
+		EffectiveWaterPolicy policy = effectivePolicy(config);
 		double maxDistance = WaterParticleDistancePolicy.effectiveDistance(config);
-		particleFilterSettings = new ParticleFilterSettings(active, config.isWaterParticles(), maxDistance * maxDistance);
+		particleFilterSettings = new ParticleFilterSettings(
+				policy.particleFilteringActive(),
+				config.isWaterParticles(),
+				maxDistance * maxDistance,
+				policy.particleBudget(),
+				policy.limitForcedWaterParticles()
+		);
 	}
 
 	public static boolean shouldKeepWaterParticle(ParticleOptions particle, boolean alwaysShow, double x, double y, double z) {
@@ -131,7 +139,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			Diagnostics.recordParticleCandidate();
 		}
 
-		if (alwaysShow) {
+		if (alwaysShow && !settings.limitForcedWaterParticles()) {
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleForcedPreserved();
+			}
 			return true;
 		}
 		if (!settings.keepWaterParticles()) {
@@ -142,11 +153,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		}
 
 		ParticleReference reference = particleReference;
-		if (!reference.available()) {
-			return true;
-		}
-
-		if (!WaterParticleDistancePolicy.isWithinDistanceSquared(
+		if (reference.available() && !WaterParticleDistancePolicy.isWithinDistanceSquared(
 				settings.maxDistanceSquared(),
 				reference.x(), reference.y(), reference.z(),
 				x, y, z
@@ -156,6 +163,29 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 			}
 			return false;
 		}
+
+		if (settings.particleBudget() > WaterOptimisationConfig.UNLIMITED_PARTICLE_BUDGET
+				&& !reserveParticleBudget(settings.particleBudget())) {
+			if (diagnosticsEnabled) {
+				Diagnostics.recordParticleBudgetRejected();
+			}
+			return false;
+		}
+		return true;
+	}
+
+	private static void beginParticleTick() {
+		PARTICLE_BUDGET_USED.set(0);
+	}
+
+	private static boolean reserveParticleBudget(int budget) {
+		int current;
+		do {
+			current = PARTICLE_BUDGET_USED.get();
+			if (current >= budget) {
+				return false;
+			}
+		} while (!PARTICLE_BUDGET_USED.compareAndSet(current, current + 1));
 		return true;
 	}
 
@@ -200,18 +230,23 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		long now = System.nanoTime();
 		if (diagnosticsLines.length == 0 || now >= diagnosticsRefreshDeadlineNanos) {
 			Diagnostics.Snapshot snapshot = Diagnostics.snapshot();
+			EffectiveWaterPolicy policy = effectivePolicy(config);
 			diagnosticsLines = new Component[]{
 				Component.literal("Water Optimisation"),
-				Component.literal("mode: " + modeLabel(config)),
+				Component.literal("renderer: " + rendererCapabilities().rendererName()),
+				Component.literal("geometry path: " + policy.geometryPath().name().toLowerCase(java.util.Locale.ROOT)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
 				Component.literal("water backfaces: " + (FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
+				Component.literal("flat candidates/patches: " + snapshot.flatWaterCandidates() + "/" + snapshot.flatWaterPatches()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
 				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
 				Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())),
+				Component.literal("particle budget: " + particleBudgetLabel(policy.particleBudget())),
+				Component.literal("budget rejects: " + snapshot.particleBudgetRejected()),
 				Component.literal("particles rejected: " + snapshot.particleRejected() + "/" + snapshot.particleCandidates())
 			};
 			diagnosticsRefreshDeadlineNanos = now + DIAGNOSTICS_REFRESH_INTERVAL_NANOS;
@@ -227,22 +262,22 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		}
 	}
 
-	private static String modeLabel(WaterOptimisationConfig config) {
-		if (!config.isEnabled()) {
-			return "disabled";
-		}
-		if (isSodiumLoaded()) {
-			return "particles only (Sodium owns fluids)";
-		}
-		return config.getPerformanceProfile().name().toLowerCase(java.util.Locale.ROOT);
-	}
-
 	private static String onOff(boolean value) {
 		return value ? "on" : "off";
 	}
 
-	private record ParticleFilterSettings(boolean active, boolean keepWaterParticles, double maxDistanceSquared) {
-		private static final ParticleFilterSettings INACTIVE = new ParticleFilterSettings(false, true, 0.0D);
+	private static String particleBudgetLabel(int budget) {
+		return budget == WaterOptimisationConfig.UNLIMITED_PARTICLE_BUDGET ? "unlimited" : budget + "/tick";
+	}
+
+	private record ParticleFilterSettings(
+			boolean active,
+			boolean keepWaterParticles,
+			double maxDistanceSquared,
+			int particleBudget,
+			boolean limitForcedWaterParticles
+	) {
+		private static final ParticleFilterSettings INACTIVE = new ParticleFilterSettings(false, true, 0.0D, 0, false);
 	}
 
 	private record ParticleReference(double x, double y, double z, boolean available) {

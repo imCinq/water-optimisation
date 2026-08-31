@@ -20,8 +20,12 @@
 	"screen.wateroptimisation.particles": "Show water particles? %s",
 	"screen.wateroptimisation.particle_distance": "Show water particles within %s blocks?",
 	"screen.wateroptimisation.fog": "Hide water particles in fog? %s",
+	"screen.wateroptimisation.particle_budget": "Limit water particles per tick? %s",
+	"screen.wateroptimisation.forced_particles": "Limit water particles that ignore distance? %s",
 	"screen.wateroptimisation.diagnostics": "Show performance stats? %s",
 	"screen.wateroptimisation.fallback_logging": "Log skipped cases? %s",
+	"screen.wateroptimisation.flat_surface": "Combine flat water surfaces? %s",
+	"screen.wateroptimisation.flat_surface_unavailable": "Combine flat water surfaces? Unavailable here",
 	"screen.wateroptimisation.reset": "Reset preset",
 	"wateroptimisation.profile.vanilla": "Vanilla",
 	"wateroptimisation.profile.balanced": "Balanced",
@@ -34,7 +38,9 @@
 	"wateroptimisation.path.vanilla_particles": "Vanilla water geometry with local particle filtering",
 	"wateroptimisation.path.hidden_compile": "Vanilla water geometry with hidden-water compile skipping",
 	"wateroptimisation.path.reduced_faces": "Vanilla water geometry with reduced inward faces",
+	"wateroptimisation.path.flat_water_surface": "Vanilla water geometry with conservative flat-surface merging",
 	"wateroptimisation.path.sodium_particles": "Sodium water geometry with local particle filtering",
 	"wateroptimisation.path.sodium_reduced_faces": "Sodium water geometry with reduced inward faces",
-	"wateroptimisation.path.legacy_particles": "Vanilla water geometry with local particle filtering (1.21.1 compatibility)"
+	"wateroptimisation.path.legacy_particles": "Vanilla water geometry with local particle filtering (1.21.1 compatibility)",
+	"wateroptimisation.particle_budget.unlimited": "Unlimited"
 }
