@@ -66,7 +66,7 @@ Maximum FPS disables ordinary water particles by default. Particle settings cont
 
 ## Sodium and compatibility
 
-Sodium has its own fluid renderer. When Sodium is detected, Water Optimisation disables its vanilla fluid hooks instead of competing with or replacing Sodium’s geometry. The local settings, particle filter, and diagnostics remain available.
+Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. On the reviewed Sodium 0.9.x builds for Minecraft 26.2, `Maximum FPS` can additionally ask Sodium to omit only reversed copies of ordinary source-water quads; Sodium still owns visibility, fluid shaping, lighting, and translucent sorting. Unknown Sodium builds stay on the particle-only fallback until their renderer shape is reviewed. The effective path is shown in the main settings screen.
 
 The mod is client-only. It declares no server entrypoint, custom packets, world updates, movement changes, collision changes, player-information features, telemetry, update checker, or outbound network service. Non-water rendering is outside its scope.
 

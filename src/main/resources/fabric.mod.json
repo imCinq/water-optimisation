@@ -25,6 +25,10 @@
 		{
 			"config": "wateroptimisation.client.mixins.json",
 			"environment": "client"
+		},
+		{
+			"config": "wateroptimisation.sodium.mixins.json",
+			"environment": "client"
 		}
 	],
 	"suggests": {

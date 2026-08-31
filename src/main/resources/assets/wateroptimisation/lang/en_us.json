@@ -6,6 +6,7 @@
 	"screen.wateroptimisation.enabled.on": "Enable water optimisation? ON",
 	"screen.wateroptimisation.enabled.off": "Enable water optimisation? OFF",
 	"screen.wateroptimisation.profile": "Preset: %s",
+	"screen.wateroptimisation.effective_path": "Effective water path: %s",
 	"screen.wateroptimisation.advanced": "Advanced settings",
 	"screen.wateroptimisation.advanced.title": "Water Optimisation — Advanced",
 	"screen.wateroptimisation.advanced.description": "Want better performance? Start with Performance. Some water options can change how underwater views look.",
@@ -27,5 +28,11 @@
 	"wateroptimisation.profile.maximum": "Maximum FPS",
 	"wateroptimisation.culling.disabled": "Keep vanilla",
 	"wateroptimisation.culling.conservative": "Hide unseen water",
-	"wateroptimisation.culling.experimental": "Hide inward faces too"
+	"wateroptimisation.culling.experimental": "Hide inward faces too",
+	"wateroptimisation.path.disabled": "Disabled — vanilla behavior",
+	"wateroptimisation.path.vanilla_particles": "Vanilla water geometry with local particle filtering",
+	"wateroptimisation.path.hidden_compile": "Vanilla water geometry with hidden-water compile skipping",
+	"wateroptimisation.path.reduced_faces": "Vanilla water geometry with reduced inward faces",
+	"wateroptimisation.path.sodium_particles": "Sodium water geometry with local particle filtering",
+	"wateroptimisation.path.sodium_reduced_faces": "Sodium water geometry with reduced inward faces"
 }

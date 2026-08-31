@@ -13,8 +13,9 @@ The main screen contains:
 1. an enable switch;
 2. a Vanilla, Balanced, Performance, or Maximum FPS preset selector;
 3. a short client-only explanation;
-4. an Advanced settings button;
-5. Done and Cancel buttons.
+4. a read-only effective-path summary;
+5. an Advanced settings button;
+6. Done and Cancel buttons.
 
 Done saves the working copy. Cancel and Escape return to the parent screen without saving. The screen never changes a server or world setting.
 
@@ -31,7 +32,7 @@ working copy rather than enabling a diagnostic.
 
 The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
 
-The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the two vanilla fluid controls because Sodium controls its own fluid renderer; the remaining local particle and diagnostic controls stay available.
+The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the vanilla fluid controls unless the reviewed Sodium 0.9.x/Minecraft 26.2 face bridge has matched; the remaining local particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
 
 ## Recovery
 

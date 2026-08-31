@@ -10,9 +10,9 @@ Mod Menu 19.0.0-alpha.1 is an optional compile-only dependency for the target. T
 
 ## Sodium
 
-Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables its vanilla FluidRenderer face, reduced-face, and tessellation hooks. It does not force a renderer replacement or call Sodium internals. The particle and configuration paths remain independent. The Experimental reduced-face setting therefore has no effect while Sodium is present.
+Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables its vanilla FluidRenderer face and tessellation hooks. A separate optional bridge is reviewed for Sodium 0.9.x on Minecraft 26.2: it changes only the boolean that marks Sodium's reversed quad copy for ordinary source water when Experimental reduced-face mode is selected. It does not replace Sodium's renderer or duplicate its visibility, fluid shaping, lighting, hidden-fluid culling, or translucent sorting.
 
-This is a renderer-ownership guard, not proof of complete Sodium integration. Test the exact Sodium build and companion-mod combination before enabling fluid optimization.
+The bridge is version-gated and fail-closed. If its class or method hooks do not match, or the build is outside Sodium 0.9.x for Minecraft 26.2, geometry remains Sodium-owned and only local particle settings apply. The main settings screen reports the effective path; the two vanilla geometry controls remain unavailable when no compatible bridge is active.
 
 ## Rendering backends
 

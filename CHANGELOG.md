@@ -2,6 +2,13 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## Unreleased
+
+- Make selecting any non-Vanilla preset turn the master switch on, while Vanilla still restores the disabled reference state.
+- Show the effective water path in the main settings screen so Sodium ownership and unavailable geometry options are explicit.
+- Add a fail-closed Sodium 0.9.x/Minecraft 26.2 bridge for the opt-in reduced-inward-face experiment without duplicating Sodium's fluid renderer, hidden-fluid culling, or translucent sorting.
+- Keep unknown Sodium builds on the particle-only fallback until a matching renderer hook is reviewed.
+
 ## 0.0.3 — 2026-08-30
 
 Small compatibility and settings-clarity release.

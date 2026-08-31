@@ -25,8 +25,8 @@ public final class FluidOptimizationPolicy {
 				&& !WaterOptimisationClient.isSodiumLoaded();
 		fluidHooksActive = hooksActive;
 		flatWaterFastPathActive = hooksActive && config.isFlatWaterFastPath();
-		reducedWaterBackfacesActive = hooksActive
-				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
+		reducedWaterBackfacesActive = reducedWaterBackfacesRequested()
+				&& (!WaterOptimisationClient.isSodiumLoaded() || SodiumFluidIntegration.geometryHooksAvailable());
 	}
 
 	public static boolean fluidHooksActive() {
@@ -39,11 +39,24 @@ public final class FluidOptimizationPolicy {
 
 	/**
 	 * The experimental mode removes only vanilla's optional reverse face for a
-	 * fluid quad. It is deliberately disabled for Sodium, which owns its fluid
-	 * renderer, and is never enabled by a safe preset.
+	 * fluid quad. The vanilla hook is disabled for Sodium, which owns its fluid
+	 * renderer; the optional reviewed Sodium bridge can apply the same narrow
+	 * operation without taking ownership of the rest of the renderer. It is
+	 * never enabled by a safe preset.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
+		if (WaterOptimisationClient.isSodiumLoaded()) {
+			return reducedWaterBackfacesRequested() && SodiumFluidIntegration.geometryHooksAvailable();
+		}
 		return reducedWaterBackfacesActive;
+	}
+
+	/** Returns the user-requested experimental mode before renderer ownership is applied. */
+	public static boolean reducedWaterBackfacesRequested() {
+		WaterOptimisationConfig config = ConfigManager.get();
+		return config.isEnabled()
+				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
+				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
 	}
 
 	/**
@@ -95,6 +108,9 @@ public final class FluidOptimizationPolicy {
 	}
 
 	private static boolean hidesFluidFace(BlockState blockState, FluidState fluidState) {
-		return blockState.isSolidRender() || isOrdinarySourceWater(blockState, fluidState);
+		// Source-water neighbors are common in the only dense case this probe
+		// can skip. Test that cheap identity/type path before asking a solid
+		// block state for its render shape.
+		return isOrdinarySourceWater(blockState, fluidState) || blockState.isSolidRender();
 	}
 }

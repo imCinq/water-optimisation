@@ -18,7 +18,7 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Vanilla | Disables the master switch and all optimization paths. Use it as the reference state. |
 | Balanced | Keeps vanilla fluid-face decisions, keeps nearby water particles, and leaves the flat-water fast path off. |
 | Performance | Keeps vanilla fluid-face decisions, enables the explicitly labelled flat source-water fast path, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. |
-| Maximum FPS | Enables the flat source-water fast path and optional reduced-face mode, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. The reduced-face mode can change inside-water views. |
+| Maximum FPS | Enables the flat source-water fast path and optional reduced-face mode, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. The reduced-face mode can change inside-water views. On a reviewed Sodium 0.9.x/Minecraft 26.2 build, the same reduced-face experiment is applied through the optional Sodium bridge. |
 
 Selecting a preset resets its Advanced settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
@@ -34,10 +34,10 @@ Selecting a preset resets its Advanced settings values. Choosing Vanilla also tu
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, translucent-resort averages, and removed reverse-face counts. |
 | debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
 
-The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it; Sodium ownership disables it. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use vanilla's geometry decisions; the mode only changes the optional reverse-face emission after vanilla has selected a fluid face.
+The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it; Sodium ownership disables the vanilla hook, while a reviewed Sodium 0.9.x/Minecraft 26.2 build can use the optional bridge. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use the renderer's normal geometry decisions; the mode only changes the optional reverse-face emission after the renderer has selected a fluid face.
 
 ## Compatibility behavior
 
-If Sodium is detected, the vanilla fluid hooks are disabled so Water Optimisation does not duplicate or replace Sodium's fluid renderer. The local particle and settings paths remain available. The diagnostics HUD reports the renderer ownership state.
+If Sodium is detected, the vanilla fluid hooks are disabled so Water Optimisation does not duplicate or replace Sodium's fluid renderer. On a reviewed Sodium 0.9.x/Minecraft 26.2 build, Maximum FPS may use the optional reduced-face bridge; unknown or unmatched builds remain particle-only. The local particle and settings paths remain available. The main screen and diagnostics HUD report the renderer ownership state.
 
 Waterlogged blocks, flowing edges, partial shapes, transparent neighbors, overlays, and unusual block states are left to vanilla behavior. No setting changes FluidState, collision, movement, world updates, or server state.
