@@ -5,8 +5,8 @@
 Client fluid state
 → target-isolated FluidRenderer hook or optional 26.2 Sodium face bridge
 → already-loaded neighbor-state classifier
-→ vanilla fluid mesh path, explicit fully-hidden source-water skip, or 26.2-only capped flat-surface prototype
-→ translucent section buffer
+→ vanilla fluid mesh path, explicit fully-hidden source-water skip, 26.2-only capped flat-surface prototype, or guarded 26.2-only owned-water mesh
+→ shared translucent section buffer and, for eligible far-water sections, a section-owned vertex buffer
 → section compilation and translucent resort diagnostics
 
 Particle state
@@ -45,7 +45,7 @@ The 1.21.1 adapter does not manufacture a level/position context for its older s
 
 The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
-The 26.2 renderer also has a diagnostics-only far-water ownership probe around section compilation and fluid tessellation. It counts faces and vertices emitted by ordinary source-water fluid calls separately from unsupported fluid calls, then carries that immutable summary from `SectionCompiler.Results` to `CompiledSectionMesh`. It deliberately retains no mesh and never suppresses vanilla output. This is an ownership handoff, not an FPS feature, and must not be interpreted as a far-water pass. The compatibility target does not load this 26.2-only hook.
+The 26.2 renderer also has an opt-in far-water ownership path around section compilation and fluid tessellation. A conservative preflight accepts only sections with ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Eligible fluid faces are copied into a `WaterOwnedMesh`, removed from the shared translucent output, and carried from `SectionCompiler.Results` to `CompiledSectionMesh`. A client render callback then draws those meshes after translucent terrain through Minecraft's Blaze3D pipeline and skips eligible sections beyond its 64-block bound. Unsupported fluids, mixed translucent sections, Sodium-owned geometry, and the 1.21.1 target remain on their existing paths. The pass is disabled by default and remains an experiment until live visual and frame-time validation proves it safe and useful.
 
 The flat-surface prototype is narrower than a general greedy mesh. It only runs when a 4x4 aligned patch can remain inside one render section. Every cell must be ordinary full source water with air above and source water below; a one-cell source-water ring protects the patch boundary from losing side faces. The patch must also share the vanilla water tint and both light layers. The first vanilla `addFace` call is expanded only when its reviewed 26.2 descriptor still matches the expected four-vertex face shape; otherwise the mixin leaves the call untouched. The other fifteen block tessellations are canceled only after the full proof succeeds.
 
@@ -79,7 +79,7 @@ The intended design is a separate water-owned representation and pass:
 3. apply water-only distance, fog, and later LOD/half-resolution decisions through Blaze3D/Minecraft abstractions;
 4. preserve vanilla/Sodium ownership and fail closed when the renderer cannot provide that separation.
 
-This track has a diagnostics-only ownership probe and a compiled-mesh ownership handoff in `docs/FAR_WATER_PASS.md`, but no runtime distance cull, separate draw, or fake setting is enabled yet.
+This track has a compiled-mesh ownership handoff and a guarded 26.2-only separate draw in `docs/FAR_WATER_PASS.md`. The runtime distance cutoff is opt-in, hard-bounded, and fail-closed; it is not a general shared-translucent cull or a stable preset.
 
 ## Non-goals
 

@@ -31,4 +31,4 @@ The mod is client-only and render-focused. It does not add packets, change movem
 
 ## Fallback behavior
 
-If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Flowing, partial, waterlogged, overlay, transparent, and unusual states remain on the vanilla path. The far-water work is not part of this fallback: until a separate water-owned pass exists, it is intentionally inactive.
+If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Flowing, partial, waterlogged, overlay, transparent, and unusual states remain on the normal renderer. The 26.2 far-water pass is unavailable with Sodium and is disabled for the 1.21.1 profile; its section preflight also falls back whenever mixed translucent content is possible.

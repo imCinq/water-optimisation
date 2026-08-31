@@ -95,8 +95,6 @@ public final class FarWaterOwnershipProbe {
 				x3, y3, z3, u3, v3,
 				color, lightCoords, addBackFace
 		);
-		fluid.ownedFaces++;
-		fluid.ownedVertices += addBackFace ? 8 : 4;
 		return true;
 	}
 
@@ -210,8 +208,6 @@ public final class FarWaterOwnershipProbe {
 		private final boolean captureMesh;
 		private int faces;
 		private int vertices;
-		private int ownedFaces;
-		private int ownedVertices;
 
 		private FluidCapture(boolean water, boolean ordinarySourceWater, boolean captureMesh) {
 			this.water = water;

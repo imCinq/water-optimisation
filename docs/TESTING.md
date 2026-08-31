@@ -52,7 +52,7 @@ Compare identical warmed scenes using the report template. Record average FPS, 1
 
 Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
 
-The dedicated far-water pass is not yet part of this matrix. When implemented, test its near/far transition, fog, waterlogged boundaries, glass/leaves, underwater views, and Sodium ownership separately.
+For the opt-in far-water pass, additionally test the 64-block cutoff from a fixed camera while looking across flat source-water pools, mixed terrain, caves, glass/leaves, overlays, flowing water, and waterlogged blocks. Verify that the pass reports uploads/draws/skips, that unsupported sections remain visible, and that the cutoff does not remove unrelated terrain. Repeat above-water and underwater views with Sodium absent and present; Sodium should report the option as unavailable and retain its own fluid renderer.
 
 ## Multiplayer smoke test
 
