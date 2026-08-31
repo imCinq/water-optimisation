@@ -4,7 +4,7 @@
 
 The practical client-side FPS targets are translucent water geometry, chunk-rebuild work, translucent overdraw and sorting, and water-related particles. Fluid simulation is server-authoritative and should remain untouched.
 
-The dedicated far-water pass is now an early, opt-in architecture track rather than a late UI idea. The 26.2 prototype separates eligible still-water geometry from the shared translucent buffer before applying a hard 64-block section-distance bound. It remains a prototype: fade, independent fog, LOD, and half-resolution decisions require further visual and frame-time evidence. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
+The dedicated far-water pass is now an early, opt-in architecture track rather than a late UI idea. The 26.2 prototype separates eligible still-water geometry from the shared translucent buffer before applying a hard 320-block section-distance bound and uses the current frame's camera matrix and translucent target. It remains a prototype: fade, independent fog, LOD, and half-resolution decisions require further visual and frame-time evidence. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
 
 The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched until an exact older-renderer bridge is reviewed.
 

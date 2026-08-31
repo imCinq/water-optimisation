@@ -2,7 +2,7 @@
 
 ## Status
 
-The 26.2 profile now contains an opt-in rendering experiment named `Limit distant water to 64 blocks?`. It is disabled by default, unavailable when Sodium owns fluid rendering, and not compiled into the 1.21.1 client source set. It uses a hard section-distance cutoff; it does not yet implement a fade, reduced-resolution mesh, or general LOD.
+The 26.2 profile now contains an opt-in rendering experiment named `Limit distant water to 320 blocks?`. It is disabled by default, unavailable when Sodium owns fluid rendering, and not compiled into the 1.21.1 client source set. It uses a hard section-distance cutoff; it does not yet implement a fade, reduced-resolution mesh, or general LOD. The draw uses the current frame's camera matrix and the translucent terrain target so the owned mesh follows camera movement.
 
 The pass is deliberately fail-closed. It can only take ownership of a section after a preflight finds ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Flowing water, waterlogged blocks, glass, leaves, plants, overlays, partial shapes, transparent boundaries, custom translucent models, and any uncertain section stay on the normal path.
 
@@ -30,7 +30,7 @@ The pass applies its own:
 - fog interaction;
 - capability check for the active Minecraft backend.
 
-The first version uses a 64-block section AABB distance bound. Eligible near sections are redrawn through the dedicated pass; eligible sections beyond the bound are skipped. Because this is a hard cutoff, the transition is intentionally exposed for testing rather than hidden behind a stable preset.
+The first version uses a 320-block section AABB distance bound. Eligible sections inside the bound are redrawn through the dedicated pass; eligible sections beyond the bound are skipped. Because this is a hard cutoff, the transition is intentionally exposed for testing rather than hidden behind a stable preset.
 
 ### Stage 3 — Controlled LOD
 

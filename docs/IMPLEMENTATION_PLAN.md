@@ -29,7 +29,7 @@ This pass keeps the original conservative phases intact while adding measurable 
 - version the local configuration and migrate older files without changing explicit user choices;
 - resolve requested settings into renderer capabilities and expose the effective path in the UI and diagnostics;
 - add bounded water-particle admission, including a per-client-tick budget and an explicit policy for particles that normally bypass distance limits;
-- prototype a disabled-by-default 26.2-only 4x4 flat still-water surface mesh. It requires a full source-water ring, source water below every cell, a clear surface, matching tint, matching light, and no Sodium ownership. Any uncertain shape remains vanilla.
+- prototype a disabled-by-default 26.2-only 4x4 flat still-water surface mesh. It requires a full source-water ring, source water below every cell, a clear surface, matching tint, matching light, and no Sodium ownership. The merged quad uses the source sprite without extrapolating atlas UVs, so adjacent atlas textures cannot bleed into the surface. Any uncertain shape remains vanilla.
 
 The flat-surface prototype is deliberately not included in a preset. It is a narrow experiment for remote artifact validation, not a promise that every water scene will improve.
 
@@ -65,7 +65,7 @@ The reduced-face mode keeps vanilla's outward fluid face and removes only its op
 
 ## Next priorities
 
-- Keep the dedicated far-water pass prototype early and opt-in for fill-rate-bound scenes. The 26.2 path now preflights water-only sections, attaches an owned still-water mesh to the compiled section lifetime, and draws it after translucent terrain through Blaze3D. Eligible sections beyond the hard 64-block bound are skipped; mixed or uncertain sections remain on the shared path.
+- Keep the dedicated far-water pass prototype early and opt-in for fill-rate-bound scenes. The 26.2 path now preflights water-only sections, attaches an owned still-water mesh to the compiled section lifetime, and draws it after translucent terrain through Blaze3D. Eligible sections beyond the hard 320-block bound are skipped; mixed or uncertain sections remain on the shared path.
 - Measure the prototype's near/far visual boundary and frame-time effect before adding a fade, independent fog curve, lower vertex density, or half-resolution/LOD variant. Keep the prototype separate from both Sodium's renderer and the 1.21.1 compatibility adapter.
 - Complete local visual and performance validation.
 - Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.

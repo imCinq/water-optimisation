@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
 import net.minecraft.client.renderer.chunk.SectionMesh;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,12 @@ import java.util.OptionalDouble;
 
 /**
  * Draws the water-only meshes captured from qualifying sections. The pass is
- * intentionally a hard 64-block cutoff for the first GPU experiment: near
+ * intentionally a hard 320-block cutoff for the first GPU experiment: near
  * water keeps the vanilla terrain pipeline, while distant eligible water is
  * omitted instead of making the shared translucent buffer draw it.
  */
 public final class FarWaterRenderer {
-	private static final double MAX_DISTANCE = 64.0D;
+	private static final double MAX_DISTANCE = 320.0D;
 	private static final double MAX_DISTANCE_SQUARED = MAX_DISTANCE * MAX_DISTANCE;
 
 	private FarWaterRenderer() {
@@ -52,7 +53,8 @@ public final class FarWaterRenderer {
 		}
 
 		Minecraft client = Minecraft.getInstance();
-		Vec3 cameraPosition = client.gameRenderer.mainCamera().position();
+		Vec3 cameraPosition = context.levelState().cameraRenderState.pos;
+		Matrix4f modelViewMatrix = new Matrix4f(context.levelState().cameraRenderState.viewRotationMatrix);
 		List<WaterDraw> draws = new ArrayList<>();
 		List<DynamicUniforms.ChunkSectionInfo> sectionInfos = new ArrayList<>();
 		int largestIndexCount = 0;
@@ -86,7 +88,7 @@ public final class FarWaterRenderer {
 
 			var origin = section.getRenderOrigin();
 			sectionInfos.add(new DynamicUniforms.ChunkSectionInfo(
-					RenderSystem.getModelViewMatrixCopy(),
+					modelViewMatrix,
 					origin.getX(),
 					origin.getY(),
 					origin.getZ(),
@@ -105,7 +107,10 @@ public final class FarWaterRenderer {
 		GpuBufferSlice[] uniforms = RenderSystem.getDynamicUniforms().writeChunkSections(
 				sectionInfos.toArray(new DynamicUniforms.ChunkSectionInfo[0])
 		);
-		RenderTarget target = client.gameRenderer.mainRenderTarget();
+		RenderTarget target = context.levelRenderer().translucentTarget();
+		if (target == null) {
+			target = client.gameRenderer.mainRenderTarget();
+		}
 		try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				() -> "Water Optimisation owned water",
 				target.getColorTextureView(),

@@ -158,18 +158,21 @@ public abstract class FluidRendererMixin {
 			return;
 		}
 
-		float width = patch.width();
-		float depth = patch.depth();
 		for (int vertex = 0; vertex < 4; vertex++) {
 			int base = 1 + vertex * 5;
 			boolean lowX = approximately(x[vertex], xMin);
 			boolean lowZ = approximately(z[vertex], zMin);
-			float xFactor = lowX ? 0.0F : width;
-			float zFactor = lowZ ? 0.0F : depth;
+			float xFactor = lowX ? 0.0F : patch.width();
+			float zFactor = lowZ ? 0.0F : patch.depth();
 			args.set(base, xMin + (xMax - xMin) * xFactor);
 			args.set(base + 2, zMin + (zMax - zMin) * zFactor);
-			args.set(base + 3, u00 + (u10 - u00) * xFactor + (u01 - u00) * zFactor);
-			args.set(base + 4, v00 + (v10 - v00) * xFactor + (v01 - v00) * zFactor);
+			// Atlas UVs cannot be extrapolated to tile a larger quad: the block
+			// atlas is sampled with clamp-to-edge, so values beyond the water
+			// sprite bleed neighboring textures into the merged surface. Stretch
+			// the validated sprite over the patch instead; this keeps the merge
+			// artifact-free until a shader-side tiled-water path exists.
+			args.set(base + 3, lowX ? u00 : u10);
+			args.set(base + 4, lowZ ? v00 : v01);
 		}
 		FlatWaterSurfacePolicy.markSurfaceGeometryApplied();
 	}
