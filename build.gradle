@@ -1,5 +1,6 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
 	id 'maven-publish'
 }
 
@@ -8,6 +9,7 @@ def legacyTarget = targetMinecraft == "1.21.1"
 if (!legacyTarget && targetMinecraft != "26.2") {
 	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2 or 1.21.1.")
 }
+apply plugin: legacyTarget ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
 
 def targetMinecraftVersion = legacyTarget ? project.minecraft_version_1211 : project.minecraft_version
 def targetLoaderVersion = legacyTarget ? project.loader_version_1211 : project.loader_version
