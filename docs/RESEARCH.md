@@ -61,7 +61,7 @@ The safe presets still have no renderer-independent GPU shortcut: vanilla alread
 The practical additions from this review are split by confidence:
 
 - ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, clearer compatibility documentation, and an early far-water ownership design;
-- active experiment: a 26.2 water submesh and dedicated far-water pass with a guarded hard distance bound;
+- active experiment: a 26.2 upward-water submesh and dedicated far-water pass with a guarded hard distance bound; the flat-surface atlas prototype is disabled until it can preserve vanilla tiling;
 - later prototype: a fade, independent fog policy, reduced vertex density, or half-resolution far water;
 - not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or enabling the far-water experiment by default.
 

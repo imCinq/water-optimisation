@@ -36,7 +36,6 @@ public abstract class FluidRendererMixin {
 	private boolean wateroptimisation$disableOptionalBackFace(boolean addBackFace) {
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.recordFluidFace(addBackFace);
-			FarWaterOwnershipProbe.recordFace(addBackFace);
 		}
 		if (!addBackFace || !FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			return addBackFace;
@@ -84,12 +83,11 @@ public abstract class FluidRendererMixin {
 	}
 
 	/**
-	 * Reuses the vanilla top-face material and lighting while expanding one
-	 * ordinary one-block quad into a validated 4x4 surface patch. Vanilla emits
-	 * the upward face first when the surface is visible, so this targets only the
-	 * first addFace invocation inside tesselate. The exact descriptor and
-	 * argument count are intentional: if Mojang changes the call shape, this
-	 * prototype silently stays on the normal renderer.
+	 * Retains the reviewed 4x4 surface prototype for a future shader-backed
+	 * implementation. It is currently capability-gated off because a single
+	 * atlas quad cannot preserve vanilla's repeated water texture. If re-enabled,
+	 * the exact descriptor and argument count keep the patch fail-closed when
+	 * Mojang changes the call shape.
 	 */
 	@ModifyArgs(
 			method = "tesselate",

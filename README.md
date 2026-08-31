@@ -82,7 +82,7 @@ The optional diagnostics HUD reports fluid blocks, fully hidden skips, removed r
 
 ## Experimental far-water pass
 
-The 26.2 build includes an opt-in `Limit distant water to 320 blocks?` experiment for fill-rate-bound scenes. It captures only ordinary still-water faces from sections that pass a conservative water-only preflight, removes those faces from the shared translucent buffer, and draws the owned mesh through Minecraft's Blaze3D translucent-terrain pipeline. Eligible water beyond the 320-block section-distance bound is omitted; near water stays on the normal path. The draw uses the current frame's camera matrix and translucent target so the owned mesh follows camera movement.
+The 26.2 build includes an opt-in `Limit distant water to 320 blocks?` experiment for fill-rate-bound scenes. It captures only upward ordinary still-water faces from sections that pass a conservative water-only preflight, removes those faces from the shared translucent buffer, and draws the owned mesh through Minecraft's Blaze3D translucent-terrain pipeline in back-to-front section order. Eligible water beyond the 320-block section-distance bound is omitted; side and bottom faces remain on the normal path. The draw uses the current frame's camera matrix and translucent target so the owned mesh follows camera movement.
 
 The experiment is disabled by default and unavailable with Sodium or on 1.21.1. Flowing water, waterlogged blocks, transparent or partial neighbors, overlays, custom translucent terrain, and ambiguous sections remain on the existing vanilla/Sodium path. This is a hard cutoff rather than a fade or LOD, so it requires live visual and FPS validation before it can be considered for a stable preset. See [the far-water design](docs/FAR_WATER_PASS.md).
 

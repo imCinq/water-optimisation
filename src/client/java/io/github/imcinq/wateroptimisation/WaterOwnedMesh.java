@@ -10,9 +10,9 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 /**
- * Owns the still-water vertices that are removed from a qualifying vanilla
- * translucent section. The CPU staging storage stays alive until the render
- * thread uploads it, then only the GPU vertex buffer is retained.
+ * Owns the upward still-water vertices that are removed from a qualifying
+ * vanilla translucent section. The CPU staging storage stays alive until the
+ * render thread uploads it, then only the GPU vertex buffer is retained.
  */
 public final class WaterOwnedMesh implements AutoCloseable {
 	private final ByteBufferBuilder stagingBuffer;

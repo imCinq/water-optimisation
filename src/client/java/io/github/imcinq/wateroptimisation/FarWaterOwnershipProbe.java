@@ -85,6 +85,12 @@ public final class FarWaterOwnershipProbe {
 		if (fluid == null || section == null || !fluid.captureMesh || !fluid.ordinarySourceWater) {
 			return false;
 		}
+		// The dedicated pass is drawn after translucent terrain and has no
+		// per-face vanilla sort order. Own only upward water surfaces; vertical
+		// sides and bottoms stay in vanilla's shared translucent buffer.
+		if (!isUpwardFace(x0, y0, z0, x1, y1, z1, x2, y2, z2)) {
+			return false;
+		}
 		if (section.meshBuilder == null) {
 			section.meshBuilder = WaterOwnedMesh.builder();
 		}
@@ -95,16 +101,9 @@ public final class FarWaterOwnershipProbe {
 				x3, y3, z3, u3, v3,
 				color, lightCoords, addBackFace
 		);
+		fluid.ownedFaces++;
+		fluid.ownedVertices += addBackFace ? 8 : 4;
 		return true;
-	}
-
-	public static void recordFace(boolean reverseFaceRequested) {
-		FluidCapture capture = FLUID.get();
-		if (capture == null) {
-			return;
-		}
-		capture.faces++;
-		capture.vertices += reverseFaceRequested ? 8 : 4;
 	}
 
 	public static void endFluid() {
@@ -114,13 +113,32 @@ public final class FarWaterOwnershipProbe {
 		if (capture == null || section == null) {
 			return;
 		}
-		if (capture.ordinarySourceWater && capture.faces > 0) {
+		if (capture.ordinarySourceWater && capture.ownedFaces > 0) {
 			section.candidateBlocks++;
-			section.candidateFaces += capture.faces;
-			section.candidateVertices += capture.vertices;
+			section.candidateFaces += capture.ownedFaces;
+			section.candidateVertices += capture.ownedVertices;
 		} else if (capture.water) {
 			section.fallbackBlocks++;
 		}
+	}
+
+	private static boolean isUpwardFace(
+			float x0, float y0, float z0,
+			float x1, float y1, float z1,
+			float x2, float y2, float z2
+	) {
+		double edge1X = x1 - x0;
+		double edge1Y = y1 - y0;
+		double edge1Z = z1 - z0;
+		double edge2X = x2 - x0;
+		double edge2Y = y2 - y0;
+		double edge2Z = z2 - z0;
+		double normalX = edge1Y * edge2Z - edge1Z * edge2Y;
+		double normalY = edge1Z * edge2X - edge1X * edge2Z;
+		double normalZ = edge1X * edge2Y - edge1Y * edge2X;
+		return normalY > 0.01D
+				&& Math.abs(normalX) <= normalY * 0.25D
+				&& Math.abs(normalZ) <= normalY * 0.25D;
 	}
 
 	private static boolean isFarPassEligible(SectionPos sectionPos, RenderSectionRegion region) {
@@ -206,8 +224,8 @@ public final class FarWaterOwnershipProbe {
 		private final boolean water;
 		private final boolean ordinarySourceWater;
 		private final boolean captureMesh;
-		private int faces;
-		private int vertices;
+		private int ownedFaces;
+		private int ownedVertices;
 
 		private FluidCapture(boolean water, boolean ordinarySourceWater, boolean captureMesh) {
 			this.water = water;

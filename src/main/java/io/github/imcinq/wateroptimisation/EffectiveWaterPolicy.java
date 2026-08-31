@@ -56,12 +56,15 @@ public record EffectiveWaterPolicy(
 		boolean fluidHooksActive = config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
 				&& !safeCapabilities.sodiumLoaded();
 		boolean flatWaterFastPathActive = fluidHooksActive && config.isFlatWaterFastPath();
-		boolean flatSurfaceActive = fluidHooksActive
-				&& config.isFlatWaterSurfaceMeshing()
-				&& safeCapabilities.flatWaterSurfaceMeshingSupported();
 		boolean farWaterPassActive = !safeCapabilities.sodiumLoaded()
 				&& config.isFarWaterPass()
 				&& safeCapabilities.farWaterPassSupported();
+		// The two geometry experiments cannot safely own the same addFace calls.
+		// Keep the dedicated pass authoritative if an old config enables both.
+		boolean flatSurfaceActive = !farWaterPassActive
+				&& fluidHooksActive
+				&& config.isFlatWaterSurfaceMeshing()
+				&& safeCapabilities.flatWaterSurfaceMeshingSupported();
 		boolean reducedBackfacesActive = !farWaterPassActive
 				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
 				&& (!safeCapabilities.sodiumLoaded() || safeCapabilities.sodiumGeometryHooksAvailable());

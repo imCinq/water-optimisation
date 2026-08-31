@@ -205,7 +205,11 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private Button addFlatSurfaceButton(int left, int top) {
 		Button button = this.addRenderableWidget(Button.builder(flatSurfaceLabel(), clicked -> {
-			this.workingCopy.setFlatWaterSurfaceMeshing(!this.workingCopy.isFlatWaterSurfaceMeshing());
+			boolean enabled = !this.workingCopy.isFlatWaterSurfaceMeshing();
+			this.workingCopy.setFlatWaterSurfaceMeshing(enabled);
+			if (enabled) {
+				this.workingCopy.setFarWaterPass(false);
+			}
 			clicked.setMessage(flatSurfaceLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 		button.active = WaterOptimisationClient.supportsFlatWaterSurfaceMeshing()
@@ -215,7 +219,11 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private Button addFarWaterButton(int left, int top) {
 		Button button = this.addRenderableWidget(Button.builder(farWaterLabel(), clicked -> {
-			this.workingCopy.setFarWaterPass(!this.workingCopy.isFarWaterPass());
+			boolean enabled = !this.workingCopy.isFarWaterPass();
+			this.workingCopy.setFarWaterPass(enabled);
+			if (enabled) {
+				this.workingCopy.setFlatWaterSurfaceMeshing(false);
+			}
 			clicked.setMessage(farWaterLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 		button.active = WaterOptimisationClient.supportsFarWaterPass()

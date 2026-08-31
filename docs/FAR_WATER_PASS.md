@@ -4,7 +4,7 @@
 
 The 26.2 profile now contains an opt-in rendering experiment named `Limit distant water to 320 blocks?`. It is disabled by default, unavailable when Sodium owns fluid rendering, and not compiled into the 1.21.1 client source set. It uses a hard section-distance cutoff; it does not yet implement a fade, reduced-resolution mesh, or general LOD. The draw uses the current frame's camera matrix and the translucent terrain target so the owned mesh follows camera movement.
 
-The pass is deliberately fail-closed. It can only take ownership of a section after a preflight finds ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Flowing water, waterlogged blocks, glass, leaves, plants, overlays, partial shapes, transparent boundaries, custom translucent models, and any uncertain section stay on the normal path.
+The pass is deliberately fail-closed. It can only take ownership of a section after a preflight finds ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. It owns upward surfaces only; vertical sides and bottoms stay vanilla because the separate pass cannot reproduce their per-face sort order safely. Flowing water, waterlogged blocks, glass, leaves, plants, overlays, partial shapes, transparent boundaries, custom translucent models, and any uncertain section stay on the normal path.
 
 ## Why this needs its own pass
 
@@ -16,7 +16,7 @@ The first requirement is therefore ownership: water geometry must be represented
 
 ### Stage 1 — Water ownership
 
-During 26.2 section compilation, the existing fluid hooks build a separate `WaterOwnedMesh` only for exact ordinary still-water faces in an eligible section. The mesh uses Minecraft's `DefaultVertexFormat.BLOCK` and is transferred with the compiled `SectionMesh` through `SectionCompiler.Results` and `CompiledSectionMesh`. Its GPU vertex buffer is created lazily on the render thread and is closed with the section mesh.
+During 26.2 section compilation, the existing fluid hooks build a separate `WaterOwnedMesh` only for exact ordinary still-water upward faces in an eligible section. The mesh uses Minecraft's `DefaultVertexFormat.BLOCK` and is transferred with the compiled `SectionMesh` through `SectionCompiler.Results` and `CompiledSectionMesh`. Its GPU vertex buffer is created lazily on the render thread and is closed with the section mesh.
 
 The shared translucent buffer remains authoritative for every unsupported or mixed case. The pass never tries to split an already-mixed translucent buffer after compilation.
 
@@ -27,10 +27,11 @@ After Minecraft's translucent terrain has rendered, the 26.2 client registers an
 The pass applies its own:
 
 - camera-relative distance bound;
+- back-to-front ordering between owned sections;
 - fog interaction;
 - capability check for the active Minecraft backend.
 
-The first version uses a 320-block section AABB distance bound. Eligible sections inside the bound are redrawn through the dedicated pass; eligible sections beyond the bound are skipped. Because this is a hard cutoff, the transition is intentionally exposed for testing rather than hidden behind a stable preset.
+The first version uses a 320-block section AABB distance bound. Eligible upward surfaces inside the bound are redrawn through the dedicated pass; eligible sections beyond the bound are skipped while their vanilla side and bottom faces remain available. Because this is a hard cutoff, the transition is intentionally exposed for testing rather than hidden behind a stable preset.
 
 ### Stage 3 — Controlled LOD
 

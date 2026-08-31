@@ -86,7 +86,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	}
 
 	public static boolean supportsFlatWaterSurfaceMeshing() {
-		return true;
+		// A single atlas quad cannot reproduce vanilla's tiled water texture
+		// without shader-side support. Keep the prototype retained in source,
+		// but fail closed until it can preserve exact visuals.
+		return false;
 	}
 
 	public static boolean supportsFarWaterPass() {
@@ -97,7 +100,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return new RendererCapabilities(
 				sodiumLoaded,
 				sodiumLoaded && SodiumFluidIntegration.geometryHooksAvailable(),
-				!sodiumLoaded,
+				supportsFlatWaterSurfaceMeshing(),
 				supportsFarWaterPass(),
 				sodiumLoaded ? "Sodium" : "Vanilla"
 		);

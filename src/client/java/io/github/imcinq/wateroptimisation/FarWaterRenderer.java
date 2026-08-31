@@ -20,15 +20,16 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
 /**
- * Draws the water-only meshes captured from qualifying sections. The pass is
- * intentionally a hard 320-block cutoff for the first GPU experiment: near
- * water keeps the vanilla terrain pipeline, while distant eligible water is
- * omitted instead of making the shared translucent buffer draw it.
+ * Draws the upward water meshes captured from qualifying sections. The pass is
+ * intentionally a hard 320-block cutoff for the first GPU experiment: side
+ * and bottom faces stay in the vanilla terrain pipeline, while distant owned
+ * surfaces are omitted instead of making the shared translucent buffer draw them.
  */
 public final class FarWaterRenderer {
 	private static final double MAX_DISTANCE = 320.0D;
@@ -96,13 +97,20 @@ public final class FarWaterRenderer {
 					sections.textureView().getWidth(0),
 					sections.textureView().getHeight(0)
 			));
-			draws.add(new WaterDraw(waterMesh, sectionInfos.size() - 1));
+			draws.add(new WaterDraw(
+					waterMesh,
+					sectionInfos.size() - 1,
+					sectionCenterDistanceSquared(section, cameraPosition)
+			));
 			largestIndexCount = Math.max(largestIndexCount, waterMesh.indexCount());
 		}
 
 		if (draws.isEmpty() || largestIndexCount <= 0) {
 			return;
 		}
+		// Translucent blending is back-to-front. The normal section renderer has
+		// a sort pass; the owned pass must establish a stable section order itself.
+		draws.sort(Comparator.comparingDouble(WaterDraw::distanceSquared).reversed());
 
 		GpuBufferSlice[] uniforms = RenderSystem.getDynamicUniforms().writeChunkSections(
 				sectionInfos.toArray(new DynamicUniforms.ChunkSectionInfo[0])
@@ -163,6 +171,17 @@ public final class FarWaterRenderer {
 		return 0.0D;
 	}
 
-	private record WaterDraw(WaterOwnedMesh mesh, int uniformIndex) {
+	private static double sectionCenterDistanceSquared(
+			SectionRenderDispatcher.RenderSection section,
+			Vec3 cameraPosition
+	) {
+		var origin = section.getRenderOrigin();
+		double dx = origin.getX() + 8.0D - cameraPosition.x;
+		double dy = origin.getY() + 8.0D - cameraPosition.y;
+		double dz = origin.getZ() + 8.0D - cameraPosition.z;
+		return dx * dx + dy * dy + dz * dz;
+	}
+
+	private record WaterDraw(WaterOwnedMesh mesh, int uniformIndex, double distanceSquared) {
 	}
 }

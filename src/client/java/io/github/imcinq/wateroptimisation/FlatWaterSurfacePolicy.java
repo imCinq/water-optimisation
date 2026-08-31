@@ -11,7 +11,9 @@ import net.minecraft.world.level.material.FluidState;
 /**
  * Finds a deliberately small, conservative still-water surface patch.
  *
- * <p>This is a 26.2-only prototype. It never crosses a render section, never
+ * <p>This is a retained 26.2-only prototype and is currently capability-gated
+ * off because one atlas quad cannot preserve vanilla's repeated water texture.
+ * It never crosses a render section, never
  * crosses a biome/light change, and requires a full source-water ring and a
  * source-water block below every cell. The ring is what lets the renderer
  * cancel the other fifteen block tessellations without losing a side face.</p>
