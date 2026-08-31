@@ -5,7 +5,7 @@
 <h1 align="center">Water Optimisation</h1>
 
 <p align="center">
-  <strong>Client-side water rendering for Minecraft 26.2</strong><br>
+  <strong>Client-side water rendering for Minecraft 26.2 and 1.21.1</strong><br>
   Reduce water-related rendering work while keeping the world, gameplay, and server unchanged.
 </p>
 
