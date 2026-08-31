@@ -34,7 +34,7 @@ jobs:
       - name: Run client-only boundary audit
         run: bash scripts/audit-client-only.sh
       - name: Build and test
-        run: ./gradlew -Ptarget_minecraft=${{ matrix.target }} test build
+        run: ./gradlew -Ptarget_minecraft=${{ matrix.target }} -Pminecraft_version=${{ matrix.target }} test build
       - name: Capture build artifacts
         uses: actions/upload-artifact@v7
         with:
