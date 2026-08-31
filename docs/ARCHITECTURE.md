@@ -3,7 +3,7 @@
 ## Data flow
 
 Client fluid state
-→ version-isolated FluidRenderer hook or optional Sodium face bridge
+→ target-isolated FluidRenderer hook or optional 26.2 Sodium face bridge
 → already-loaded neighbor-state classifier
 → vanilla fluid mesh path or explicit fully-hidden source-water skip
 → translucent section buffer
@@ -15,6 +15,10 @@ Particle state
 → vanilla particle renderer or distance rejection
 
 Diagnostics observe these decisions locally without changing gameplay state.
+
+## Target profiles
+
+The 26.2 and 1.21.1 client APIs are compiled from separate source roots. The 26.2 profile uses the non-remapping Loom plugin and extraction-based GUI/HUD APIs. The 1.21.1 profile uses remapping Loom with official Mojang mappings and its older `GuiGraphics`, `HudRenderCallback`, key-binding, liquid-renderer, and level-refresh APIs. The generated metadata selects only the mixin configuration for the requested target.
 
 ## Components
 
@@ -30,12 +34,14 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 
 ### Fluid hooks
 
-FluidRendererMixin targets Minecraft 26.2's public FluidRenderer tessellation method. The policy is intentionally narrow:
+The 26.2 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.1 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
 - the flat path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
 - Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering;
 - flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
+
+The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
 
 The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
@@ -52,8 +58,22 @@ ClientLevelMixin intercepts only the client-side addParticle overload. It exits 
 - Fabric API is the primary client integration surface.
 - Mod Menu is optional and contains no renderer logic.
 - Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. A separate version-gated bridge can remove only the reversed copy of ordinary source-water quads on reviewed Sodium 0.9.x/Minecraft 26.2 builds; unknown builds fall back to Sodium unchanged.
+- On Minecraft 1.21.1, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.
+
+## Far-water architecture boundary
+
+Far-water is an early GPU/fill-rate track, but it cannot safely be implemented as a distance test inside the current translucent section buffer. That buffer contains water together with glass, leaves, overlays, and other translucent geometry. A section-level or shared-buffer cutoff would either remove unrelated visuals or require a brittle per-vertex rewrite after asynchronous compilation.
+
+The intended design is a separate water-owned representation and pass:
+
+1. identify only the exact water geometry that can be separated without changing non-water translucency;
+2. keep near water on the full-quality path and route only far water through an independently bounded pass;
+3. apply water-only distance, fog, and later LOD/half-resolution decisions through Blaze3D/Minecraft abstractions;
+4. preserve vanilla/Sodium ownership and fail closed when the renderer cannot provide that separation.
+
+This track has design groundwork in `docs/FAR_WATER_PASS.md`, but no runtime distance cull or fake setting is enabled yet.
 
 ## Non-goals
 

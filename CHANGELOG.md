@@ -4,6 +4,14 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
+No changes yet.
+
+## 0.0.4 — 2026-08-31
+
+- Package target-specific artifacts for Minecraft 26.2 and 1.21.1 in the same GitHub Release.
+- Add a target-isolated Minecraft 1.21.1 compatibility profile using Java 21, remapping Loom, official Mojang mappings, older client GUI/HUD APIs, and a conservative source-water/particle path.
+- Keep Minecraft 1.21.1 Sodium geometry on a particle-only fallback until its older renderer is reviewed independently.
+- Start the dedicated far-water GPU track earlier: document the water-owned pass, independent distance/fog policy, and future LOD boundary without adding an unsafe shared-translucency cull or placeholder setting.
 - Make selecting any non-Vanilla preset turn the master switch on, while Vanilla still restores the disabled reference state.
 - Show the effective water path in the main settings screen so Sodium ownership and unavailable geometry options are explicit.
 - Add a fail-closed Sodium 0.9.x/Minecraft 26.2 bridge for the opt-in reduced-inward-face experiment without duplicating Sodium's fluid renderer, hidden-fluid culling, or translucent sorting.
@@ -104,4 +112,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.3 package is the current canonical release; Maximum FPS remains an opt-in visual trade-off and should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.4 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.

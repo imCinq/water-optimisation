@@ -1,7 +1,45 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
 	id 'maven-publish'
 }
+
+def targetMinecraft = providers.gradleProperty("target_minecraft").orElse("26.2").get()
+def legacyTarget = targetMinecraft == "1.21.1"
+if (!legacyTarget && targetMinecraft != "26.2") {
+	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2 or 1.21.1.")
+}
+apply plugin: legacyTarget ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
+
+def targetMinecraftVersion = legacyTarget ? project.minecraft_version_1211 : project.minecraft_version
+def targetLoaderVersion = legacyTarget ? project.loader_version_1211 : project.loader_version
+def targetFabricApiVersion = legacyTarget ? project.fabric_api_version_1211 : project.fabric_api_version
+def targetModMenuVersion = legacyTarget ? project.modmenu_version_1211 : project.modmenu_version
+def targetJavaVersion = legacyTarget ? 21 : 25
+def modDependencyConfiguration = legacyTarget ? "modImplementation" : "implementation"
+def modCompileOnlyConfiguration = legacyTarget ? "modCompileOnly" : "compileOnly"
+def targetDescription = "Client-side water rendering optimisation for Minecraft 26.2 and 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
+def sodiumMixinEntry = legacyTarget ? "" : """,
+		{
+			"config": "wateroptimisation.sodium.mixins.json",
+			"environment": "client"
+		}"""
+def clientMixinEntry = """{
+			"config": "${legacyTarget ? "wateroptimisation.legacy.mixins.json" : "wateroptimisation.client.mixins.json"}",
+			"environment": "client"
+		}${sodiumMixinEntry}"""
+
+def resourceExpansion = [
+	version: project.version,
+	target_description: targetDescription,
+	loader_dependency: ">=${targetLoaderVersion}",
+	minecraft_dependency: "~${targetMinecraftVersion}",
+	java_dependency: ">=${targetJavaVersion}",
+	modmenu_dependency: ">=${targetModMenuVersion}",
+	client_mixin_entry: clientMixinEntry,
+	java_compatibility_level: "JAVA_${targetJavaVersion}",
+	mixin_default_require: legacyTarget ? 0 : 1
+]
 
 repositories {
 	// Loom provides the repositories needed for Minecraft and Fabric dependencies.
@@ -22,26 +60,38 @@ loom {
 	}
 }
 
+// The two Minecraft lines have incompatible client APIs. Keep the source
+// variants separate so a target can never accidentally load the other line's
+// GUI or renderer classes.
+sourceSets.client.java.setSrcDirs(legacyTarget
+		? ["src/1.21.1/client/java"]
+		: ["src/client/java"])
+
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+	minecraft "com.mojang:minecraft:${targetMinecraftVersion}"
+	if (legacyTarget) {
+		mappings loom.officialMojangMappings()
+	}
+	add(modDependencyConfiguration, "net.fabricmc:fabric-loader:${targetLoaderVersion}")
+	add(modDependencyConfiguration, "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}")
+	add(modCompileOnlyConfiguration, "com.terraformersmc:modmenu:${targetModMenuVersion}")
 	testImplementation "org.junit.jupiter:junit-jupiter:5.13.4"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.13.4"
 }
 
 processResources {
-	def version = project.version
-	inputs.property "version", version
+	inputs.properties(resourceExpansion)
 
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand resourceExpansion
+	}
+	filesMatching("wateroptimisation.client.mixins.json") {
+		expand resourceExpansion
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = targetJavaVersion
 }
 
 tasks.test {
@@ -50,8 +100,8 @@ tasks.test {
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
+	targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
 }
 
 jar {
