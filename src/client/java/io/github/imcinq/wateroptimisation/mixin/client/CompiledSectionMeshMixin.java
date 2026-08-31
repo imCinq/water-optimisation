@@ -24,7 +24,8 @@ public abstract class CompiledSectionMeshMixin implements WaterSectionOwnershipA
 			SectionCompiler.Results results,
 			CallbackInfo callback
 	) {
-		if (results instanceof WaterSectionOwnershipResultsAccess access) {
+		Object resultObject = results;
+		if (resultObject instanceof WaterSectionOwnershipResultsAccess access) {
 			wateroptimisation$waterOwnership = access.wateroptimisation$getWaterOwnership();
 		}
 	}
