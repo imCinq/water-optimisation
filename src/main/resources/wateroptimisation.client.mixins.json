@@ -7,6 +7,8 @@
 		"ClientLevelMixin",
 		"FluidRendererMixin",
 		"SectionCompilerMixin",
+		"SectionCompilerResultsMixin",
+		"CompiledSectionMeshMixin",
 		"ResortTransparencyTaskMixin"
 	],
 	"injectors": {

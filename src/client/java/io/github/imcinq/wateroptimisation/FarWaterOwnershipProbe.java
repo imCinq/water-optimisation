@@ -29,13 +29,16 @@ public final class FarWaterOwnershipProbe {
 		SECTION.set(new SectionCapture());
 	}
 
-	public static void endSection() {
+	public static WaterSectionOwnership endSection() {
 		FLUID.remove();
 		SectionCapture capture = SECTION.get();
 		SECTION.remove();
-		if (capture != null) {
-			capture.publish();
+		if (capture == null) {
+			return WaterSectionOwnership.EMPTY;
 		}
+		WaterSectionOwnership ownership = capture.finish();
+		ownership.publishDiagnostics();
+		return ownership;
 	}
 
 	public static void beginFluid(BlockState blockState, FluidState fluidState) {
@@ -83,8 +86,8 @@ public final class FarWaterOwnershipProbe {
 		private SectionCapture() {
 		}
 
-		private void publish() {
-			Diagnostics.recordFarWaterSection(
+		private WaterSectionOwnership finish() {
+			return new WaterSectionOwnership(
 					candidateBlocks,
 					candidateFaces,
 					candidateVertices,
