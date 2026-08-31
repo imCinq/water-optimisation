@@ -18,9 +18,7 @@ def targetModMenuVersion = legacyTarget ? project.modmenu_version_1211 : project
 def targetJavaVersion = legacyTarget ? 21 : 25
 def modDependencyConfiguration = legacyTarget ? "modImplementation" : "implementation"
 def modCompileOnlyConfiguration = legacyTarget ? "modCompileOnly" : "compileOnly"
-def targetDescription = legacyTarget
-		? "Client-side water rendering optimisation for Minecraft 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
-		: "Client-side water rendering optimisation for Minecraft 26.2 with conservative geometry culling, particle filtering, and diagnostics."
+def targetDescription = "Client-side water rendering optimisation for Minecraft 26.2 and 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
 def sodiumMixinEntry = legacyTarget ? "" : """,
 		{
 			"config": "wateroptimisation.sodium.mixins.json",

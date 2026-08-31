@@ -24,18 +24,18 @@ Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scene
 
 ## Start here
 
-1. Download the [latest stable release](https://github.com/imCinq/water-optimisation/releases/latest), or the [0.0.4 preview](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.4) for Minecraft 1.21.1.
+1. Download the [latest release](https://github.com/imCinq/water-optimisation/releases/latest) and choose the JAR for Minecraft 26.2 or 1.21.1.
 2. Put the runtime JAR in the client’s `mods` folder.
 3. Launch a supported Minecraft version with Fabric.
 4. Open the settings from Mod Menu, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current stable release is [0.0.3](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.3) for Minecraft 26.2. The [0.0.4 preview](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.4) adds target-specific 26.2 and 1.21.1 artifacts in one GitHub Release. The 1.21.1 build is intentionally a compatibility preview: it has remote build and audit coverage, but still needs live visual and FPS validation. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current [0.0.4 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.4) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. The 1.21.1 build is a compatibility build with remote build and audit coverage; live visual and FPS validation is still recommended for both targets. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | Minecraft | Java | Build status | Geometry scope |
 | --- | --- | --- | --- |
-| 26.2 | 25+ | Stable 0.0.3; 0.0.4 preview available | Conservative vanilla hooks plus the opt-in reviewed Sodium bridge. |
-| 1.21.1 | 21+ | 0.0.4 preview | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
+| 26.2 | 25+ | 0.0.4 release | Conservative vanilla hooks plus the opt-in reviewed Sodium bridge. |
+| 1.21.1 | 21+ | 0.0.4 compatibility build | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 
 ## Pick a preset
 

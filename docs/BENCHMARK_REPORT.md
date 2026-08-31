@@ -11,7 +11,7 @@ A successful build proves compilation and packaging. It does not prove an FPS ga
 | Field | Value |
 | --- | --- |
 | OS and GPU | |
-| Minecraft | 26.2 |
+| Minecraft | 26.2 or 1.21.1 |
 | Java | |
 | Fabric Loader | |
 | Fabric API | |
@@ -19,7 +19,7 @@ A successful build proves compilation and packaging. It does not prove an FPS ga
 | Sodium and version | |
 | Other renderer/performance mods | |
 | Resource pack/shaders | |
-| Backend | OpenGL or Vulkan |
+| Backend | OpenGL; Vulkan on 26.2 where available |
 | Resolution and GUI scale | |
 | Render distance/simulation distance | |
 | FPS cap/graphics settings | |

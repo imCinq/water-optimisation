@@ -28,7 +28,7 @@ Use this checklist before publishing a Water Optimisation artifact. A passing CI
 
 ## Local Minecraft validation
 
-- [ ] The exact artifact is tested in a clean Minecraft 26.2 Fabric client.
+- [ ] The exact artifacts are tested in clean Minecraft 26.2 and 1.21.1 Fabric clients.
 - [ ] Disabled, Balanced, and Performance modes are compared in the same warmed scenes.
 - [ ] Flat water, oceans, flowing water, waterfalls, waterlogged blocks, leaves, transparent blocks, flooded caves, and underwater views are checked.
 - [ ] No missing planes, seams, z-fighting, overlay errors, lighting differences, wrong flow orientation, stale geometry, or clipped settings text are observed.

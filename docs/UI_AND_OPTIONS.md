@@ -42,4 +42,4 @@ Configuration loading catches invalid or partial JSON and restores safe defaults
 
 ## Local validation still required
 
-The remote build proves that the screen and optional adapter compile against the 26.2 toolchain. A local run must still check common GUI scales, readable text, Mod Menu present/absent, keyboard navigation, persistence, and Escape/Cancel behavior.
+The remote build proves that the screen and optional adapter compile against both the 26.2 and 1.21.1 toolchains. A local run must still check common GUI scales, readable text, Mod Menu present/absent, keyboard navigation, persistence, and Escape/Cancel behavior on each target.
