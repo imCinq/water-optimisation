@@ -6,6 +6,14 @@ All notable changes to Water Optimisation are documented here.
 
 No changes yet.
 
+## 0.0.5 — 2026-09-01
+
+- Add the opt-in 26.2 far-water pass with a camera-following 320-block hard cutoff and conservative section ownership.
+- Carry exact upward still-water faces through compiled section meshes and draw them through Minecraft's translucent pipeline.
+- Preserve vanilla fallbacks for flowing, waterlogged, transparent, partial, overlay-adjacent, mixed, and ambiguous scenes.
+- Mark reduced water geometry as a red `Experimental: Reduce water geometry?` option with a hover warning that it may cause visual and graphical issues.
+- Remove the unsupported flat-surface prototype and its disabled settings control entirely.
+
 ## 0.0.4 — 2026-08-31
 
 - Package target-specific artifacts for Minecraft 26.2 and 1.21.1 in the same GitHub Release.
@@ -112,4 +120,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.4 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.5 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
