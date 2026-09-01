@@ -2,7 +2,7 @@
 
 ## Status
 
-This is an early implementation track, not an enabled gameplay or rendering option. The current mod still uses Minecraft’s normal translucent section buffer. The 26.2 build now has a diagnostics-only ownership probe for ordinary source-water tessellations, but no distance cutoff, half-resolution draw, or water-only fade is active.
+This is an early implementation track, not an enabled gameplay or rendering option. The current mod still uses Minecraft’s normal translucent section buffer. The 26.2 build now has a diagnostics-only ownership probe for ordinary source-water tessellations and carries its immutable summary with the compiled section mesh, but no distance cutoff, half-resolution draw, or water-only fade is active.
 
 ## Why this needs its own pass
 
@@ -14,7 +14,7 @@ The first requirement is therefore ownership: water geometry must be represented
 
 ### Stage 1 — Water ownership
 
-Create a water-specific mesh or submesh representation only for exact ordinary source-water geometry. The first probe records candidate blocks, emitted faces, and vertex counts without retaining or redirecting mesh data. The next step is to attach that representation to the compiled section lifetime. Preserve the current vanilla path for flowing water, waterlogged blocks, overlays, partial shapes, transparent boundaries, and ambiguous states. Keep Sodium’s renderer authoritative when Sodium is present unless an exact integration supplies the same separation.
+Create a water-specific mesh or submesh representation only for exact ordinary source-water geometry. The first probe records candidate blocks, emitted faces, and vertex counts without retaining or redirecting mesh data. That summary now travels from `SectionCompiler.Results` to `CompiledSectionMesh`, so the future renderer can make decisions against the same lifetime as vanilla’s section mesh. It is still metadata only: no geometry is moved and no draw is added. Preserve the current vanilla path for flowing water, waterlogged blocks, overlays, partial shapes, transparent boundaries, and ambiguous states. Keep Sodium’s renderer authoritative when Sodium is present unless an exact integration supplies the same separation.
 
 The representation must retain enough information for correct nearby rendering:
 
@@ -55,7 +55,7 @@ Diagnostics for this track should measure the decision rather than claim a benef
 - transition distance and rejected/fallback reasons;
 - visual comparison at the transition, underwater, and transparent boundaries.
 
-Existing section-compile and translucent-resort counters cannot prove a far-water win because they measure the shared path. The prototype needs water-owned counters before a user-facing setting is justified.
+Existing section-compile and translucent-resort counters cannot prove a far-water win because they measure the shared path. The current ownership counters and compiled-mesh handoff prove only that an eligible section can be identified; the prototype still needs water-owned mesh bytes, pass timing, and visual validation before a user-facing setting is justified.
 
 ## Target order
 

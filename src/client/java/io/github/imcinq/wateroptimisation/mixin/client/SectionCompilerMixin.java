@@ -2,6 +2,8 @@ package io.github.imcinq.wateroptimisation.mixin.client;
 
 import io.github.imcinq.wateroptimisation.Diagnostics;
 import io.github.imcinq.wateroptimisation.FarWaterOwnershipProbe;
+import io.github.imcinq.wateroptimisation.WaterSectionOwnership;
+import io.github.imcinq.wateroptimisation.WaterSectionOwnershipResultsAccess;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
@@ -43,7 +45,10 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
-		FarWaterOwnershipProbe.endSection();
+		WaterSectionOwnership ownership = FarWaterOwnershipProbe.endSection();
+		if (callback.getReturnValue() instanceof WaterSectionOwnershipResultsAccess access) {
+			access.wateroptimisation$setWaterOwnership(ownership);
+		}
 		if (!Diagnostics.isEnabled()) {
 			return;
 		}

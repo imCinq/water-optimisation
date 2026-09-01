@@ -82,7 +82,7 @@ The optional diagnostics HUD reports fluid blocks, fully hidden skips, removed r
 
 ## The next GPU track
 
-The research-backed route for fill-rate-bound scenes is a dedicated far-water pass with its own water mesh, distance/fog policy, and later LOD options. Water currently shares Minecraft’s translucent section buffer, so a distance cutoff there could hide glass, leaves, overlays, or other translucent geometry. The 26.2 build now starts this work with a diagnostics-only ownership probe; it records ordinary source-water candidates without changing output. No unsafe shared-buffer distance cull is enabled yet. See [the far-water design](docs/FAR_WATER_PASS.md).
+The research-backed route for fill-rate-bound scenes is a dedicated far-water pass with its own water mesh, distance/fog policy, and later LOD options. Water currently shares Minecraft’s translucent section buffer, so a distance cutoff there could hide glass, leaves, overlays, or other translucent geometry. The 26.2 build now starts this work with a diagnostics-only ownership probe whose immutable summary follows the compiled section mesh; it records ordinary source-water candidates without changing output. No unsafe shared-buffer distance cull or separate draw is enabled yet. See [the far-water design](docs/FAR_WATER_PASS.md).
 
 For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`, and `Maximum FPS` from the same camera. Record average FPS, 1% lows, frame time, and visual correctness above water, underwater, around flowing water, in caves, and with Sodium present and absent. The mod is designed to reduce work, but no universal FPS gain is promised across hardware, shaders, resource packs, or backends.
 
