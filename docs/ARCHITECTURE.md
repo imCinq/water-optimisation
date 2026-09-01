@@ -45,6 +45,8 @@ The 1.21.1 adapter does not manufacture a level/position context for its older s
 
 The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
+The 26.2 renderer also has a diagnostics-only far-water ownership probe around section compilation and fluid tessellation. It counts faces and vertices emitted by ordinary source-water fluid calls separately from unsupported fluid calls, but deliberately retains no mesh and never suppresses vanilla output. This is the first step toward a water-owned buffer; it is not an FPS feature and must not be interpreted as a far-water pass. The compatibility target does not load this 26.2-only hook.
+
 The flat-surface prototype is narrower than a general greedy mesh. It only runs when a 4x4 aligned patch can remain inside one render section. Every cell must be ordinary full source water with air above and source water below; a one-cell source-water ring protects the patch boundary from losing side faces. The patch must also share the vanilla water tint and both light layers. The first vanilla `addFace` call is expanded only when its reviewed 26.2 descriptor still matches the expected four-vertex face shape; otherwise the mixin leaves the call untouched. The other fifteen block tessellations are canceled only after the full proof succeeds.
 
 ### Particle filter
@@ -77,7 +79,7 @@ The intended design is a separate water-owned representation and pass:
 3. apply water-only distance, fog, and later LOD/half-resolution decisions through Blaze3D/Minecraft abstractions;
 4. preserve vanilla/Sodium ownership and fail closed when the renderer cannot provide that separation.
 
-This track has design groundwork in `docs/FAR_WATER_PASS.md`, but no runtime distance cull or fake setting is enabled yet.
+This track has a diagnostics-only ownership probe and design groundwork in `docs/FAR_WATER_PASS.md`, but no runtime distance cull or fake setting is enabled yet.
 
 ## Non-goals
 

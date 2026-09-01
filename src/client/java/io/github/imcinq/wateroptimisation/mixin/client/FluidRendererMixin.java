@@ -3,6 +3,7 @@ package io.github.imcinq.wateroptimisation.mixin.client;
 import io.github.imcinq.wateroptimisation.Diagnostics;
 import io.github.imcinq.wateroptimisation.FlatWaterSurfacePolicy;
 import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
+import io.github.imcinq.wateroptimisation.FarWaterOwnershipProbe;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.BlockPos;
@@ -34,6 +35,7 @@ public abstract class FluidRendererMixin {
 	private boolean wateroptimisation$disableOptionalBackFace(boolean addBackFace) {
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.recordFluidFace(addBackFace);
+			FarWaterOwnershipProbe.recordFace(addBackFace);
 		}
 		if (!addBackFace || !FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			return addBackFace;
@@ -147,6 +149,7 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
+		FarWaterOwnershipProbe.beginFluid(blockState, fluidState);
 		wateroptimisation$flatWaterPatch.remove();
 		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			if (FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
@@ -171,6 +174,7 @@ public abstract class FluidRendererMixin {
 			if (diagnosticsEnabled) {
 				Diagnostics.endFluidCompile();
 			}
+			FarWaterOwnershipProbe.endFluid();
 			callback.cancel();
 			return;
 		}
@@ -235,6 +239,7 @@ public abstract class FluidRendererMixin {
 			Diagnostics.recordFluidFastPathSkip();
 			Diagnostics.endFluidCompile();
 		}
+		FarWaterOwnershipProbe.endFluid();
 		wateroptimisation$flatWaterPatch.remove();
 		wateroptimisation$waterTessellation.remove();
 		callback.cancel();
@@ -251,6 +256,7 @@ public abstract class FluidRendererMixin {
 	) {
 		wateroptimisation$flatWaterPatch.remove();
 		wateroptimisation$waterTessellation.remove();
+		FarWaterOwnershipProbe.endFluid();
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.endFluidCompile();
 		}

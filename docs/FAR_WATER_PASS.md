@@ -2,7 +2,7 @@
 
 ## Status
 
-This is an early implementation design, not an enabled gameplay or rendering option. The current mod still uses Minecraft’s normal translucent section buffer. No distance cutoff, half-resolution draw, or water-only fade is active.
+This is an early implementation track, not an enabled gameplay or rendering option. The current mod still uses Minecraft’s normal translucent section buffer. The 26.2 build now has a diagnostics-only ownership probe for ordinary source-water tessellations, but no distance cutoff, half-resolution draw, or water-only fade is active.
 
 ## Why this needs its own pass
 
@@ -14,7 +14,7 @@ The first requirement is therefore ownership: water geometry must be represented
 
 ### Stage 1 — Water ownership
 
-Create a water-specific mesh or submesh representation only for exact ordinary source-water geometry. Preserve the current vanilla path for flowing water, waterlogged blocks, overlays, partial shapes, transparent boundaries, and ambiguous states. Keep Sodium’s renderer authoritative when Sodium is present unless an exact integration supplies the same separation.
+Create a water-specific mesh or submesh representation only for exact ordinary source-water geometry. The first probe records candidate blocks, emitted faces, and vertex counts without retaining or redirecting mesh data. The next step is to attach that representation to the compiled section lifetime. Preserve the current vanilla path for flowing water, waterlogged blocks, overlays, partial shapes, transparent boundaries, and ambiguous states. Keep Sodium’s renderer authoritative when Sodium is present unless an exact integration supplies the same separation.
 
 The representation must retain enough information for correct nearby rendering:
 
@@ -49,6 +49,7 @@ Diagnostics for this track should measure the decision rather than claim a benef
 
 - eligible near and far water quads;
 - water mesh bytes and vertex counts;
+- ordinary source-water candidate blocks and fallback blocks;
 - dedicated pass CPU submission time;
 - dedicated pass GPU time where the backend exposes it;
 - transition distance and rejected/fallback reasons;

@@ -1,6 +1,7 @@
 package io.github.imcinq.wateroptimisation.mixin.client;
 
 import io.github.imcinq.wateroptimisation.Diagnostics;
+import io.github.imcinq.wateroptimisation.FarWaterOwnershipProbe;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
@@ -24,6 +25,7 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
+		FarWaterOwnershipProbe.beginSection();
 		if (!Diagnostics.isEnabled()) {
 			return;
 		}
@@ -41,6 +43,7 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
+		FarWaterOwnershipProbe.endSection();
 		if (!Diagnostics.isEnabled()) {
 			return;
 		}
