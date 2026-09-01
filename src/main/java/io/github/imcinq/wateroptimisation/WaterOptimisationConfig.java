@@ -1,8 +1,11 @@
 package io.github.imcinq.wateroptimisation;
 
 public final class WaterOptimisationConfig {
+	public static final int CURRENT_CONFIG_VERSION = 1;
 	public static final int MIN_PARTICLE_DISTANCE = 8;
 	public static final int MAX_PARTICLE_DISTANCE = 128;
+	public static final int UNLIMITED_PARTICLE_BUDGET = 0;
+	public static final int[] PARTICLE_BUDGETS = {UNLIMITED_PARTICLE_BUDGET, 64, 128, 256};
 
 	public enum PerformanceProfile {
 		VANILLA("wateroptimisation.profile.vanilla"),
@@ -51,20 +54,28 @@ public final class WaterOptimisationConfig {
 	private PerformanceProfile performanceProfile;
 	private FluidCullingMode fluidCullingMode;
 	private boolean flatWaterFastPath;
+	private boolean flatWaterSurfaceMeshing;
 	private boolean waterParticles;
 	private int particleDistance;
 	private boolean particleFogCulling;
+	private int particleBudget;
+	private boolean limitForcedWaterParticles;
 	private boolean diagnosticsHud;
 	private boolean debugFallbackLogging;
+	private int configVersion;
 
 	public WaterOptimisationConfig() {
+		this.configVersion = CURRENT_CONFIG_VERSION;
 		this.enabled = false;
 		this.performanceProfile = PerformanceProfile.BALANCED;
 		this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 		this.flatWaterFastPath = false;
+		this.flatWaterSurfaceMeshing = false;
 		this.waterParticles = true;
 		this.particleDistance = 32;
 		this.particleFogCulling = false;
+		this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
+		this.limitForcedWaterParticles = false;
 		this.diagnosticsHud = false;
 		this.debugFallbackLogging = false;
 	}
@@ -75,13 +86,17 @@ public final class WaterOptimisationConfig {
 
 	public WaterOptimisationConfig copy() {
 		WaterOptimisationConfig copy = new WaterOptimisationConfig();
+		copy.configVersion = this.configVersion;
 		copy.enabled = this.enabled;
 		copy.performanceProfile = this.performanceProfile;
 		copy.fluidCullingMode = this.fluidCullingMode;
 		copy.flatWaterFastPath = this.flatWaterFastPath;
+		copy.flatWaterSurfaceMeshing = this.flatWaterSurfaceMeshing;
 		copy.waterParticles = this.waterParticles;
 		copy.particleDistance = this.particleDistance;
 		copy.particleFogCulling = this.particleFogCulling;
+		copy.particleBudget = this.particleBudget;
+		copy.limitForcedWaterParticles = this.limitForcedWaterParticles;
 		copy.diagnosticsHud = this.diagnosticsHud;
 		copy.debugFallbackLogging = this.debugFallbackLogging;
 		return copy;
@@ -96,10 +111,14 @@ public final class WaterOptimisationConfig {
 				&& this.enabled == other.enabled
 				&& this.performanceProfile == other.performanceProfile
 				&& this.fluidCullingMode == other.fluidCullingMode
-				&& this.flatWaterFastPath == other.flatWaterFastPath;
+				&& this.flatWaterFastPath == other.flatWaterFastPath
+				&& this.flatWaterSurfaceMeshing == other.flatWaterSurfaceMeshing;
 	}
 
 	public void sanitize() {
+		if (this.configVersion <= 0 || this.configVersion > CURRENT_CONFIG_VERSION) {
+			this.configVersion = CURRENT_CONFIG_VERSION;
+		}
 		if (this.performanceProfile == null) {
 			this.performanceProfile = PerformanceProfile.BALANCED;
 		}
@@ -107,6 +126,39 @@ public final class WaterOptimisationConfig {
 			this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 		}
 		this.particleDistance = Math.max(MIN_PARTICLE_DISTANCE, Math.min(MAX_PARTICLE_DISTANCE, this.particleDistance));
+		this.particleBudget = normalizeParticleBudget(this.particleBudget);
+	}
+
+	/**
+	 * Upgrades the pre-versioned JSON format without changing an explicit user
+	 * choice. New fields intentionally keep their safe defaults when they were
+	 * absent from an older file.
+	 */
+	void migrateFrom(int sourceVersion, boolean enabledWasPresent) {
+		if (!enabledWasPresent) {
+			this.enabled = this.performanceProfile != PerformanceProfile.VANILLA;
+		}
+		this.configVersion = CURRENT_CONFIG_VERSION;
+		this.sanitize();
+	}
+
+	private static int normalizeParticleBudget(int budget) {
+		for (int allowed : PARTICLE_BUDGETS) {
+			if (budget == allowed) {
+				return budget;
+			}
+		}
+		return UNLIMITED_PARTICLE_BUDGET;
+	}
+
+	public static int nextParticleBudget(int current) {
+		int normalized = normalizeParticleBudget(current);
+		for (int index = 0; index < PARTICLE_BUDGETS.length; index++) {
+			if (PARTICLE_BUDGETS[index] == normalized) {
+				return PARTICLE_BUDGETS[(index + 1) % PARTICLE_BUDGETS.length];
+			}
+		}
+		return UNLIMITED_PARTICLE_BUDGET;
 	}
 
 	public void resetToProfile() {
@@ -115,9 +167,12 @@ public final class WaterOptimisationConfig {
 				this.enabled = false;
 				this.fluidCullingMode = FluidCullingMode.DISABLED;
 				this.flatWaterFastPath = false;
+				this.flatWaterSurfaceMeshing = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
 				this.particleFogCulling = false;
+				this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
+				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
 				this.debugFallbackLogging = false;
 			}
@@ -125,9 +180,12 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 				this.flatWaterFastPath = false;
+				this.flatWaterSurfaceMeshing = false;
 				this.waterParticles = true;
 				this.particleDistance = 32;
 				this.particleFogCulling = false;
+				this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
+				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
 				this.debugFallbackLogging = false;
 			}
@@ -135,9 +193,12 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.CONSERVATIVE;
 				this.flatWaterFastPath = true;
+				this.flatWaterSurfaceMeshing = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
 				this.particleFogCulling = true;
+				this.particleBudget = 128;
+				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
 				this.debugFallbackLogging = false;
 			}
@@ -145,9 +206,12 @@ public final class WaterOptimisationConfig {
 				this.enabled = true;
 				this.fluidCullingMode = FluidCullingMode.EXPERIMENTAL;
 				this.flatWaterFastPath = true;
+				this.flatWaterSurfaceMeshing = false;
 				this.waterParticles = false;
 				this.particleDistance = 16;
 				this.particleFogCulling = true;
+				this.particleBudget = 64;
+				this.limitForcedWaterParticles = true;
 				this.diagnosticsHud = false;
 				this.debugFallbackLogging = false;
 			}
@@ -192,6 +256,14 @@ public final class WaterOptimisationConfig {
 		this.flatWaterFastPath = flatWaterFastPath;
 	}
 
+	public boolean isFlatWaterSurfaceMeshing() {
+		return this.flatWaterSurfaceMeshing;
+	}
+
+	public void setFlatWaterSurfaceMeshing(boolean flatWaterSurfaceMeshing) {
+		this.flatWaterSurfaceMeshing = flatWaterSurfaceMeshing;
+	}
+
 	public boolean isWaterParticles() {
 		return this.waterParticles;
 	}
@@ -217,6 +289,22 @@ public final class WaterOptimisationConfig {
 		this.particleFogCulling = particleFogCulling;
 	}
 
+	public int getParticleBudget() {
+		return this.particleBudget;
+	}
+
+	public void setParticleBudget(int particleBudget) {
+		this.particleBudget = normalizeParticleBudget(particleBudget);
+	}
+
+	public boolean isLimitForcedWaterParticles() {
+		return this.limitForcedWaterParticles;
+	}
+
+	public void setLimitForcedWaterParticles(boolean limitForcedWaterParticles) {
+		this.limitForcedWaterParticles = limitForcedWaterParticles;
+	}
+
 	public boolean isDiagnosticsHud() {
 		return this.diagnosticsHud;
 	}
@@ -231,5 +319,9 @@ public final class WaterOptimisationConfig {
 
 	public void setDebugFallbackLogging(boolean debugFallbackLogging) {
 		this.debugFallbackLogging = debugFallbackLogging;
+	}
+
+	public int getConfigVersion() {
+		return this.configVersion;
 	}
 }

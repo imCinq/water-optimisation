@@ -2,6 +2,9 @@ package io.github.imcinq.wateroptimisation;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
@@ -28,12 +31,27 @@ public final class ConfigManager {
 				return;
 			}
 
-			WaterOptimisationConfig loaded = GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), WaterOptimisationConfig.class);
+			JsonElement parsed = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8));
+			if (!parsed.isJsonObject()) {
+				throw new IllegalStateException("Configuration file contained no object");
+			}
+			JsonObject object = parsed.getAsJsonObject();
+			int sourceVersion = readConfigVersion(object);
+			boolean enabledWasPresent = object.has("enabled") && !object.get("enabled").isJsonNull();
+			WaterOptimisationConfig loaded = GSON.fromJson(object, WaterOptimisationConfig.class);
 			if (loaded == null) {
 				throw new IllegalStateException("Configuration file contained no object");
 			}
-			loaded.sanitize();
+			loaded.migrateFrom(sourceVersion, enabledWasPresent);
 			applyConfig(loaded);
+			if (sourceVersion != WaterOptimisationConfig.CURRENT_CONFIG_VERSION
+					|| !object.has("configVersion")) {
+				try {
+					writeConfig(path, loaded);
+				} catch (IOException | RuntimeException exception) {
+					WaterOptimisationClient.LOGGER.warn("Could not persist the migrated configuration at {}.", path, exception);
+				}
+			}
 		} catch (IOException | RuntimeException exception) {
 			applyConfig(WaterOptimisationConfig.defaults());
 			WaterOptimisationClient.LOGGER.warn("Could not load {}, using safe defaults.", path, exception);
@@ -52,13 +70,30 @@ public final class ConfigManager {
 		WaterOptimisationConfig safeCopy = updated == null ? WaterOptimisationConfig.defaults() : updated.copy();
 		safeCopy.sanitize();
 		Path path = getConfigPath();
-		Path temporary = path.resolveSibling(path.getFileName() + ".tmp");
 
 		try {
-			Files.createDirectories(path.getParent());
+			writeConfig(path, safeCopy);
+			applyConfig(safeCopy);
+		} catch (IOException | RuntimeException exception) {
+			WaterOptimisationClient.LOGGER.error("Could not save {}.", path, exception);
+		}
+	}
+
+	private static void writeConfig(Path path, WaterOptimisationConfig value) throws IOException {
+		Files.createDirectories(path.getParent());
+		if (Files.exists(path)) {
+			Files.copy(
+					path,
+					path.resolveSibling(path.getFileName() + ".bak"),
+					StandardCopyOption.REPLACE_EXISTING
+			);
+		}
+
+		Path temporary = path.resolveSibling(path.getFileName() + ".tmp");
+		try {
 			Files.writeString(
 					temporary,
-					GSON.toJson(safeCopy),
+					GSON.toJson(value),
 					StandardCharsets.UTF_8,
 					StandardOpenOption.CREATE,
 					StandardOpenOption.TRUNCATE_EXISTING,
@@ -69,9 +104,17 @@ public final class ConfigManager {
 			} catch (AtomicMoveNotSupportedException exception) {
 				Files.move(temporary, path, StandardCopyOption.REPLACE_EXISTING);
 			}
-			applyConfig(safeCopy);
-		} catch (IOException | RuntimeException exception) {
-			WaterOptimisationClient.LOGGER.error("Could not save {}.", path, exception);
+		} finally {
+			Files.deleteIfExists(temporary);
+		}
+	}
+
+	private static int readConfigVersion(JsonObject object) {
+		try {
+			JsonElement value = object.get("configVersion");
+			return value != null && value.isJsonPrimitive() ? value.getAsInt() : 0;
+		} catch (RuntimeException exception) {
+			return 0;
 		}
 	}
 

@@ -49,6 +49,31 @@ public final class Diagnostics {
 		}
 	}
 
+	public static void recordFluidFace(boolean reverseFaceRequested) {
+		Counters counters = activeCounters();
+		if (counters == null) {
+			return;
+		}
+		counters.fluidFaces.increment();
+		if (reverseFaceRequested) {
+			counters.fluidReverseFaceRequests.increment();
+		}
+	}
+
+	public static void recordFlatWaterCandidate() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.flatWaterCandidates.increment();
+		}
+	}
+
+	public static void recordFlatWaterPatch() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.flatWaterPatches.increment();
+		}
+	}
+
 	public static void recordFluidFallback(String reason) {
 		Counters counters = activeCounters();
 		if (counters == null) {
@@ -76,6 +101,22 @@ public final class Diagnostics {
 		if (distance) {
 			counters.particleDistanceRejected.increment();
 		}
+	}
+
+	public static void recordParticleForcedPreserved() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.particleForcedPreserved.increment();
+		}
+	}
+
+	public static void recordParticleBudgetRejected() {
+		Counters counters = activeCounters();
+		if (counters == null) {
+			return;
+		}
+		counters.particleBudgetRejected.increment();
+		counters.particleRejected.increment();
 	}
 
 	/**
@@ -177,10 +218,16 @@ public final class Diagnostics {
 				counters.fluidBlocksVisited.sum(),
 				counters.fluidFastPathSkips.sum(),
 				counters.reducedWaterBackfaces.sum(),
+				counters.fluidFaces.sum(),
+				counters.fluidReverseFaceRequests.sum(),
+				counters.flatWaterCandidates.sum(),
+				counters.flatWaterPatches.sum(),
 				counters.fluidFallbacks.sum(),
 				counters.particleCandidates.sum(),
 				counters.particleRejected.sum(),
 				counters.particleDistanceRejected.sum(),
+				counters.particleForcedPreserved.sum(),
+				counters.particleBudgetRejected.sum(),
 				fluidCalls,
 				fluidNanos,
 				averageMillis(fluidCalls, fluidNanos),
@@ -205,10 +252,16 @@ public final class Diagnostics {
 		private final LongAdder fluidBlocksVisited = new LongAdder();
 		private final LongAdder fluidFastPathSkips = new LongAdder();
 		private final LongAdder reducedWaterBackfaces = new LongAdder();
+		private final LongAdder fluidFaces = new LongAdder();
+		private final LongAdder fluidReverseFaceRequests = new LongAdder();
+		private final LongAdder flatWaterCandidates = new LongAdder();
+		private final LongAdder flatWaterPatches = new LongAdder();
 		private final LongAdder fluidFallbacks = new LongAdder();
 		private final LongAdder particleCandidates = new LongAdder();
 		private final LongAdder particleRejected = new LongAdder();
 		private final LongAdder particleDistanceRejected = new LongAdder();
+		private final LongAdder particleForcedPreserved = new LongAdder();
+		private final LongAdder particleBudgetRejected = new LongAdder();
 		private final LongAdder fluidCompileCalls = new LongAdder();
 		private final LongAdder fluidCompileNanos = new LongAdder();
 		private final LongAdder sectionCompileCalls = new LongAdder();
@@ -237,10 +290,16 @@ public final class Diagnostics {
 			long fluidBlocksVisited,
 			long fluidFastPathSkips,
 			long reducedWaterBackfaces,
+			long fluidFaces,
+			long fluidReverseFaceRequests,
+			long flatWaterCandidates,
+			long flatWaterPatches,
 			long fluidFallbacks,
 			long particleCandidates,
 			long particleRejected,
 			long particleDistanceRejected,
+			long particleForcedPreserved,
+			long particleBudgetRejected,
 			long fluidCompileCalls,
 			long fluidCompileNanos,
 			double averageFluidCompileMillis,

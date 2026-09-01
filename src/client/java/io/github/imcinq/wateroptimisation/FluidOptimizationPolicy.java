@@ -8,6 +8,7 @@ import net.minecraft.world.level.material.Fluids;
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
+	private static volatile boolean flatWaterSurfaceMeshingActive;
 	private static volatile boolean reducedWaterBackfacesActive;
 
 	private FluidOptimizationPolicy() {
@@ -19,14 +20,11 @@ public final class FluidOptimizationPolicy {
 	 */
 	public static void refresh() {
 		WaterOptimisationConfig config = ConfigManager.get();
-		boolean hooksActive = config.isEnabled()
-				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
-				&& config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
-				&& !WaterOptimisationClient.isSodiumLoaded();
-		fluidHooksActive = hooksActive;
-		flatWaterFastPathActive = hooksActive && config.isFlatWaterFastPath();
-		reducedWaterBackfacesActive = reducedWaterBackfacesRequested()
-				&& (!WaterOptimisationClient.isSodiumLoaded() || SodiumFluidIntegration.geometryHooksAvailable());
+		EffectiveWaterPolicy policy = WaterOptimisationClient.effectivePolicy(config);
+		fluidHooksActive = policy.fluidHooksActive();
+		flatWaterFastPathActive = policy.flatWaterFastPathActive();
+		flatWaterSurfaceMeshingActive = policy.flatWaterSurfaceMeshingActive();
+		reducedWaterBackfacesActive = policy.reducedWaterBackfacesActive();
 	}
 
 	public static boolean fluidHooksActive() {
@@ -35,6 +33,10 @@ public final class FluidOptimizationPolicy {
 
 	public static boolean flatWaterFastPathActive() {
 		return flatWaterFastPathActive;
+	}
+
+	public static boolean flatWaterSurfaceMeshingActive() {
+		return flatWaterSurfaceMeshingActive;
 	}
 
 	/**

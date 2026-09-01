@@ -22,6 +22,17 @@ The 0.0.4 release packages both target-specific builds from the same reviewed so
 
 The Minecraft 1.21.1 profile uses Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative and has no Sodium geometry bridge yet.
 
+## Active Phase 1–3 extension
+
+This pass keeps the original conservative phases intact while adding measurable controls around them:
+
+- version the local configuration and migrate older files without changing explicit user choices;
+- resolve requested settings into renderer capabilities and expose the effective path in the UI and diagnostics;
+- add bounded water-particle admission, including a per-client-tick budget and an explicit policy for particles that normally bypass distance limits;
+- prototype a disabled-by-default 26.2-only 4x4 flat still-water surface mesh. It requires a full source-water ring, source water below every cell, a clear surface, matching tint, matching light, and no Sodium ownership. Any uncertain shape remains vanilla.
+
+The flat-surface prototype is deliberately not included in a preset. It is a narrow experiment for remote artifact validation, not a promise that every water scene will improve.
+
 ## Completed phases
 
 ### Phase 0 — Instrumentation

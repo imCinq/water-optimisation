@@ -23,8 +23,8 @@ Done saves the working copy. Cancel and Escape return to the parent screen witho
 
 Advanced controls are separate from the main screen and are grouped into three sections:
 
-- Performance: skipping hidden water blocks, water particles, particle distance, and particle fog culling;
-- Water rendering: the fluid-geometry mode, including the optional reduced-face setting;
+- Performance: skipping hidden water blocks, water particles, particle distance, particle fog culling, and the optional per-tick particle budget;
+- Water rendering: the fluid-geometry mode, the optional reduced-face setting, and the 26.2-only flat-surface experiment;
 - Diagnostics: performance statistics and fallback logging.
 
 Reset preset is kept with the bottom action buttons because it changes the whole
@@ -32,7 +32,7 @@ working copy rather than enabling a diagnostic.
 
 The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
 
-The labels are phrased as short questions so their effect is understandable without renderer knowledge. Sodium ownership disables the vanilla fluid controls unless the reviewed Sodium 0.9.x/Minecraft 26.2 face bridge has matched; on 1.21.1, the geometry controls remain unavailable while the particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
+The labels are phrased as short questions so their effect is understandable without renderer knowledge: “Skip hidden water blocks?”, “Limit water particles per tick?”, and “Combine flat water surfaces?”. Sodium ownership displays a short notice and disables the overlapping vanilla geometry controls unless the reviewed Sodium 0.9.x/Minecraft 26.2 face bridge has matched; on 1.21.1, the flat-surface experiment remains unavailable while the particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
 
 There is intentionally no far-water toggle yet. A toggle would imply that the shared translucent buffer can safely distance-cull water, which it cannot. The separate pass must exist and be visually reviewed before exposing a user-facing option.
 
