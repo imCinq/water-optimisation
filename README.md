@@ -80,9 +80,11 @@ The mod is client-only. It declares no server entrypoint, custom packets, world 
 
 The optional diagnostics HUD reports fluid blocks, fully hidden skips, removed reverse faces, section compilation, translucent resorting, and particle admission. It is a cross-check, not a benchmark tool; disable it for final FPS measurements.
 
-## The next GPU track
+## Experimental far-water pass
 
-The research-backed route for fill-rate-bound scenes is a dedicated far-water pass with its own water mesh, distance/fog policy, and later LOD options. Water currently shares Minecraft’s translucent section buffer, so a distance cutoff there could hide glass, leaves, overlays, or other translucent geometry. The 26.2 build now starts this work with a diagnostics-only ownership probe whose immutable summary follows the compiled section mesh; it records ordinary source-water candidates without changing output. No unsafe shared-buffer distance cull or separate draw is enabled yet. See [the far-water design](docs/FAR_WATER_PASS.md).
+The 26.2 build includes an opt-in `Limit distant water to 320 blocks?` experiment for fill-rate-bound scenes. It captures only upward ordinary still-water faces from sections that pass a conservative water-only preflight, removes those faces from the shared translucent buffer, and draws the owned mesh through Minecraft's Blaze3D translucent-terrain pipeline in back-to-front section order. Eligible water beyond the 320-block section-distance bound is omitted; side and bottom faces remain on the normal path. The draw uses the current frame's camera matrix and translucent target so the owned mesh follows camera movement.
+
+The experiment is disabled by default and unavailable with Sodium or on 1.21.1. Flowing water, waterlogged blocks, transparent or partial neighbors, overlays, custom translucent terrain, and ambiguous sections remain on the existing vanilla/Sodium path. This is a hard cutoff rather than a fade or LOD, so it requires live visual and FPS validation before it can be considered for a stable preset. See [the far-water design](docs/FAR_WATER_PASS.md).
 
 For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`, and `Maximum FPS` from the same camera. Record average FPS, 1% lows, frame time, and visual correctness above water, underwater, around flowing water, in caves, and with Sodium present and absent. The mod is designed to reduce work, but no universal FPS gain is promised across hardware, shaders, resource packs, or backends.
 

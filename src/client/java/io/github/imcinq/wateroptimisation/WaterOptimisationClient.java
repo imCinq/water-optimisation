@@ -31,6 +31,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	);
 	private static KeyMapping openConfigKey;
 	private static volatile boolean sodiumLoaded;
+	private static volatile boolean farWaterPassFaulted;
 	private static volatile ParticleFilterSettings particleFilterSettings = ParticleFilterSettings.INACTIVE;
 	private static volatile ParticleReference particleReference = ParticleReference.UNAVAILABLE;
 	private static final AtomicInteger PARTICLE_BUDGET_USED = new AtomicInteger();
@@ -64,6 +65,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Identifier.fromNamespaceAndPath(MOD_ID, "diagnostics"),
 				WaterOptimisationClient::extractDiagnostics
 		);
+		FarWaterRenderer.register();
 
 		if (sodiumLoaded) {
 			if (SodiumFluidIntegration.isSupportedVersion()) {
@@ -83,17 +85,30 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		return true;
 	}
 
-	public static boolean supportsFlatWaterSurfaceMeshing() {
-		return true;
+	public static boolean supportsFarWaterPass() {
+		return !sodiumLoaded && !farWaterPassFaulted;
 	}
 
 	public static RendererCapabilities rendererCapabilities() {
 		return new RendererCapabilities(
 				sodiumLoaded,
 				sodiumLoaded && SodiumFluidIntegration.geometryHooksAvailable(),
-				!sodiumLoaded,
+				supportsFarWaterPass(),
 				sodiumLoaded ? "Sodium" : "Vanilla"
 		);
+	}
+
+	static void disableFarWaterPassForSession(Throwable cause) {
+		if (farWaterPassFaulted) {
+			return;
+		}
+		farWaterPassFaulted = true;
+		LOGGER.error("The experimental far-water pass was disabled for this session; rebuilding sections with vanilla water ownership.", cause);
+		FluidOptimizationPolicy.refresh();
+		Minecraft client = Minecraft.getInstance();
+		if (client.level != null && client.levelExtractor != null) {
+			client.levelExtractor.allChanged();
+		}
 	}
 
 	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {
@@ -238,13 +253,14 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
 				Component.literal("water backfaces: " + (FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
-				Component.literal("far-water ownership: probe only"),
+				Component.literal("far-water pass: " + onOff(policy.farWaterPassActive())),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
 				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
-				Component.literal("flat candidates/patches: " + snapshot.flatWaterCandidates() + "/" + snapshot.flatWaterPatches()),
 				Component.literal("far-water candidates: " + snapshot.farWaterCandidateBlocks() + " blocks / " + snapshot.farWaterCandidateFaces() + " faces"),
 				Component.literal("far-water vertices/fallbacks: " + snapshot.farWaterCandidateVertices() + "/" + snapshot.farWaterFallbackBlocks()),
+				Component.literal("far-water uploads/draws: " + snapshot.farWaterUploads() + "/" + snapshot.farWaterDrawnSections() + " sections"),
+				Component.literal("far-water indices/skips: " + snapshot.farWaterDrawnIndices() + "/" + snapshot.farWaterDistanceSkips()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
 				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
 				Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())),

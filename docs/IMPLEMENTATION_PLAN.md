@@ -29,9 +29,7 @@ This pass keeps the original conservative phases intact while adding measurable 
 - version the local configuration and migrate older files without changing explicit user choices;
 - resolve requested settings into renderer capabilities and expose the effective path in the UI and diagnostics;
 - add bounded water-particle admission, including a per-client-tick budget and an explicit policy for particles that normally bypass distance limits;
-- prototype a disabled-by-default 26.2-only 4x4 flat still-water surface mesh. It requires a full source-water ring, source water below every cell, a clear surface, matching tint, matching light, and no Sodium ownership. Any uncertain shape remains vanilla.
-
-The flat-surface prototype is deliberately not included in a preset. It is a narrow experiment for remote artifact validation, not a promise that every water scene will improve.
+- keep the optional 26.2-only far-water pass isolated behind a hard capability and distance bound. Any uncertain shape remains on the vanilla path.
 
 ## Completed phases
 
@@ -65,14 +63,14 @@ The reduced-face mode keeps vanilla's outward fluid face and removes only its op
 
 ## Next priorities
 
-- Start the dedicated far-water pass prototype early for fill-rate-bound scenes. The 26.2 diagnostics-only ownership probe now measures ordinary source-water candidate faces and vertices without changing the shared buffer, and its immutable summary is carried with each compiled section mesh. The next step is to attach actual owned geometry; do not expose a distance/LOD toggle until that geometry can be drawn without duplicating or hiding shared translucent content.
-- Define the far-water pass around independent water-only distance, fog, and later LOD/half-resolution controls through the Minecraft rendering abstraction. Keep the prototype separate from both the 26.2 shared translucent path and the 1.21.1 compatibility adapter.
+- Keep the dedicated far-water pass prototype early and opt-in for fill-rate-bound scenes. The 26.2 path now preflights water-only sections, attaches only upward owned-water surfaces to the compiled section lifetime, draws them after translucent terrain through Blaze3D in back-to-front section order, and skips eligible sections beyond the hard 320-block bound; mixed or uncertain sections remain on the shared path.
+- Measure the prototype's near/far visual boundary and frame-time effect before adding a fade, independent fog curve, lower vertex density, or half-resolution/LOD variant. Keep the prototype separate from both Sodium's renderer and the 1.21.1 compatibility adapter.
 - Complete local visual and performance validation.
 - Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
 - Consider rolling diagnostics and fallback reason reporting.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.
-- Keep camera-relative water-distance fading deferred until the separate water-owned pass is correct.
+- Keep camera-relative water-distance fading deferred until the separate water-owned pass is visually and quantitatively correct.
 - Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.
 
 ## Release gate

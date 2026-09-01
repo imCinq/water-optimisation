@@ -60,24 +60,10 @@ public final class Diagnostics {
 		}
 	}
 
-	public static void recordFlatWaterCandidate() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.flatWaterCandidates.increment();
-		}
-	}
-
-	public static void recordFlatWaterPatch() {
-		Counters counters = activeCounters();
-		if (counters != null) {
-			counters.flatWaterPatches.increment();
-		}
-	}
-
 	/**
 	 * Records the candidate geometry observed by the 26.2 far-water ownership
-	 * probe. The probe never removes this geometry; these counters only describe
-	 * the shared translucent input that a later water-owned pass could replace.
+	 * pass. The counters include both compile-time ownership and render-time
+	 * draw results so an in-game comparison can show whether the pass is active.
 	 */
 	public static void recordFarWaterSection(
 			long candidateBlocks,
@@ -94,6 +80,29 @@ public final class Diagnostics {
 		counters.farWaterCandidateFaces.add(Math.max(0L, candidateFaces));
 		counters.farWaterCandidateVertices.add(Math.max(0L, candidateVertices));
 		counters.farWaterFallbackBlocks.add(Math.max(0L, fallbackBlocks));
+	}
+
+	public static void recordFarWaterUpload() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.farWaterUploads.increment();
+		}
+	}
+
+	public static void recordFarWaterDraw(int indexCount) {
+		Counters counters = activeCounters();
+		if (counters == null) {
+			return;
+		}
+		counters.farWaterDrawnSections.increment();
+		counters.farWaterDrawnIndices.add(Math.max(0, indexCount));
+	}
+
+	public static void recordFarWaterDistanceSkip() {
+		Counters counters = activeCounters();
+		if (counters != null) {
+			counters.farWaterDistanceSkips.increment();
+		}
 	}
 
 	public static void recordFluidFallback(String reason) {
@@ -242,13 +251,15 @@ public final class Diagnostics {
 				counters.reducedWaterBackfaces.sum(),
 				counters.fluidFaces.sum(),
 				counters.fluidReverseFaceRequests.sum(),
-				counters.flatWaterCandidates.sum(),
-				counters.flatWaterPatches.sum(),
 				counters.farWaterSections.sum(),
 				counters.farWaterCandidateBlocks.sum(),
 				counters.farWaterCandidateFaces.sum(),
 				counters.farWaterCandidateVertices.sum(),
 				counters.farWaterFallbackBlocks.sum(),
+				counters.farWaterUploads.sum(),
+				counters.farWaterDrawnSections.sum(),
+				counters.farWaterDrawnIndices.sum(),
+				counters.farWaterDistanceSkips.sum(),
 				counters.fluidFallbacks.sum(),
 				counters.particleCandidates.sum(),
 				counters.particleRejected.sum(),
@@ -281,13 +292,15 @@ public final class Diagnostics {
 		private final LongAdder reducedWaterBackfaces = new LongAdder();
 		private final LongAdder fluidFaces = new LongAdder();
 		private final LongAdder fluidReverseFaceRequests = new LongAdder();
-		private final LongAdder flatWaterCandidates = new LongAdder();
-		private final LongAdder flatWaterPatches = new LongAdder();
 		private final LongAdder farWaterSections = new LongAdder();
 		private final LongAdder farWaterCandidateBlocks = new LongAdder();
 		private final LongAdder farWaterCandidateFaces = new LongAdder();
 		private final LongAdder farWaterCandidateVertices = new LongAdder();
 		private final LongAdder farWaterFallbackBlocks = new LongAdder();
+		private final LongAdder farWaterUploads = new LongAdder();
+		private final LongAdder farWaterDrawnSections = new LongAdder();
+		private final LongAdder farWaterDrawnIndices = new LongAdder();
+		private final LongAdder farWaterDistanceSkips = new LongAdder();
 		private final LongAdder fluidFallbacks = new LongAdder();
 		private final LongAdder particleCandidates = new LongAdder();
 		private final LongAdder particleRejected = new LongAdder();
@@ -324,13 +337,15 @@ public final class Diagnostics {
 			long reducedWaterBackfaces,
 			long fluidFaces,
 			long fluidReverseFaceRequests,
-			long flatWaterCandidates,
-			long flatWaterPatches,
 			long farWaterSections,
 			long farWaterCandidateBlocks,
 			long farWaterCandidateFaces,
 			long farWaterCandidateVertices,
 			long farWaterFallbackBlocks,
+			long farWaterUploads,
+			long farWaterDrawnSections,
+			long farWaterDrawnIndices,
+			long farWaterDistanceSkips,
 			long fluidFallbacks,
 			long particleCandidates,
 			long particleRejected,

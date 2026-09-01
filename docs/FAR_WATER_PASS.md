@@ -2,7 +2,9 @@
 
 ## Status
 
-This is an early implementation track, not an enabled gameplay or rendering option. The current mod still uses Minecraft’s normal translucent section buffer. The 26.2 build now has a diagnostics-only ownership probe for ordinary source-water tessellations and carries its immutable summary with the compiled section mesh, but no distance cutoff, half-resolution draw, or water-only fade is active.
+The 26.2 profile now contains an opt-in rendering experiment named `Limit distant water to 320 blocks?`. It is disabled by default, unavailable when Sodium owns fluid rendering, and not compiled into the 1.21.1 client source set. It uses a hard section-distance cutoff; it does not yet implement a fade, reduced-resolution mesh, or general LOD. The draw uses the current frame's camera matrix and the translucent terrain target so the owned mesh follows camera movement.
+
+The pass is deliberately fail-closed. It can only take ownership of a section after a preflight finds ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. It owns upward surfaces only; vertical sides and bottoms stay vanilla because the separate pass cannot reproduce their per-face sort order safely. Flowing water, waterlogged blocks, glass, leaves, plants, overlays, partial shapes, transparent boundaries, custom translucent models, and any uncertain section stay on the normal path.
 
 ## Why this needs its own pass
 
@@ -10,56 +12,50 @@ Water is compiled into a shared translucent buffer alongside glass, leaves, over
 
 The first requirement is therefore ownership: water geometry must be represented separately before it can receive a water-only GPU policy. A global translucent-sort bypass is not a substitute for that separation.
 
-## Proposed stages
+## Current implementation
 
 ### Stage 1 — Water ownership
 
-Create a water-specific mesh or submesh representation only for exact ordinary source-water geometry. The first probe records candidate blocks, emitted faces, and vertex counts without retaining or redirecting mesh data. That summary now travels from `SectionCompiler.Results` to `CompiledSectionMesh`, so the future renderer can make decisions against the same lifetime as vanilla’s section mesh. It is still metadata only: no geometry is moved and no draw is added. Preserve the current vanilla path for flowing water, waterlogged blocks, overlays, partial shapes, transparent boundaries, and ambiguous states. Keep Sodium’s renderer authoritative when Sodium is present unless an exact integration supplies the same separation.
+During 26.2 section compilation, the existing fluid hooks build a separate `WaterOwnedMesh` only for exact ordinary still-water upward faces in an eligible section. The mesh uses Minecraft's `DefaultVertexFormat.BLOCK` and is transferred with the compiled `SectionMesh` through `SectionCompiler.Results` and `CompiledSectionMesh`. Its GPU vertex buffer is created lazily on the render thread and is closed with the section mesh.
 
-The representation must retain enough information for correct nearby rendering:
-
-- still versus flowing material;
-- surface height and corner heights;
-- light and tint inputs;
-- face orientation and inward/outward policy;
-- section bounds and sort metadata;
-- whether a quad is eligible for the far-water path.
+The shared translucent buffer remains authoritative for every unsupported or mixed case. The pass never tries to split an already-mixed translucent buffer after compilation.
 
 ### Stage 2 — Dedicated water pass
 
-Draw near water with the current full-quality behavior. Route only eligible far-water geometry through a separate water-owned pass that has its own:
+After Minecraft's translucent terrain has rendered, the 26.2 client registers an `AFTER_TRANSLUCENT_TERRAIN` callback. It draws owned water meshes through `RenderPipelines.TRANSLUCENT_TERRAIN`, reusing the terrain atlas, level lightmap, section uniforms, depth target, blending, and fog bindings exposed by Blaze3D. It uses Minecraft's rendering abstraction rather than raw OpenGL so the path can fail safely on an unsupported backend.
+
+The pass applies its own:
 
 - camera-relative distance bound;
+- back-to-front ordering between owned sections;
 - fog interaction;
-- near/far transition band;
-- translucent ordering policy;
 - capability check for the active Minecraft backend.
 
-The pass must use Minecraft/Blaze3D rendering abstractions. It must not assume raw OpenGL state, because Minecraft 26.2 can use a Vulkan backend.
+The first version uses a 320-block section AABB distance bound. Eligible upward surfaces inside the bound are redrawn through the dedicated pass; eligible sections beyond the bound are skipped while their vanilla side and bottom faces remain available. Because this is a hard cutoff, the transition is intentionally exposed for testing rather than hidden behind a stable preset.
 
 ### Stage 3 — Controlled LOD
 
-Only after the separate pass is visually stable should it gain optional LODs. The first candidate is a capped flat still-water mesh with a conservative transition band. A later experiment may use reduced vertex density or half-resolution far water, but only if the active pipeline preserves fog, tint, depth, and blending behavior.
+Only after the separate pass is visually stable should it gain optional LODs. The first candidate is a capped flat still-water mesh with a conservative transition band. A later experiment may use reduced vertex density or half-resolution far water, but only if the active pipeline preserves fog, tint, depth, and blending behavior. The current pass does not claim either optimization.
 
 The pass should never silently change the near-water surface. Its fallback is the full vanilla/Sodium path whenever ownership, material, backend, or sort conditions are uncertain.
 
 ## Instrumentation needed
 
-Diagnostics for this track should measure the decision rather than claim a benefit:
+Diagnostics for this track measure the decision rather than claim a benefit:
 
-- eligible near and far water quads;
-- water mesh bytes and vertex counts;
+- eligible near and far water sections;
+- owned-water uploads, drawn sections, drawn indices, and distance skips;
 - ordinary source-water candidate blocks and fallback blocks;
 - dedicated pass CPU submission time;
 - dedicated pass GPU time where the backend exposes it;
 - transition distance and rejected/fallback reasons;
 - visual comparison at the transition, underwater, and transparent boundaries.
 
-Existing section-compile and translucent-resort counters cannot prove a far-water win because they measure the shared path. The current ownership counters and compiled-mesh handoff prove only that an eligible section can be identified; the prototype still needs water-owned mesh bytes, pass timing, and visual validation before a user-facing setting is justified.
+Existing section-compile and translucent-resort counters cannot prove a far-water win because they measure the shared path. The current counters show whether the owned mesh was uploaded, drawn, or skipped by distance; they do not measure GPU time. The prototype still needs live visual validation and controlled frame-time measurements before it can be enabled by a preset or called a performance improvement.
 
 ## Target order
 
-Prototype the separate pass on Minecraft 26.2 first, where the current renderer and Fabric rendering guidance are known. Keep the 1.21.1 profile on its conservative compatibility adapter until the same water-ownership contract can be implemented against its older liquid renderer. Do not add a version-independent mixin that guesses at either renderer’s internal buffer layout.
+Keep the separate pass on Minecraft 26.2 first, where the current renderer and Fabric rendering guidance are known. Keep the 1.21.1 profile on its conservative compatibility adapter until the same water-ownership contract can be implemented against its older liquid renderer. Do not add a version-independent mixin that guesses at either renderer’s internal buffer layout. Sodium remains authoritative and does not use this pass.
 
 ## Acceptance gate
 
@@ -71,4 +67,4 @@ This track is ready for a user-facing option only when a remote-built artifact h
 4. measurable water-only GPU/frame-time improvement in a controlled far-water scene;
 5. an immediate fail-closed fallback when the pass cannot be separated or sorted safely.
 
-Until then, the correct product behavior is to keep the idea documented and the runtime unchanged.
+Until then, the correct product behavior is to keep the experiment opt-in, keep unsupported sections on the normal renderer, and treat remote build success as compatibility evidence rather than an FPS result.

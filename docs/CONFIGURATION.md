@@ -31,14 +31,14 @@ Selecting a preset resets its Advanced settings values. Choosing Vanilla also tu
 | --- | --- | --- |
 | fluidCullingMode | conservative | Disabled, Conservative, or Experimental. Disabled turns off fluid hooks; Conservative enables only the fully hidden source-water fast path; Experimental additionally removes vanilla's optional reverse fluid faces for ordinary full source-water blocks. |
 | flatWaterFastPath | false | Skips only an ordinary source-water block whose six neighboring faces are hidden. On 26.2, full solid-rendering neighbors are included; on 1.21.1, the compatibility proof is limited to ordinary source-water neighbors. |
-| flatWaterSurfaceMeshing | false | 26.2-only experiment. Combines a validated 4x4 flat still-water surface into one tiled top quad. It requires a source-water ring, source water below every cell, a clear surface, matching biome tint and light, and no Sodium ownership. It is disabled by default and is unavailable on 1.21.1. |
+| farWaterPass | false | 26.2-only experiment. In conservative water-only sections, draws only upward owned still-water surfaces through a separate terrain pass, orders sections back-to-front, and omits eligible sections beyond 320 blocks. It is a hard cutoff, disabled by default, unavailable with Sodium, and unavailable on 1.21.1. Mixed translucent, flowing, waterlogged, transparent, overlay, and ambiguous cases stay on the normal path. |
 | waterParticles | true | Keeps or rejects cosmetic water particles after the master switch is enabled. The Performance preset sets this to false. |
 | particleDistance | 32 | Maximum camera-relative admission distance in blocks; clamped to 8–128. The Performance preset uses 16. During camera initialization, the player position is used as a lifecycle fallback. |
 | particleFogCulling | false | Tightens the camera-relative distance bound to 75% as a conservative fog approximation; it does not reproduce backend-specific fog math. The Performance preset enables it. |
 | particleBudget | unlimited | Optional client-side cap on admitted water particles per tick. Available values are unlimited, 64, 128, and 256. The Performance preset uses 128 and Maximum FPS uses 64. |
 | limitForcedWaterParticles | false | If enabled, water particles that normally bypass distance limits are subject to the configured particle setting and budget. This can change cosmetic effects. |
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, translucent-resort averages, and removed reverse-face counts. |
-| debugFallbackLogging | false | Logs local fallback decisions where a future hook reports one. |
+| debugFallbackLogging | false | Logs local fallback decisions where a hook reports one. |
 
 The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it; Sodium ownership disables the vanilla hook, while a reviewed Sodium 0.9.x/Minecraft 26.2 build can use the optional bridge. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use the renderer's normal geometry decisions; the mode only changes the optional reverse-face emission after the renderer has selected a fluid face.
 

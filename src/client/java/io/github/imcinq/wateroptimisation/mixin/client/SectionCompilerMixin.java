@@ -27,7 +27,7 @@ public abstract class SectionCompilerMixin {
 			SectionBufferBuilderPack builders,
 			CallbackInfoReturnable<?> callback
 	) {
-		FarWaterOwnershipProbe.beginSection();
+		FarWaterOwnershipProbe.beginSection(sectionPos, region);
 		if (!Diagnostics.isEnabled()) {
 			return;
 		}

@@ -1,5 +1,6 @@
 package io.github.imcinq.wateroptimisation.mixin.client;
 
+import io.github.imcinq.wateroptimisation.WaterOwnedMesh;
 import io.github.imcinq.wateroptimisation.WaterSectionOwnership;
 import io.github.imcinq.wateroptimisation.WaterSectionOwnershipAccess;
 import io.github.imcinq.wateroptimisation.WaterSectionOwnershipResultsAccess;
@@ -17,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CompiledSectionMeshMixin implements WaterSectionOwnershipAccess {
 	@Unique
 	private WaterSectionOwnership wateroptimisation$waterOwnership = WaterSectionOwnership.EMPTY;
+	@Unique
+	private WaterOwnedMesh wateroptimisation$ownedMesh;
 
 	@Inject(method = "<init>", at = @At("TAIL"), require = 0)
 	private void wateroptimisation$copyWaterOwnership(
@@ -26,12 +29,26 @@ public abstract class CompiledSectionMeshMixin implements WaterSectionOwnershipA
 	) {
 		Object resultObject = results;
 		if (resultObject instanceof WaterSectionOwnershipResultsAccess access) {
-			wateroptimisation$waterOwnership = access.wateroptimisation$getWaterOwnership();
+			wateroptimisation$waterOwnership = access.wateroptimisation$takeWaterOwnership();
+			wateroptimisation$ownedMesh = wateroptimisation$waterOwnership.ownedMesh();
+		}
+	}
+
+	@Inject(method = "close", at = @At("HEAD"))
+	private void wateroptimisation$closeOwnedMesh(CallbackInfo callback) {
+		if (this.wateroptimisation$ownedMesh != null) {
+			this.wateroptimisation$ownedMesh.close();
+			this.wateroptimisation$ownedMesh = null;
 		}
 	}
 
 	@Override
 	public WaterSectionOwnership wateroptimisation$getWaterOwnership() {
 		return wateroptimisation$waterOwnership;
+	}
+
+	@Override
+	public WaterOwnedMesh wateroptimisation$getOwnedMesh() {
+		return this.wateroptimisation$ownedMesh;
 	}
 }

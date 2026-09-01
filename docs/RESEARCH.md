@@ -4,7 +4,7 @@
 
 The practical client-side FPS targets are translucent water geometry, chunk-rebuild work, translucent overdraw and sorting, and water-related particles. Fluid simulation is server-authoritative and should remain untouched.
 
-The dedicated far-water pass is now an early architecture track rather than a late UI idea. It remains a prototype boundary: water must be separated from the shared translucent buffer before distance, fog, LOD, or half-resolution decisions can be applied safely. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
+The dedicated far-water pass is now an early, opt-in architecture track rather than a late UI idea. The 26.2 prototype separates eligible still-water geometry from the shared translucent buffer before applying a hard 320-block section-distance bound and uses the current frame's camera matrix and translucent target. It remains a prototype: fade, independent fog, LOD, and half-resolution decisions require further visual and frame-time evidence. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
 
 The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched until an exact older-renderer bridge is reviewed.
 
@@ -61,7 +61,8 @@ The safe presets still have no renderer-independent GPU shortcut: vanilla alread
 The practical additions from this review are split by confidence:
 
 - ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, clearer compatibility documentation, and an early far-water ownership design;
-- later prototype: a water submesh and dedicated far-water pass with independent distance/fog policy;
-- not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or a user-facing far-water toggle before the pass exists.
+- active experiment: a 26.2 upward-water submesh and dedicated far-water pass with a guarded hard distance bound;
+- later prototype: a fade, independent fog policy, reduced vertex density, or half-resolution far water;
+- not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or enabling the far-water experiment by default.
 
 MoreCulling was reviewed as a comparable culling project, but its source is GPL-3.0 and its implementation is not suitable for copying into this MIT project without permission: https://github.com/FxMorin/MoreCulling

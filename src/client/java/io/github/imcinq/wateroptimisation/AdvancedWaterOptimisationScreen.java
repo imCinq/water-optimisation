@@ -2,8 +2,10 @@ package io.github.imcinq.wateroptimisation;
 
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -28,7 +30,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Button forcedParticlesButton;
 	private Button diagnosticsButton;
 	private Button fallbackButton;
-	private Button flatSurfaceButton;
+	private Button farWaterButton;
 	private int contentWidth;
 	private int buttonLeft;
 	private int buttonWidth;
@@ -106,7 +108,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		this.forcedParticlesButton = addForcedParticlesButton(this.buttonLeft, controlsY + 5 * (BUTTON_HEIGHT + BUTTON_GAP));
 
 		this.cullingButton = addCullingButton(this.rightColumnLeft, controlsY);
-		this.flatSurfaceButton = addFlatSurfaceButton(this.rightColumnLeft, controlsY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.farWaterButton = addFarWaterButton(this.rightColumnLeft, controlsY + BUTTON_HEIGHT + BUTTON_GAP);
 		this.diagnosticsSectionY = controlsY + 2 * (BUTTON_HEIGHT + BUTTON_GAP) + 8;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
 		this.diagnosticsButton = addDiagnosticsButton(this.rightColumnLeft, diagnosticsY);
@@ -127,7 +129,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		this.experimentalSectionY = safeBottom + SECTION_GAP;
 		int cullingY = this.experimentalSectionY + lineHeight() + 4;
 		this.cullingButton = addCullingButton(this.buttonLeft, cullingY);
-		this.flatSurfaceButton = addFlatSurfaceButton(this.buttonLeft, cullingY + BUTTON_HEIGHT + BUTTON_GAP);
+		this.farWaterButton = addFarWaterButton(this.buttonLeft, cullingY + BUTTON_HEIGHT + BUTTON_GAP);
 
 		this.diagnosticsSectionY = cullingY + 2 * (BUTTON_HEIGHT + BUTTON_GAP) + SECTION_GAP;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
@@ -148,6 +150,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.culling.tooltip")));
 		button.active = !WaterOptimisationClient.isSodiumLoaded()
 				|| SodiumFluidIntegration.geometryHooksAvailable();
 		return button;
@@ -200,12 +203,13 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 	}
 
-	private Button addFlatSurfaceButton(int left, int top) {
-		Button button = this.addRenderableWidget(Button.builder(flatSurfaceLabel(), clicked -> {
-			this.workingCopy.setFlatWaterSurfaceMeshing(!this.workingCopy.isFlatWaterSurfaceMeshing());
-			clicked.setMessage(flatSurfaceLabel());
+	private Button addFarWaterButton(int left, int top) {
+		Button button = this.addRenderableWidget(Button.builder(farWaterLabel(), clicked -> {
+			boolean enabled = !this.workingCopy.isFarWaterPass();
+			this.workingCopy.setFarWaterPass(enabled);
+			clicked.setMessage(farWaterLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
-		button.active = WaterOptimisationClient.supportsFlatWaterSurfaceMeshing()
+		button.active = WaterOptimisationClient.supportsFarWaterPass()
 				&& !WaterOptimisationClient.isSodiumLoaded();
 		return button;
 	}
@@ -248,7 +252,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	}
 
 	private Component cullingLabel() {
-		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()));
+		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
+				.withStyle(ChatFormatting.RED);
 	}
 
 	private Component fastPathLabel() {
@@ -275,12 +280,12 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		return Component.translatable("screen.wateroptimisation.forced_particles", yesNo(this.workingCopy.isLimitForcedWaterParticles()));
 	}
 
-	private Component flatSurfaceLabel() {
-		if (!WaterOptimisationClient.supportsFlatWaterSurfaceMeshing()
+	private Component farWaterLabel() {
+		if (!WaterOptimisationClient.supportsFarWaterPass()
 				|| WaterOptimisationClient.isSodiumLoaded()) {
-			return Component.translatable("screen.wateroptimisation.flat_surface_unavailable");
+			return Component.translatable("screen.wateroptimisation.far_water_unavailable");
 		}
-		return Component.translatable("screen.wateroptimisation.flat_surface", yesNo(this.workingCopy.isFlatWaterSurfaceMeshing()));
+		return Component.translatable("screen.wateroptimisation.far_water", yesNo(this.workingCopy.isFarWaterPass()));
 	}
 
 	private Component particleBudgetValue() {

@@ -5,4 +5,6 @@ public interface WaterSectionOwnershipResultsAccess {
 	WaterSectionOwnership wateroptimisation$getWaterOwnership();
 
 	void wateroptimisation$setWaterOwnership(WaterSectionOwnership ownership);
+
+	WaterSectionOwnership wateroptimisation$takeWaterOwnership();
 }
