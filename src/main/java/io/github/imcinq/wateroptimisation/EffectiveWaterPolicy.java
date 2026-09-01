@@ -10,7 +10,7 @@ public record EffectiveWaterPolicy(
 		GeometryPath geometryPath,
 		boolean fluidHooksActive,
 		boolean flatWaterFastPathActive,
-		boolean flatWaterSurfaceMeshingActive,
+		boolean farWaterPassActive,
 		boolean reducedWaterBackfacesActive,
 		boolean particleFilteringActive,
 		int particleBudget,
@@ -21,7 +21,7 @@ public record EffectiveWaterPolicy(
 		VANILLA_PARTICLES("wateroptimisation.path.vanilla_particles"),
 		HIDDEN_WATER_COMPILE("wateroptimisation.path.hidden_compile"),
 		REDUCED_INWARD_FACES("wateroptimisation.path.reduced_faces"),
-		FLAT_WATER_SURFACE("wateroptimisation.path.flat_water_surface"),
+		FAR_WATER_PASS("wateroptimisation.path.far_water_pass"),
 		SODIUM_PARTICLES("wateroptimisation.path.sodium_particles"),
 		SODIUM_REDUCED_INWARD_FACES("wateroptimisation.path.sodium_reduced_faces");
 
@@ -54,10 +54,11 @@ public record EffectiveWaterPolicy(
 		boolean fluidHooksActive = config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
 				&& !safeCapabilities.sodiumLoaded();
 		boolean flatWaterFastPathActive = fluidHooksActive && config.isFlatWaterFastPath();
-		boolean flatSurfaceActive = fluidHooksActive
-				&& config.isFlatWaterSurfaceMeshing()
-				&& safeCapabilities.flatWaterSurfaceMeshingSupported();
-		boolean reducedBackfacesActive = config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
+		boolean farWaterPassActive = !safeCapabilities.sodiumLoaded()
+				&& config.isFarWaterPass()
+				&& safeCapabilities.farWaterPassSupported();
+		boolean reducedBackfacesActive = !farWaterPassActive
+				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
 				&& (!safeCapabilities.sodiumLoaded() || safeCapabilities.sodiumGeometryHooksAvailable());
 
 		GeometryPath path;
@@ -65,8 +66,8 @@ public record EffectiveWaterPolicy(
 			path = reducedBackfacesActive
 					? GeometryPath.SODIUM_REDUCED_INWARD_FACES
 					: GeometryPath.SODIUM_PARTICLES;
-		} else if (flatSurfaceActive) {
-			path = GeometryPath.FLAT_WATER_SURFACE;
+		} else if (farWaterPassActive) {
+			path = GeometryPath.FAR_WATER_PASS;
 		} else if (reducedBackfacesActive) {
 			path = GeometryPath.REDUCED_INWARD_FACES;
 		} else if (flatWaterFastPathActive) {
@@ -79,7 +80,7 @@ public record EffectiveWaterPolicy(
 				path,
 				fluidHooksActive,
 				flatWaterFastPathActive,
-				flatSurfaceActive,
+				farWaterPassActive,
 				reducedBackfacesActive,
 				particleFilteringActive,
 				particleBudget,

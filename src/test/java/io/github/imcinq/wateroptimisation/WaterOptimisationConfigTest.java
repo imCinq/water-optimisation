@@ -16,7 +16,7 @@ class WaterOptimisationConfigTest {
 		assertEquals(WaterOptimisationConfig.PerformanceProfile.BALANCED, config.getPerformanceProfile());
 		assertEquals(WaterOptimisationConfig.FluidCullingMode.CONSERVATIVE, config.getFluidCullingMode());
 		assertFalse(config.isFlatWaterFastPath());
-		assertFalse(config.isFlatWaterSurfaceMeshing());
+		assertFalse(config.isFarWaterPass());
 		assertTrue(config.isWaterParticles());
 		assertEquals(32, config.getParticleDistance());
 		assertFalse(config.isParticleFogCulling());
@@ -32,6 +32,7 @@ class WaterOptimisationConfigTest {
 		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.BALANCED);
 		assertTrue(config.isEnabled());
 		assertFalse(config.isFlatWaterFastPath());
+		assertFalse(config.isFarWaterPass());
 		assertEquals(WaterOptimisationConfig.FluidCullingMode.CONSERVATIVE, config.getFluidCullingMode());
 
 		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.PERFORMANCE);
@@ -61,6 +62,7 @@ class WaterOptimisationConfigTest {
 		assertFalse(config.isEnabled());
 		assertEquals(WaterOptimisationConfig.FluidCullingMode.DISABLED, config.getFluidCullingMode());
 		assertFalse(config.isFlatWaterFastPath());
+		assertFalse(config.isFarWaterPass());
 	}
 
 	@Test
@@ -151,10 +153,10 @@ class WaterOptimisationConfigTest {
 	}
 
 	@Test
-	void flatSurfaceSettingRequiresFluidSectionRefresh() {
+	void farWaterSettingRequiresFluidSectionRefresh() {
 		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
 		WaterOptimisationConfig changed = original.copy();
-		changed.setFlatWaterSurfaceMeshing(true);
+		changed.setFarWaterPass(true);
 
 		assertFalse(original.sameFluidRenderingConfiguration(changed));
 	}
@@ -172,22 +174,14 @@ class WaterOptimisationConfigTest {
 	void effectivePolicyFailsClosedPerRendererCapability() {
 		WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
 		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.PERFORMANCE);
-		config.setFlatWaterSurfaceMeshing(true);
 
 		EffectiveWaterPolicy vanilla = EffectiveWaterPolicy.resolve(config, RendererCapabilities.vanilla());
 		assertTrue(vanilla.flatWaterFastPathActive());
-		assertFalse(vanilla.flatWaterSurfaceMeshingActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.HIDDEN_WATER_COMPILE, vanilla.geometryPath());
-
-		RendererCapabilities reviewedVanilla = new RendererCapabilities(false, false, true, "Vanilla");
-		EffectiveWaterPolicy flat = EffectiveWaterPolicy.resolve(config, reviewedVanilla);
-		assertTrue(flat.flatWaterSurfaceMeshingActive());
-		assertEquals(EffectiveWaterPolicy.GeometryPath.FLAT_WATER_SURFACE, flat.geometryPath());
 
 		RendererCapabilities sodium = new RendererCapabilities(true, false, false, "Sodium");
 		EffectiveWaterPolicy sodiumPolicy = EffectiveWaterPolicy.resolve(config, sodium);
 		assertFalse(sodiumPolicy.fluidHooksActive());
-		assertFalse(sodiumPolicy.flatWaterSurfaceMeshingActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.SODIUM_PARTICLES, sodiumPolicy.geometryPath());
 	}
 
@@ -209,5 +203,32 @@ class WaterOptimisationConfigTest {
 		);
 		assertTrue(available.reducedWaterBackfacesActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.SODIUM_REDUCED_INWARD_FACES, available.geometryPath());
+	}
+
+	@Test
+	void farWaterPassRequiresAReviewedNonSodiumCapability() {
+		WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
+		config.selectProfile(WaterOptimisationConfig.PerformanceProfile.PERFORMANCE);
+		config.setFarWaterPass(true);
+
+		EffectiveWaterPolicy unavailable = EffectiveWaterPolicy.resolve(
+				config,
+				new RendererCapabilities(false, false, false, "Vanilla")
+		);
+		assertFalse(unavailable.farWaterPassActive());
+
+		EffectiveWaterPolicy available = EffectiveWaterPolicy.resolve(
+				config,
+				new RendererCapabilities(false, false, true, "Vanilla")
+		);
+		assertTrue(available.farWaterPassActive());
+		assertFalse(available.reducedWaterBackfacesActive());
+		assertEquals(EffectiveWaterPolicy.GeometryPath.FAR_WATER_PASS, available.geometryPath());
+
+		EffectiveWaterPolicy sodium = EffectiveWaterPolicy.resolve(
+				config,
+				new RendererCapabilities(true, true, true, "Sodium")
+		);
+		assertFalse(sodium.farWaterPassActive());
 	}
 }

@@ -2,14 +2,14 @@
 
 ## Current status
 
-Water Optimisation 0.0.4 is the current public GitHub release with target-specific artifacts for Minecraft 26.2 and 1.21.1. The 1.21.1 artifact is a compatibility build pending live visual and FPS validation; earlier releases remain in the changelog and tags as historical records. Maximum FPS is still an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation 0.0.5 is the current public GitHub release with target-specific artifacts for Minecraft 26.2 and 1.21.1. The 1.21.1 artifact is a compatibility build pending live visual and FPS validation; earlier releases remain in the changelog and tags as historical records. Maximum FPS and the far-water pass are still opt-in visual trade-offs inside an otherwise client-only release.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
-| Mod version | 0.0.4 |
-| Minecraft | 26.2 and 1.21.1, with target-specific 0.0.4 artifacts |
+| Mod version | 0.0.5 |
+| Minecraft | 26.2 and 1.21.1, with target-specific 0.0.5 artifacts |
 | Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
 | Fabric API | 0.158.0+26.2; 0.116.12+1.21.1 |
 | Java | 25 for 26.2; 21 for 1.21.1 |
@@ -20,7 +20,7 @@ Water Optimisation 0.0.4 is the current public GitHub release with target-specif
 
 ## Release artifacts
 
-Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.4) for the target-specific runtime JARs, matching sources JARs, and `SHA256SUMS-0.0.4.txt`. Choose the asset matching the Minecraft target, then verify the tag, accepted commit, and checksum before distributing the artifact. The former `v0.0.3` release remains available as historical 26.2-only distribution.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.5) for the target-specific runtime JARs, matching sources JARs, and `SHA256SUMS-0.0.5.txt`. Choose the asset matching the Minecraft target, then verify the tag, accepted commit, and checksum before distributing the artifact. The former `v0.0.4` release remains available as historical distribution.
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
