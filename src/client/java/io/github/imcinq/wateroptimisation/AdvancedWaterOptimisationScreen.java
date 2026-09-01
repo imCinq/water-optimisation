@@ -2,8 +2,10 @@ package io.github.imcinq.wateroptimisation;
 
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -148,6 +150,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.culling.tooltip")));
 		button.active = !WaterOptimisationClient.isSodiumLoaded()
 				|| SodiumFluidIntegration.geometryHooksAvailable();
 		return button;
@@ -249,7 +252,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	}
 
 	private Component cullingLabel() {
-		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()));
+		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
+				.withStyle(ChatFormatting.RED);
 	}
 
 	private Component fastPathLabel() {

@@ -2,8 +2,10 @@ package io.github.imcinq.wateroptimisation;
 
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -145,6 +147,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			this.workingCopy.setFluidCullingMode(nextCullingMode());
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.culling.tooltip")));
 		button.active = !WaterOptimisationClient.isSodiumLoaded();
 		return button;
 	}
@@ -245,9 +248,11 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Component cullingLabel() {
 		if (!WaterOptimisationClient.supportsReducedWaterBackfaces()
 				&& this.workingCopy.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL) {
-			return Component.translatable("screen.wateroptimisation.culling_unavailable");
+			return Component.translatable("screen.wateroptimisation.culling_unavailable")
+					.withStyle(ChatFormatting.RED);
 		}
-		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()));
+		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
+				.withStyle(ChatFormatting.RED);
 	}
 
 	private Component fastPathLabel() {
