@@ -149,6 +149,34 @@ class WaterOptimisationConfigTest {
 	}
 
 	@Test
+	void unsampledFluidCallDoesNotCloseStaleSampleAfterDiagnosticsToggle() {
+		WaterOptimisationConfig enabled = WaterOptimisationConfig.defaults();
+		enabled.setDiagnosticsHud(true);
+		WaterOptimisationConfig disabled = enabled.copy();
+		disabled.setDiagnosticsHud(false);
+
+		Diagnostics.updateConfig(enabled);
+		Diagnostics.endFluidCompile();
+		Diagnostics.reset();
+		try {
+			Diagnostics.beginFluidCompile();
+			Diagnostics.updateConfig(disabled);
+			Diagnostics.updateConfig(enabled);
+
+			// The first call was sampled; the next call is unsampled. It must not
+			// finish the sample that crossed the diagnostics toggle.
+			Diagnostics.beginFluidCompile();
+			Diagnostics.endFluidCompile();
+
+			assertEquals(0, Diagnostics.snapshot().fluidCompileCalls());
+		} finally {
+			Diagnostics.endFluidCompile();
+			Diagnostics.updateConfig(disabled);
+			Diagnostics.reset();
+		}
+	}
+
+	@Test
 	void experimentalFluidModeRequiresFluidSectionRefresh() {
 		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
 		WaterOptimisationConfig changed = original.copy();

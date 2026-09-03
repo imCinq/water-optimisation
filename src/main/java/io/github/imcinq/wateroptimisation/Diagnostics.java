@@ -98,12 +98,17 @@ public final class Diagnostics {
 	 * reads to every fluid block while retaining a representative average.
 	 */
 	public static void beginFluidCompile() {
+		FluidTiming timing = FLUID_TIMING.get();
+		// A diagnostics toggle can skip the previous return hook. Clear the prior
+		// invocation before deciding whether this one is sampled, so an unsampled
+		// call can never close a stale sample from before the toggle.
+		timing.active = false;
+		timing.counters = null;
 		Counters counters = activeCounters();
 		if (counters == null) {
 			return;
 		}
 		counters.fluidBlocksVisited.increment();
-		FluidTiming timing = FLUID_TIMING.get();
 		if ((timing.sampleIndex++ & FLUID_TIMING_SAMPLE_MASK) != 0) {
 			return;
 		}

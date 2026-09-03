@@ -4,6 +4,11 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
+- No unreleased changes.
+
+## 0.0.7 — 2026-09-03
+
+- 🛡️ Fix diagnostics fluid-timing state after toggling the diagnostics HUD during a sampled tessellation.
 - 🛡️ Make reduced-face policy target-aware so Minecraft 1.21.1 cannot advertise an unsupported geometry path.
 - ⚡ Short-circuit the 1.21.1 source-water probe on visible top faces and reuse its mutable neighbor position.
 - 📊 Show whether the optional fast-path hook has actually been observed in diagnostics.
@@ -133,4 +138,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.6 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.7 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
