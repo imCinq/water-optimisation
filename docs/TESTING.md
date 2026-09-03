@@ -52,7 +52,7 @@ Compare identical warmed scenes using the report template. Record average FPS, 1
 
 Use the diagnostics HUD as a local cross-check, not as a replacement for frame-time profiling.
 
-For the opt-in far-water pass, additionally test the 320-block cutoff from a fixed camera and while moving the camera through flat source-water pools, mixed terrain, caves, glass/leaves, overlays, flowing water, and waterlogged blocks. Verify that the pass follows camera movement, reports uploads/draws/skips, that unsupported sections remain visible, and that the cutoff does not remove unrelated terrain. Repeat above-water and underwater views with Sodium absent and present; Sodium should report the option as unavailable and retain its own fluid renderer.
+For the opt-in far-water pass, additionally test the 320-block cutoff from a fixed camera and while moving the camera through flat source-water pools, mixed terrain, caves, glass/leaves, overlays, flowing water, and waterlogged blocks. Verify that the pass follows camera movement, reports uploads/draws/skips, that unsupported sections remain visible, and that the cutoff does not remove unrelated terrain. Repeat above-water and underwater views with Sodium absent and present; Sodium should report overlapping geometry options as unavailable and retain its own fluid renderer. A Sodium-present run must not report mod-owned reverse-face reductions.
 
 ## Multiplayer smoke test
 

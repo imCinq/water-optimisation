@@ -19,15 +19,10 @@ def targetJavaVersion = legacyTarget ? 21 : 25
 def modDependencyConfiguration = legacyTarget ? "modImplementation" : "implementation"
 def modCompileOnlyConfiguration = legacyTarget ? "modCompileOnly" : "compileOnly"
 def targetDescription = "Client-side water rendering optimisation for Minecraft 26.2 and 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
-def sodiumMixinEntry = legacyTarget ? "" : """,
-		{
-			"config": "wateroptimisation.sodium.mixins.json",
-			"environment": "client"
-		}"""
 def clientMixinEntry = """{
 			"config": "${legacyTarget ? "wateroptimisation.legacy.mixins.json" : "wateroptimisation.client.mixins.json"}",
 			"environment": "client"
-		}${sodiumMixinEntry}"""
+		}"""
 
 def resourceExpansion = [
 	version: project.version,
@@ -38,7 +33,7 @@ def resourceExpansion = [
 	modmenu_dependency: ">=${targetModMenuVersion}",
 	client_mixin_entry: clientMixinEntry,
 	java_compatibility_level: "JAVA_${targetJavaVersion}",
-	mixin_default_require: legacyTarget ? 0 : 1
+	mixin_default_require: 0
 ]
 
 repositories {

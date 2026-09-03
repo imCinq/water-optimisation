@@ -68,21 +68,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		FarWaterRenderer.register();
 
 		if (sodiumLoaded) {
-			if (SodiumFluidIntegration.isSupportedVersion()) {
-				LOGGER.info("Sodium 0.9.x for Minecraft 26.2 detected; vanilla fluid hooks remain disabled and the optional inward-face bridge is available after its hooks match.");
-			} else {
-				LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and this Sodium build remains on the particle-only fallback.");
-			}
+			LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and Sodium remains the water-geometry owner. Water Optimisation applies local particle controls only.");
 		}
 		LOGGER.info("Water Optimisation initialized; rendering changes are opt-in and default to safe no-op behavior.");
 	}
 
 	public static boolean isSodiumLoaded() {
 		return sodiumLoaded;
-	}
-
-	public static boolean supportsReducedWaterBackfaces() {
-		return true;
 	}
 
 	public static boolean supportsFarWaterPass() {
@@ -92,7 +84,6 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	public static RendererCapabilities rendererCapabilities() {
 		return new RendererCapabilities(
 				sodiumLoaded,
-				sodiumLoaded && SodiumFluidIntegration.geometryHooksAvailable(),
 				supportsFarWaterPass(),
 				sodiumLoaded ? "Sodium" : "Vanilla"
 		);
@@ -252,11 +243,11 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("geometry path: " + policy.geometryPath().name().toLowerCase(java.util.Locale.ROOT)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
-				Component.literal("water backfaces: " + (FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
+				Component.literal("water backfaces: " + (sodiumLoaded ? "Sodium-owned" : FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
 				Component.literal("far-water pass: " + onOff(policy.farWaterPassActive())),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
-				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
+				Component.literal("mod reverse faces removed: " + snapshot.reducedWaterBackfaces()),
 				Component.literal("far-water candidates: " + snapshot.farWaterCandidateBlocks() + " blocks / " + snapshot.farWaterCandidateFaces() + " faces"),
 				Component.literal("far-water vertices/fallbacks: " + snapshot.farWaterCandidateVertices() + "/" + snapshot.farWaterFallbackBlocks()),
 				Component.literal("far-water uploads/draws: " + snapshot.farWaterUploads() + "/" + snapshot.farWaterDrawnSections() + " sections"),

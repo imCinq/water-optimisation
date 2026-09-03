@@ -49,7 +49,7 @@ Minecraft 26.2 supports an optional Vulkan backend in addition to OpenGL. The mo
 
 The Minecraft 26.2 rendering guidance requires the Blaze3D abstraction because the release has an optional Vulkan backend; this project therefore does not use raw OpenGL: https://docs.fabricmc.net/develop/rendering/basic-concepts
 
-Sodium's current `DefaultFluidRenderer` performs shape-aware face visibility, same-fluid culling, cached occlusion comparisons, fluid-height sampling, and an optional flooded-cave heuristic. Its `TranslucentGeometryCollector` gathers translucent quads and chooses sorting data for each section. Those optimizations depend on Sodium's renderer, level slice, and shape-cache ownership, so this mod does not copy or duplicate them. Sodium remains the owner of fluid rendering when detected:
+Sodium's current `DefaultFluidRenderer` performs shape-aware face visibility, same-fluid culling, cached occlusion comparisons, fluid-height sampling, and an optional flooded-cave heuristic. Its `TranslucentGeometryCollector` gathers translucent quads and chooses sorting data for each section. Those optimizations depend on Sodium's renderer, level slice, and shape-cache ownership, so this mod does not copy or duplicate them. Sodium remains the owner of fluid rendering when detected, and this mod does not install a Sodium geometry mixin:
 
 - https://raw.githubusercontent.com/CaffeineMC/sodium/dev/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer.java
 - https://raw.githubusercontent.com/CaffeineMC/sodium/dev/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/translucent_sorting/TranslucentGeometryCollector.java
@@ -62,6 +62,7 @@ The practical additions from this review are split by confidence:
 
 - ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, clearer compatibility documentation, and an early far-water ownership design;
 - active experiment: a 26.2 upward-water submesh and dedicated far-water pass with a guarded hard distance bound;
+- deferred compatibility work: a Sodium-specific reverse-face reduction requires an emission-cancellation hook, not a winding argument rewrite;
 - later prototype: a fade, independent fog policy, reduced vertex density, or half-resolution far water;
 - not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or enabling the far-water experiment by default.
 

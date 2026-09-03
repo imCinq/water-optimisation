@@ -59,14 +59,14 @@ Sodium ownership detection disables the vanilla fluid hooks rather than replacin
 
 ### Phase 6 — Experimental reduced faces
 
-The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled in the vanilla hook when Sodium owns fluid rendering. A separate, version-gated Sodium 0.9.x/Minecraft 26.2 bridge applies the same narrow face reduction without replacing Sodium's renderer; unknown builds remain on the fallback.
+The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering; no Sodium geometry bridge is currently installed.
 
 ## Next priorities
 
 - Keep the dedicated far-water pass prototype early and opt-in for fill-rate-bound scenes. The 26.2 path now preflights water-only sections, attaches only upward owned-water surfaces to the compiled section lifetime, draws them after translucent terrain through Blaze3D in back-to-front section order, and skips eligible sections beyond the hard 320-block bound; mixed or uncertain sections remain on the shared path.
 - Measure the prototype's near/far visual boundary and frame-time effect before adding a fade, independent fog curve, lower vertex density, or half-resolution/LOD variant. Keep the prototype separate from both Sodium's renderer and the 1.21.1 compatibility adapter.
 - Complete local visual and performance validation.
-- Validate the optional Sodium reduced-face bridge on the exact 26.2 Sodium build and keep it disabled if either hook does not match.
+- Re-review a future Sodium reduced-face implementation only after an exact emission-cancellation hook and artifact-specific runtime validation exist.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
 - Consider rolling diagnostics and fallback reason reporting.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.

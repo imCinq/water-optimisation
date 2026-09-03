@@ -41,27 +41,14 @@ public final class FluidOptimizationPolicy {
 
 	/**
 	 * The experimental mode removes only vanilla's optional reverse face for a
-	 * fluid quad. The vanilla hook is disabled for Sodium, which owns its fluid
-	 * renderer; the optional reviewed Sodium bridge can apply the same narrow
-	 * operation without taking ownership of the rest of the renderer. It is
-	 * never enabled by a safe preset.
+	 * fluid quad. Sodium owns its fluid renderer, so the vanilla hook never runs
+	 * there and the experimental mode remains unavailable until a renderer-
+	 * specific implementation is independently reviewed.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
-		if (farWaterPassActive) {
-			return false;
-		}
-		if (WaterOptimisationClient.isSodiumLoaded()) {
-			return reducedWaterBackfacesRequested() && SodiumFluidIntegration.geometryHooksAvailable();
-		}
-		return reducedWaterBackfacesActive;
-	}
-
-	/** Returns the user-requested experimental mode before renderer ownership is applied. */
-	public static boolean reducedWaterBackfacesRequested() {
-		WaterOptimisationConfig config = ConfigManager.get();
-		return config.isEnabled()
-				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
-				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
+		return !WaterOptimisationClient.isSodiumLoaded()
+				&& !farWaterPassActive
+				&& reducedWaterBackfacesActive;
 	}
 
 	/**

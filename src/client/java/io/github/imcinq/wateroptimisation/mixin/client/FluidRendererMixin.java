@@ -108,7 +108,8 @@ public abstract class FluidRendererMixin {
 					ordinal = 0
 			),
 			cancellable = true,
-			locals = LocalCapture.CAPTURE_FAILHARD
+			require = 0,
+			locals = LocalCapture.CAPTURE_FAILSOFT
 	)
 	private void wateroptimisation$skipInteriorSourceWater(
 			BlockAndTintGetter level,

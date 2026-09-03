@@ -34,7 +34,7 @@ The current [0.0.5 release](https://github.com/imCinq/water-optimisation/release
 
 | Minecraft | Java | Build status | Geometry scope |
 | --- | --- | --- | --- |
-| 26.2 | 25+ | 0.0.5 release | Conservative vanilla hooks plus the opt-in reviewed Sodium bridge and far-water experiment. |
+| 26.2 | 25+ | 0.0.5 release | Conservative vanilla hooks plus the opt-in far-water experiment. Sodium remains the geometry owner when present. |
 | 1.21.1 | 21+ | 0.0.5 compatibility build | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 
 ## Pick a preset
@@ -72,7 +72,7 @@ Maximum FPS disables ordinary water particles by default. Particle settings cont
 
 ## Sodium and compatibility
 
-Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. On the reviewed Sodium 0.9.x builds for Minecraft 26.2, `Maximum FPS` can additionally ask Sodium to omit only reversed copies of ordinary source-water quads; Sodium still owns visibility, fluid shaping, lighting, and translucent sorting. On 1.21.1, Sodium stays on the particle-only fallback until that older renderer is reviewed separately. Unknown Sodium builds stay on the particle-only fallback. The effective path is shown in the main settings screen.
+Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. When Sodium is present, Sodium owns all water geometry and Water Optimisation applies only local particle controls. The reduced-inward-face option is available only on the vanilla renderer until a renderer-specific Sodium implementation is reviewed and validated. On 1.21.1, Sodium likewise remains the geometry owner. The effective path is shown in the main settings screen.
 
 The mod is client-only. It declares no server entrypoint, custom packets, world updates, movement changes, collision changes, player-information features, telemetry, update checker, or outbound network service. Non-water rendering is outside its scope.
 
