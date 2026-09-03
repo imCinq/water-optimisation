@@ -3,7 +3,7 @@
 ## Data flow
 
 Client fluid state
-→ target-isolated FluidRenderer hook or optional 26.2 Sodium face bridge
+→ target-isolated FluidRenderer hook, with Sodium ownership detected before vanilla hooks run
 → already-loaded neighbor-state classifier
 → vanilla fluid mesh path, explicit fully-hidden source-water skip, or guarded 26.2-only owned-water mesh
 → shared translucent section buffer and, for eligible far-water sections, a section-owned vertex buffer
@@ -37,13 +37,13 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 The 26.2 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.1 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
-- Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering;
+- Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering. No Sodium geometry mixin is installed;
 - the hidden-water path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
 - flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
 
 The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
 
-The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Its thread-local context is touched only while the experimental mode is active, keeping safe and disabled paths free of cleanup calls. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
+The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The 26.2 local capture is optional and fail-soft: if the renderer's locals change, the optimization is skipped instead of crashing the client. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 The 26.2 renderer also has an opt-in far-water ownership path around section compilation and fluid tessellation. A conservative preflight accepts only sections with ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Only upward fluid faces are copied into a `WaterOwnedMesh`; vertical sides and bottoms remain in the shared translucent output because the dedicated pass cannot reproduce vanilla's per-face sort order safely. Owned surfaces are carried from `SectionCompiler.Results` to `CompiledSectionMesh`. A client render callback then draws those meshes after translucent terrain through Minecraft's Blaze3D pipeline, using the current frame camera matrix and translucent target, ordering sections back-to-front, and skipping eligible sections beyond its 320-block bound. Unsupported fluids, mixed translucent sections, Sodium-owned geometry, and the 1.21.1 target remain on their existing paths. The pass is disabled by default and remains an experiment until live visual and frame-time validation proves it safe and useful.
 
@@ -61,7 +61,7 @@ An optional budget resets at the start of each client tick and is reserved only 
 
 - Fabric API is the primary client integration surface.
 - Mod Menu is optional and contains no renderer logic.
-- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. A separate version-gated bridge can remove only the reversed copy of ordinary source-water quads on reviewed Sodium 0.9.x/Minecraft 26.2 builds; unknown builds fall back to Sodium unchanged.
+- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. Sodium remains fully responsible for water geometry; the mod has no Sodium geometry bridge until an exact renderer-specific cancellation hook is reviewed and validated.
 - On Minecraft 1.21.1, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.

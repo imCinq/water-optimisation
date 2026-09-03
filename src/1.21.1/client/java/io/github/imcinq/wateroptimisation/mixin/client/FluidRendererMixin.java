@@ -3,6 +3,7 @@ package io.github.imcinq.wateroptimisation.mixin.client;
 import io.github.imcinq.wateroptimisation.Diagnostics;
 import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,18 +51,23 @@ public abstract class FluidRendererMixin {
 			return;
 		}
 
-		BlockState blockStateDown = level.getBlockState(pos.below());
-		FluidState fluidStateDown = level.getFluidState(pos.below());
-		BlockState blockStateUp = level.getBlockState(pos.above());
-		FluidState fluidStateUp = level.getFluidState(pos.above());
-		BlockState blockStateNorth = level.getBlockState(pos.north());
-		FluidState fluidStateNorth = level.getFluidState(pos.north());
-		BlockState blockStateSouth = level.getBlockState(pos.south());
-		FluidState fluidStateSouth = level.getFluidState(pos.south());
-		BlockState blockStateWest = level.getBlockState(pos.west());
-		FluidState fluidStateWest = level.getFluidState(pos.west());
-		BlockState blockStateEast = level.getBlockState(pos.east());
-		FluidState fluidStateEast = level.getFluidState(pos.east());
+		// Keep this compatibility probe allocation-light: fetch each neighbor
+		// block once and derive its fluid state from that already-loaded state.
+		// The older renderer does not expose these locals at a stable injection
+		// point, so this is the narrowest safe reduction of its lookup overhead.
+		BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
+		BlockState blockStateDown = level.getBlockState(neighborPos.setWithOffset(pos, Direction.DOWN));
+		FluidState fluidStateDown = blockStateDown.getFluidState();
+		BlockState blockStateUp = level.getBlockState(neighborPos.setWithOffset(pos, Direction.UP));
+		FluidState fluidStateUp = blockStateUp.getFluidState();
+		BlockState blockStateNorth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.NORTH));
+		FluidState fluidStateNorth = blockStateNorth.getFluidState();
+		BlockState blockStateSouth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.SOUTH));
+		FluidState fluidStateSouth = blockStateSouth.getFluidState();
+		BlockState blockStateWest = level.getBlockState(neighborPos.setWithOffset(pos, Direction.WEST));
+		FluidState fluidStateWest = blockStateWest.getFluidState();
+		BlockState blockStateEast = level.getBlockState(neighborPos.setWithOffset(pos, Direction.EAST));
+		FluidState fluidStateEast = blockStateEast.getFluidState();
 
 		if (!FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
 				blockState,

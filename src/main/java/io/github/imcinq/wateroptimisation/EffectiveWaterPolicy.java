@@ -22,8 +22,7 @@ public record EffectiveWaterPolicy(
 		HIDDEN_WATER_COMPILE("wateroptimisation.path.hidden_compile"),
 		REDUCED_INWARD_FACES("wateroptimisation.path.reduced_faces"),
 		FAR_WATER_PASS("wateroptimisation.path.far_water_pass"),
-		SODIUM_PARTICLES("wateroptimisation.path.sodium_particles"),
-		SODIUM_REDUCED_INWARD_FACES("wateroptimisation.path.sodium_reduced_faces");
+		SODIUM_PARTICLES("wateroptimisation.path.sodium_particles");
 
 		private final String translationKey;
 
@@ -58,14 +57,12 @@ public record EffectiveWaterPolicy(
 				&& config.isFarWaterPass()
 				&& safeCapabilities.farWaterPassSupported();
 		boolean reducedBackfacesActive = !farWaterPassActive
-				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
-				&& (!safeCapabilities.sodiumLoaded() || safeCapabilities.sodiumGeometryHooksAvailable());
+				&& !safeCapabilities.sodiumLoaded()
+				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
 
 		GeometryPath path;
 		if (safeCapabilities.sodiumLoaded()) {
-			path = reducedBackfacesActive
-					? GeometryPath.SODIUM_REDUCED_INWARD_FACES
-					: GeometryPath.SODIUM_PARTICLES;
+			path = GeometryPath.SODIUM_PARTICLES;
 		} else if (farWaterPassActive) {
 			path = GeometryPath.FAR_WATER_PASS;
 		} else if (reducedBackfacesActive) {

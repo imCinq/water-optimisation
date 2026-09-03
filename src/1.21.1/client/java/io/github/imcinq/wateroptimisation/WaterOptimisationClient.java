@@ -75,7 +75,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	}
 
 	public static RendererCapabilities rendererCapabilities() {
-		return new RendererCapabilities(sodiumLoaded, false, false, sodiumLoaded ? "Sodium" : "Vanilla");
+		return new RendererCapabilities(sodiumLoaded, false, sodiumLoaded ? "Sodium" : "Vanilla");
 	}
 
 	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {
@@ -218,10 +218,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("geometry path: " + policy.geometryPath().name().toLowerCase(java.util.Locale.ROOT)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
-				Component.literal("water backfaces: vanilla (1.21.1 compatibility)"),
+				Component.literal("water backfaces: " + (sodiumLoaded ? "Sodium-owned" : "vanilla (1.21.1 compatibility)")),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
-				Component.literal("reverse faces removed: " + snapshot.reducedWaterBackfaces()),
+				Component.literal("mod reverse faces removed: " + snapshot.reducedWaterBackfaces()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
 				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
 				Component.literal("translucent resort avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageTranslucentResortMillis())),

@@ -151,8 +151,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.culling.tooltip")));
-		button.active = !WaterOptimisationClient.isSodiumLoaded()
-				|| SodiumFluidIntegration.geometryHooksAvailable();
+		button.active = !WaterOptimisationClient.isSodiumLoaded();
 		return button;
 	}
 
@@ -252,11 +251,18 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	}
 
 	private Component cullingLabel() {
+		if (WaterOptimisationClient.isSodiumLoaded()) {
+			return Component.translatable("screen.wateroptimisation.culling_sodium_unavailable")
+					.withStyle(ChatFormatting.RED);
+		}
 		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
 				.withStyle(ChatFormatting.RED);
 	}
 
 	private Component fastPathLabel() {
+		if (WaterOptimisationClient.isSodiumLoaded()) {
+			return Component.translatable("screen.wateroptimisation.fast_path_unavailable");
+		}
 		return Component.translatable("screen.wateroptimisation.fast_path", yesNo(this.workingCopy.isFlatWaterFastPath()));
 	}
 
