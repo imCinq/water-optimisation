@@ -2,7 +2,7 @@
 
 ## Current status
 
-Water Optimisation 0.0.5 is the current public GitHub release with target-specific artifacts for Minecraft 26.2 and 1.21.1. The 1.21.1 artifact is a compatibility build pending live visual and FPS validation; earlier releases remain in the changelog and tags as historical records. Maximum FPS and the far-water pass are still opt-in visual trade-offs inside an otherwise client-only release.
+Water Optimisation 0.0.5 is the current public GitHub release with target-specific artifacts for Minecraft 26.2 and 1.21.1. The 1.21.1 artifact is a compatibility build pending live visual and FPS validation; earlier releases remain in the changelog and tags as historical records. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
 
 ## Current build profile
 

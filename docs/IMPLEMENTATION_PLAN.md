@@ -29,7 +29,7 @@ This pass keeps the original conservative phases intact while adding measurable 
 - version the local configuration and migrate older files without changing explicit user choices;
 - resolve requested settings into renderer capabilities and expose the effective path in the UI and diagnostics;
 - add bounded water-particle admission, including a per-client-tick budget and an explicit policy for particles that normally bypass distance limits;
-- keep the optional 26.2-only far-water pass isolated behind a hard capability and distance bound. Any uncertain shape remains on the vanilla path.
+- keep experimental GPU/fill-rate work out of the release path until a separate water-owned design has repeatable visual and frame-time evidence.
 
 ## Completed phases
 
@@ -63,14 +63,13 @@ The reduced-face mode keeps vanilla's outward fluid face and removes only its op
 
 ## Next priorities
 
-- Keep the dedicated far-water pass prototype early and opt-in for fill-rate-bound scenes. The 26.2 path now preflights water-only sections, attaches only upward owned-water surfaces to the compiled section lifetime, draws them after translucent terrain through Blaze3D in back-to-front section order, and skips eligible sections beyond the hard 320-block bound; mixed or uncertain sections remain on the shared path.
-- Measure the prototype's near/far visual boundary and frame-time effect before adding a fade, independent fog curve, lower vertex density, or half-resolution/LOD variant. Keep the prototype separate from both Sodium's renderer and the 1.21.1 compatibility adapter.
+- Revisit a separate water-owned GPU/fill-rate path only after a new design has a correctness proof and a repeatable win; the previous prototype was removed after visual failures.
 - Complete local visual and performance validation.
 - Re-review a future Sodium reduced-face implementation only after an exact emission-cancellation hook and artifact-specific runtime validation exist.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
 - Consider rolling diagnostics and fallback reason reporting.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.
-- Keep camera-relative water-distance fading deferred until the separate water-owned pass is visually and quantitatively correct.
+- Keep camera-relative water-distance fading deferred until a separate water-owned pass is independently proven safe and useful.
 - Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.
 
 ## Release gate

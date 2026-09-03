@@ -4,7 +4,7 @@
 
 The practical client-side FPS targets are translucent water geometry, chunk-rebuild work, translucent overdraw and sorting, and water-related particles. Fluid simulation is server-authoritative and should remain untouched.
 
-The dedicated far-water pass is now an early, opt-in architecture track rather than a late UI idea. The 26.2 prototype separates eligible still-water geometry from the shared translucent buffer before applying a hard 320-block section-distance bound and uses the current frame's camera matrix and translucent target. It remains a prototype: fade, independent fog, LOD, and half-resolution decisions require further visual and frame-time evidence. See [FAR_WATER_PASS.md](FAR_WATER_PASS.md).
+The earlier dedicated far-water pass prototype was removed after visual correctness failures. A future GPU/fill-rate path must first prove water ownership, camera following, translucent ordering, and measurable frame-time benefit before it returns to the public build.
 
 The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched until an exact older-renderer bridge is reviewed.
 
@@ -60,10 +60,10 @@ The safe presets still have no renderer-independent GPU shortcut: vanilla alread
 
 The practical additions from this review are split by confidence:
 
-- ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, clearer compatibility documentation, and an early far-water ownership design;
-- active experiment: a 26.2 upward-water submesh and dedicated far-water pass with a guarded hard distance bound;
+- ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, and clearer compatibility documentation;
+- deferred experiment: a water-owned GPU/fill-rate path with a new correctness proof and controlled measurements;
 - deferred compatibility work: a Sodium-specific reverse-face reduction requires an emission-cancellation hook, not a winding argument rewrite;
 - later prototype: a fade, independent fog policy, reduced vertex density, or half-resolution far water;
-- not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or enabling the far-water experiment by default.
+- not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or returning the failed far-water prototype without new evidence.
 
 MoreCulling was reviewed as a comparable culling project, but its source is GPL-3.0 and its implementation is not suitable for copying into this MIT project without permission: https://github.com/FxMorin/MoreCulling

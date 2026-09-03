@@ -7,6 +7,7 @@ All notable changes to Water Optimisation are documented here.
 - Disable the Sodium reduced-face bridge after confirming that Sodium's `writeQuad` `flip` argument controls winding and normal orientation, not quad emission. Sodium now remains fully renderer-owned; the vanilla reduced-face experiment is unchanged.
 - Make the 26.2 fluid local-capture optimization fail soft when renderer locals change, so an unmatched hook falls back to vanilla behavior instead of failing client initialization.
 - Reduce 1.21.1 fast-path probe overhead by reusing one mutable neighbor position and deriving fluid states from the fetched block states.
+- Remove the unvalidated 26.2 far-water ownership prototype and its public control after visual correctness failures; normal translucent rendering remains authoritative.
 
 ## 0.0.5 — 2026-09-01
 

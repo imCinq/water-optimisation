@@ -7,7 +7,7 @@ The project has isolated target profiles so the incompatible client APIs cannot 
 | Target | Java | Fabric Loader | Fabric API | Mod Menu | Runtime geometry scope |
 | --- | --- | --- | --- | --- | --- |
 | Minecraft 26.2 | 25+ | 0.19.3+ | 0.158.0+26.2 | Optional 19.0.0-alpha.1 | Vanilla conservative/reduced-face hooks; Sodium-owned geometry when present. |
-| Minecraft 1.21.1 | 21+ | 0.16.13+ | 0.116.12+1.21.1 | Optional 11.0.4 | Conservative source-water fast path and particles; no Sodium geometry bridge yet. |
+| Minecraft 1.21.1 | 21+ | 0.16.13+ | 0.116.12+1.21.1 | Optional 11.0.4 | Conservative source-water fast path and particles; Sodium-owned geometry when present. |
 
 The 1.21.1 profile uses the remapping Loom plugin and official Mojang mappings, while 26.2 uses the non-remapping Loom profile. Its older GUI, HUD, key-binding, and liquid-renderer APIs live under `src/1.21.1/client/java` and `wateroptimisation.legacy.mixins.json`.
 
@@ -29,4 +29,4 @@ The mod is client-only and render-focused. It does not add packets, change movem
 
 ## Fallback behavior
 
-If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Flowing, partial, waterlogged, overlay, transparent, and unusual states remain on the normal renderer. The 26.2 far-water pass is unavailable with Sodium and is disabled for the 1.21.1 profile; its section preflight also falls back whenever mixed translucent content is possible.
+If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Flowing, partial, waterlogged, overlay, transparent, and unusual states remain on the normal renderer.

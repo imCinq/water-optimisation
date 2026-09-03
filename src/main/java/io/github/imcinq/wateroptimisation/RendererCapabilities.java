@@ -8,7 +8,6 @@ package io.github.imcinq.wateroptimisation;
  */
 public record RendererCapabilities(
 		boolean sodiumLoaded,
-		boolean farWaterPassSupported,
 		String rendererName
 ) {
 	public RendererCapabilities {
@@ -16,6 +15,6 @@ public record RendererCapabilities(
 	}
 
 	public static RendererCapabilities vanilla() {
-		return new RendererCapabilities(false, false, "Vanilla");
+		return new RendererCapabilities(false, "Vanilla");
 	}
 }

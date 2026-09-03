@@ -5,8 +5,8 @@
 Client fluid state
 → target-isolated FluidRenderer hook, with Sodium ownership detected before vanilla hooks run
 → already-loaded neighbor-state classifier
-→ vanilla fluid mesh path, explicit fully-hidden source-water skip, or guarded 26.2-only owned-water mesh
-→ shared translucent section buffer and, for eligible far-water sections, a section-owned vertex buffer
+→ vanilla fluid mesh path or explicit fully-hidden source-water skip
+→ shared translucent section buffer
 → section compilation and translucent resort diagnostics
 
 Particle state
@@ -45,8 +45,6 @@ The 1.21.1 adapter does not manufacture a level/position context for its older s
 
 The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The 26.2 local capture is optional and fail-soft: if the renderer's locals change, the optimization is skipped instead of crashing the client. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
-The 26.2 renderer also has an opt-in far-water ownership path around section compilation and fluid tessellation. A conservative preflight accepts only sections with ordinary still source water and no non-air, non-solid model that could introduce mixed translucent terrain. Only upward fluid faces are copied into a `WaterOwnedMesh`; vertical sides and bottoms remain in the shared translucent output because the dedicated pass cannot reproduce vanilla's per-face sort order safely. Owned surfaces are carried from `SectionCompiler.Results` to `CompiledSectionMesh`. A client render callback then draws those meshes after translucent terrain through Minecraft's Blaze3D pipeline, using the current frame camera matrix and translucent target, ordering sections back-to-front, and skipping eligible sections beyond its 320-block bound. Unsupported fluids, mixed translucent sections, Sodium-owned geometry, and the 1.21.1 target remain on their existing paths. The pass is disabled by default and remains an experiment until live visual and frame-time validation proves it safe and useful.
-
 ### Particle filter
 
 ClientLevelMixin intercepts only the client-side addParticle overload. It exits immediately while the mod is disabled or on the Vanilla preset, then recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies a cached camera-relative distance policy only when the master switch is enabled. The filter snapshot is rebuilt only when configuration changes. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
@@ -65,19 +63,6 @@ An optional budget resets at the start of each client tick and is reserved only 
 - On Minecraft 1.21.1, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.
-
-## Far-water architecture boundary
-
-Far-water is an early GPU/fill-rate track, but it cannot safely be implemented as a distance test inside the current translucent section buffer. That buffer contains water together with glass, leaves, overlays, and other translucent geometry. A section-level or shared-buffer cutoff would either remove unrelated visuals or require a brittle per-vertex rewrite after asynchronous compilation.
-
-The intended design is a separate water-owned representation and pass:
-
-1. identify only the exact water geometry that can be separated without changing non-water translucency;
-2. keep near water on the full-quality path and route only far water through an independently bounded pass;
-3. apply water-only distance, fog, and later LOD/half-resolution decisions through Blaze3D/Minecraft abstractions;
-4. preserve vanilla/Sodium ownership and fail closed when the renderer cannot provide that separation.
-
-This track has a compiled-mesh ownership handoff and a guarded 26.2-only separate draw in `docs/FAR_WATER_PASS.md`. The runtime distance cutoff is opt-in, hard-bounded, and fail-closed; it is not a general shared-translucent cull or a stable preset.
 
 ## Non-goals
 
