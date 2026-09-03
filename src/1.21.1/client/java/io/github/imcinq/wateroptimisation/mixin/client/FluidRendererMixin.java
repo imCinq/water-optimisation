@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,12 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Conservative 1.21.1 adapter. LiquidBlockRenderer has a different method
  * body from the 26.2 renderer and does not expose a stable local-state hook,
  * so the compatibility path performs the six-neighbor probe only after the
- * cheap ordinary-source-water check. Reverse-face reduction stays disabled on
- * this target until an exact renderer hook is reviewed.
+ * cheap ordinary-source-water and upward-neighbor checks. Reverse-face
+ * reduction stays disabled on this target until an exact renderer hook is
+ * reviewed.
  */
 @Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {
-	@Inject(method = "tesselate", at = @At("HEAD"), require = 0)
+	@Unique
+	private static final ThreadLocal<BlockPos.MutableBlockPos> wateroptimisation$neighborPosition =
+			ThreadLocal.withInitial(BlockPos.MutableBlockPos::new);
+
+	@Inject(method = "tesselate", at = @At("HEAD"), cancellable = true, require = 0)
 	private void wateroptimisation$beforeTesselate(
 			BlockAndTintGetter level,
 			BlockPos pos,
@@ -32,34 +38,28 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
+		FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.beginFluidCompile();
 		}
-	}
-
-	@Inject(method = "tesselate", at = @At("HEAD"), cancellable = true, require = 0)
-	private void wateroptimisation$skipInteriorSourceWater(
-			BlockAndTintGetter level,
-			BlockPos pos,
-			VertexConsumer consumer,
-			BlockState blockState,
-			FluidState fluidState,
-			CallbackInfo callback
-	) {
 		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
 				|| !FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
 			return;
 		}
 
-		// Keep this compatibility probe allocation-light: fetch each neighbor
-		// block once and derive its fluid state from that already-loaded state.
-		// The older renderer does not expose these locals at a stable injection
-		// point, so this is the narrowest safe reduction of its lookup overhead.
-		BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
-		BlockState blockStateDown = level.getBlockState(neighborPos.setWithOffset(pos, Direction.DOWN));
-		FluidState fluidStateDown = blockStateDown.getFluidState();
+		// Open-surface water is the common case. The upward face must be hidden
+		// for a block to qualify, so fail before the remaining five lookups.
+		BlockPos.MutableBlockPos neighborPos = wateroptimisation$neighborPosition.get();
 		BlockState blockStateUp = level.getBlockState(neighborPos.setWithOffset(pos, Direction.UP));
 		FluidState fluidStateUp = blockStateUp.getFluidState();
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(blockStateUp, fluidStateUp)) {
+			return;
+		}
+
+		// Derive every fluid state from the one block-state lookup for that
+		// direction. This keeps the compatibility proof narrow and allocation-free.
+		BlockState blockStateDown = level.getBlockState(neighborPos.setWithOffset(pos, Direction.DOWN));
+		FluidState fluidStateDown = blockStateDown.getFluidState();
 		BlockState blockStateNorth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.NORTH));
 		FluidState fluidStateNorth = blockStateNorth.getFluidState();
 		BlockState blockStateSouth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.SOUTH));

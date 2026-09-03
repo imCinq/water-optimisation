@@ -1,7 +1,7 @@
 package io.github.imcinq.wateroptimisation;
 
 public final class WaterOptimisationConfig {
-	public static final int CURRENT_CONFIG_VERSION = 3;
+	public static final int CURRENT_CONFIG_VERSION = 4;
 	public static final int MIN_PARTICLE_DISTANCE = 8;
 	public static final int MAX_PARTICLE_DISTANCE = 128;
 	public static final int UNLIMITED_PARTICLE_BUDGET = 0;
@@ -60,7 +60,6 @@ public final class WaterOptimisationConfig {
 	private int particleBudget;
 	private boolean limitForcedWaterParticles;
 	private boolean diagnosticsHud;
-	private boolean debugFallbackLogging;
 	private int configVersion;
 
 	public WaterOptimisationConfig() {
@@ -75,7 +74,6 @@ public final class WaterOptimisationConfig {
 		this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
 		this.limitForcedWaterParticles = false;
 		this.diagnosticsHud = false;
-		this.debugFallbackLogging = false;
 	}
 
 	public static WaterOptimisationConfig defaults() {
@@ -95,7 +93,6 @@ public final class WaterOptimisationConfig {
 		copy.particleBudget = this.particleBudget;
 		copy.limitForcedWaterParticles = this.limitForcedWaterParticles;
 		copy.diagnosticsHud = this.diagnosticsHud;
-		copy.debugFallbackLogging = this.debugFallbackLogging;
 		return copy;
 	}
 
@@ -170,7 +167,6 @@ public final class WaterOptimisationConfig {
 				this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
 				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
-				this.debugFallbackLogging = false;
 			}
 			case BALANCED -> {
 				this.enabled = true;
@@ -182,7 +178,6 @@ public final class WaterOptimisationConfig {
 				this.particleBudget = UNLIMITED_PARTICLE_BUDGET;
 				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
-				this.debugFallbackLogging = false;
 			}
 			case PERFORMANCE -> {
 				this.enabled = true;
@@ -194,7 +189,6 @@ public final class WaterOptimisationConfig {
 				this.particleBudget = 128;
 				this.limitForcedWaterParticles = false;
 				this.diagnosticsHud = false;
-				this.debugFallbackLogging = false;
 			}
 			case MAXIMUM -> {
 				this.enabled = true;
@@ -206,7 +200,6 @@ public final class WaterOptimisationConfig {
 				this.particleBudget = 64;
 				this.limitForcedWaterParticles = true;
 				this.diagnosticsHud = false;
-				this.debugFallbackLogging = false;
 			}
 		}
 		this.sanitize();
@@ -296,14 +289,6 @@ public final class WaterOptimisationConfig {
 
 	public void setDiagnosticsHud(boolean diagnosticsHud) {
 		this.diagnosticsHud = diagnosticsHud;
-	}
-
-	public boolean isDebugFallbackLogging() {
-		return this.debugFallbackLogging;
-	}
-
-	public void setDebugFallbackLogging(boolean debugFallbackLogging) {
-		this.debugFallbackLogging = debugFallbackLogging;
 	}
 
 	public int getConfigVersion() {

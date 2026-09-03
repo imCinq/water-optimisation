@@ -9,7 +9,6 @@ public final class Diagnostics {
 	private static final ThreadLocal<FluidTiming> FLUID_TIMING = ThreadLocal.withInitial(FluidTiming::new);
 	private static final ThreadLocal<PhaseTiming> PHASE_TIMING = ThreadLocal.withInitial(PhaseTiming::new);
 	private static volatile boolean instrumentationEnabled;
-	private static volatile boolean debugFallbackLogging;
 
 	private Diagnostics() {
 	}
@@ -19,8 +18,7 @@ public final class Diagnostics {
 	 * This keeps disabled diagnostics out of the fluid-rendering hot path.
 	 */
 	public static void updateConfig(WaterOptimisationConfig config) {
-		instrumentationEnabled = config != null && (config.isDiagnosticsHud() || config.isDebugFallbackLogging());
-		debugFallbackLogging = config != null && config.isDebugFallbackLogging();
+		instrumentationEnabled = config != null && config.isDiagnosticsHud();
 	}
 
 	public static boolean isEnabled() {
@@ -57,17 +55,6 @@ public final class Diagnostics {
 		counters.fluidFaces.increment();
 		if (reverseFaceRequested) {
 			counters.fluidReverseFaceRequests.increment();
-		}
-	}
-
-	public static void recordFluidFallback(String reason) {
-		Counters counters = activeCounters();
-		if (counters == null) {
-			return;
-		}
-		counters.fluidFallbacks.increment();
-		if (debugFallbackLogging) {
-			WaterOptimisationLog.LOGGER.debug("Fluid optimization fallback: {}", reason);
 		}
 	}
 
@@ -206,7 +193,6 @@ public final class Diagnostics {
 				counters.reducedWaterBackfaces.sum(),
 				counters.fluidFaces.sum(),
 				counters.fluidReverseFaceRequests.sum(),
-				counters.fluidFallbacks.sum(),
 				counters.particleCandidates.sum(),
 				counters.particleRejected.sum(),
 				counters.particleDistanceRejected.sum(),
@@ -238,7 +224,6 @@ public final class Diagnostics {
 		private final LongAdder reducedWaterBackfaces = new LongAdder();
 		private final LongAdder fluidFaces = new LongAdder();
 		private final LongAdder fluidReverseFaceRequests = new LongAdder();
-		private final LongAdder fluidFallbacks = new LongAdder();
 		private final LongAdder particleCandidates = new LongAdder();
 		private final LongAdder particleRejected = new LongAdder();
 		private final LongAdder particleDistanceRejected = new LongAdder();
@@ -274,7 +259,6 @@ public final class Diagnostics {
 			long reducedWaterBackfaces,
 			long fluidFaces,
 			long fluidReverseFaceRequests,
-			long fluidFallbacks,
 			long particleCandidates,
 			long particleRejected,
 			long particleDistanceRejected,

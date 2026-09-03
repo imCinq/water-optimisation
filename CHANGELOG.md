@@ -4,7 +4,11 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-_No unreleased changes._
+- 🛡️ Make reduced-face policy target-aware so Minecraft 1.21.1 cannot advertise an unsupported geometry path.
+- ⚡ Short-circuit the 1.21.1 source-water probe on visible top faces and reuse its mutable neighbor position.
+- 📊 Show whether the optional fast-path hook has actually been observed in diagnostics.
+- 🧹 Remove the unused fallback-logging setting and migrate it out of existing client configuration files.
+- 🛠️ Reflow the main preset screen after profile changes and remove a source of Advanced-screen footer overlap.
 
 ## 0.0.6 — 2026-09-03
 

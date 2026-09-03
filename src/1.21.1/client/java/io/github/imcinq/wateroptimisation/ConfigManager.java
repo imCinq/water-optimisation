@@ -39,6 +39,7 @@ public final class ConfigManager {
 			int sourceVersion = readConfigVersion(object);
 			boolean enabledWasPresent = object.has("enabled") && !object.get("enabled").isJsonNull();
 			boolean removedFarWaterFieldPresent = object.has("farWaterPass");
+			boolean removedDebugFallbackLoggingFieldPresent = object.has("debugFallbackLogging");
 			WaterOptimisationConfig loaded = GSON.fromJson(object, WaterOptimisationConfig.class);
 			if (loaded == null) {
 				throw new IllegalStateException("Configuration file contained no object");
@@ -47,7 +48,8 @@ public final class ConfigManager {
 			applyConfig(loaded);
 			if (sourceVersion != WaterOptimisationConfig.CURRENT_CONFIG_VERSION
 					|| !object.has("configVersion")
-					|| removedFarWaterFieldPresent) {
+					|| removedFarWaterFieldPresent
+					|| removedDebugFallbackLoggingFieldPresent) {
 				try {
 					writeConfig(path, loaded);
 				} catch (IOException | RuntimeException exception) {

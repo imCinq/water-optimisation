@@ -135,7 +135,6 @@ class WaterOptimisationConfigTest {
 		changed.setParticleDistance(64);
 		changed.setParticleFogCulling(true);
 		changed.setDiagnosticsHud(true);
-		changed.setDebugFallbackLogging(true);
 
 		assertTrue(original.sameFluidRenderingConfiguration(changed));
 	}
@@ -167,7 +166,7 @@ class WaterOptimisationConfigTest {
 		assertTrue(vanilla.flatWaterFastPathActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.HIDDEN_WATER_COMPILE, vanilla.geometryPath());
 
-		RendererCapabilities sodium = new RendererCapabilities(true, "Sodium");
+		RendererCapabilities sodium = new RendererCapabilities(true, "Sodium", false);
 		EffectiveWaterPolicy sodiumPolicy = EffectiveWaterPolicy.resolve(config, sodium);
 		assertFalse(sodiumPolicy.fluidHooksActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.SODIUM_PARTICLES, sodiumPolicy.geometryPath());
@@ -180,15 +179,25 @@ class WaterOptimisationConfigTest {
 
 		EffectiveWaterPolicy sodium = EffectiveWaterPolicy.resolve(
 				config,
-				new RendererCapabilities(true, "Sodium")
+				new RendererCapabilities(true, "Sodium", false)
 		);
 		assertFalse(sodium.fluidHooksActive());
 		assertFalse(sodium.reducedWaterBackfacesActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.SODIUM_PARTICLES, sodium.geometryPath());
 
-		EffectiveWaterPolicy vanilla = EffectiveWaterPolicy.resolve(config, RendererCapabilities.vanilla());
+		EffectiveWaterPolicy vanilla = EffectiveWaterPolicy.resolve(
+				config,
+				new RendererCapabilities(false, "Vanilla 26.2", true)
+		);
 		assertTrue(vanilla.reducedWaterBackfacesActive());
 		assertEquals(EffectiveWaterPolicy.GeometryPath.REDUCED_INWARD_FACES, vanilla.geometryPath());
+
+		EffectiveWaterPolicy legacy = EffectiveWaterPolicy.resolve(
+				config,
+				new RendererCapabilities(false, "Vanilla 1.21.1", false)
+		);
+		assertFalse(legacy.reducedWaterBackfacesActive());
+		assertEquals(EffectiveWaterPolicy.GeometryPath.HIDDEN_WATER_COMPILE, legacy.geometryPath());
 	}
 
 }

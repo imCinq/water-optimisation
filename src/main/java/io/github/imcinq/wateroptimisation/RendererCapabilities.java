@@ -8,13 +8,14 @@ package io.github.imcinq.wateroptimisation;
  */
 public record RendererCapabilities(
 		boolean sodiumLoaded,
-		String rendererName
+		String rendererName,
+		boolean supportsReducedWaterBackfaces
 ) {
 	public RendererCapabilities {
 		rendererName = rendererName == null || rendererName.isBlank() ? "Unknown" : rendererName;
 	}
 
 	public static RendererCapabilities vanilla() {
-		return new RendererCapabilities(false, "Vanilla");
+		return new RendererCapabilities(false, "Vanilla", false);
 	}
 }

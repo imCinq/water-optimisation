@@ -59,8 +59,9 @@ public final class WaterOptimisationScreen extends Screen {
 				profileLabel(),
 				button -> {
 					this.workingCopy.selectProfile(this.workingCopy.getPerformanceProfile().next());
-					button.setMessage(profileLabel());
-					this.enabledButton.setMessage(enabledLabel());
+					// The effective-path text can wrap differently for each preset.
+					// Rebuild the layout so the buttons never retain stale positions.
+					this.rebuildWidgets();
 				}
 		).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
 
