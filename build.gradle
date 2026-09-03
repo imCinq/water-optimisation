@@ -33,7 +33,7 @@ def resourceExpansion = [
 	modmenu_dependency: ">=${targetModMenuVersion}",
 	client_mixin_entry: clientMixinEntry,
 	java_compatibility_level: "JAVA_${targetJavaVersion}",
-	mixin_default_require: 0
+	mixin_default_require: legacyTarget ? 0 : 1
 ]
 
 repositories {

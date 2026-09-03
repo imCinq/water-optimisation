@@ -30,12 +30,12 @@ Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current [0.0.5 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.5) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. The 1.21.1 build is a compatibility build with remote build and audit coverage; live visual and FPS validation is still recommended for both targets. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current [0.0.6 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.6) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. The 1.21.1 build is a compatibility build with remote build and audit coverage; live visual and FPS validation is still recommended for both targets. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | Minecraft | Java | Build status | Geometry scope |
 | --- | --- | --- | --- |
-| 26.2 | 25+ | 0.0.5 release | Conservative vanilla hooks plus the opt-in far-water experiment. Sodium remains the geometry owner when present. |
-| 1.21.1 | 21+ | 0.0.5 compatibility build | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
+| 26.2 | 25+ | 0.0.6 release | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
+| 1.21.1 | 21+ | 0.0.6 compatibility build | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 
 ## Pick a preset
 
@@ -80,12 +80,6 @@ The mod is client-only. It declares no server entrypoint, custom packets, world 
 
 The optional diagnostics HUD reports fluid blocks, fully hidden skips, removed reverse faces, section compilation, translucent resorting, and particle admission. It is a cross-check, not a benchmark tool; disable it for final FPS measurements.
 
-## Experimental far-water pass
-
-The 26.2 build includes an opt-in `Limit distant water to 320 blocks?` experiment for fill-rate-bound scenes. It captures only upward ordinary still-water faces from sections that pass a conservative water-only preflight, removes those faces from the shared translucent buffer, and draws the owned mesh through Minecraft's Blaze3D translucent-terrain pipeline in back-to-front section order. Eligible water beyond the 320-block section-distance bound is omitted; side and bottom faces remain on the normal path. The draw uses the current frame's camera matrix and translucent target so the owned mesh follows camera movement.
-
-The experiment is disabled by default and unavailable with Sodium or on 1.21.1. Flowing water, waterlogged blocks, transparent or partial neighbors, overlays, custom translucent terrain, and ambiguous sections remain on the existing vanilla/Sodium path. This is a hard cutoff rather than a fade or LOD, so it requires live visual and FPS validation before it can be considered for a stable preset. See [the far-water design](docs/FAR_WATER_PASS.md).
-
 For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`, and `Maximum FPS` from the same camera. Record average FPS, 1% lows, frame time, and visual correctness above water, underwater, around flowing water, in caves, and with Sodium present and absent. The mod is designed to reduce work, but no universal FPS gain is promised across hardware, shaders, resource packs, or backends.
 
 ## Requirements
@@ -106,7 +100,6 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 - [Testing matrix](docs/TESTING.md) — visual and performance checks.
 - [Benchmark template](docs/BENCHMARK_REPORT.md) — repeatable measurements.
 - [Architecture](docs/ARCHITECTURE.md) — renderer and client-boundary details.
-- [Far-water design](docs/FAR_WATER_PASS.md) — the GPU/fill-rate path being prototyped separately from shared translucency.
 - [Privacy](PRIVACY.md) and [security policy](SECURITY.md).
 
 ## Contributing

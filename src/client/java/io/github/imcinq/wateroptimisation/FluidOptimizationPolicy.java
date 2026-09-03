@@ -8,7 +8,6 @@ import net.minecraft.world.level.material.Fluids;
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
-	private static volatile boolean farWaterPassActive;
 	private static volatile boolean reducedWaterBackfacesActive;
 
 	private FluidOptimizationPolicy() {
@@ -23,7 +22,6 @@ public final class FluidOptimizationPolicy {
 		EffectiveWaterPolicy policy = WaterOptimisationClient.effectivePolicy(config);
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
-		farWaterPassActive = policy.farWaterPassActive();
 		reducedWaterBackfacesActive = policy.reducedWaterBackfacesActive();
 	}
 
@@ -35,19 +33,13 @@ public final class FluidOptimizationPolicy {
 		return flatWaterFastPathActive;
 	}
 
-	public static boolean farWaterPassActive() {
-		return farWaterPassActive;
-	}
-
 	/**
 	 * The experimental mode removes only vanilla's optional reverse face for a
 	 * fluid quad. Sodium owns its fluid renderer, so the vanilla hook never runs
-	 * there and the experimental mode remains unavailable until a renderer-
-	 * specific implementation is independently reviewed.
+	 * there and the experimental mode is unavailable while Sodium is present.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
 		return !WaterOptimisationClient.isSodiumLoaded()
-				&& !farWaterPassActive
 				&& reducedWaterBackfacesActive;
 	}
 

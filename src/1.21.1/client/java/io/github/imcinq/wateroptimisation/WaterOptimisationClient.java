@@ -75,7 +75,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	}
 
 	public static RendererCapabilities rendererCapabilities() {
-		return new RendererCapabilities(sodiumLoaded, false, sodiumLoaded ? "Sodium" : "Vanilla");
+		return new RendererCapabilities(sodiumLoaded, sodiumLoaded ? "Sodium" : "Vanilla");
 	}
 
 	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {

@@ -27,8 +27,6 @@
 	"screen.wateroptimisation.forced_particles": "Limit water particles that ignore distance? %s",
 	"screen.wateroptimisation.diagnostics": "Show performance stats? %s",
 	"screen.wateroptimisation.fallback_logging": "Log skipped cases? %s",
-	"screen.wateroptimisation.far_water": "Limit distant water to 320 blocks? %s",
-	"screen.wateroptimisation.far_water_unavailable": "Limit distant water to 320 blocks? Unavailable here",
 	"screen.wateroptimisation.reset": "Reset preset",
 	"wateroptimisation.profile.vanilla": "Vanilla",
 	"wateroptimisation.profile.balanced": "Balanced",
@@ -41,7 +39,6 @@
 	"wateroptimisation.path.vanilla_particles": "Vanilla water geometry with local particle filtering",
 	"wateroptimisation.path.hidden_compile": "Vanilla water geometry with hidden-water compile skipping",
 	"wateroptimisation.path.reduced_faces": "Vanilla water geometry with reduced inward faces",
-	"wateroptimisation.path.far_water_pass": "Water-only pass with a 320-block visibility limit",
 	"wateroptimisation.path.sodium_particles": "Sodium water geometry with local particle filtering",
 	"wateroptimisation.path.legacy_particles": "Vanilla water geometry with local particle filtering (1.21.1 compatibility)",
 	"wateroptimisation.particle_budget.unlimited": "Unlimited"
