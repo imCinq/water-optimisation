@@ -30,7 +30,7 @@ Initializes the local configuration, keybind, native screens, HUD element, and S
 
 The common configuration model is independent of Minecraft client classes so defaults, profile reset, clamping, and copy isolation can be unit-tested. ConfigManager loads and atomically saves the JSON file on the client.
 
-Only settings that can change compiled fluid geometry invalidate rendered sections. Particle-distance, particle-enable, fog, diagnostics, and fallback-logging changes take effect at their own hooks and do not trigger a full section rebuild.
+Only settings that can change compiled fluid geometry invalidate rendered sections. Particle-distance, particle-enable, fog, and diagnostics changes take effect at their own hooks and do not trigger a full section rebuild.
 
 ### Fluid hooks
 
@@ -43,13 +43,13 @@ The 26.2 FluidRendererMixin targets the current public fluid tessellation method
 
 The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
 
-The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The 26.2 local capture is optional and fail-soft: if the renderer's locals change, the optimization is skipped instead of crashing the client. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
+The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. The 26.2 local capture is optional and fail-soft: if the renderer's locals change, the optimization is skipped instead of crashing the client. The diagnostics HUD reports whether that optional fast-path hook has actually been observed, so an unobserved hook is not mistaken for measured skips. On 1.21.1, the compatibility hook reports the same status while retaining its narrower source-water-only proof. The mixin is client-only and isolated in wateroptimisation.client.mixins.json. It does not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 ### Particle filter
 
 ClientLevelMixin intercepts only the client-side addParticle overload. It exits immediately while the mod is disabled or on the Vanilla preset, then recognizes water-specific particle types, preserves non-water particles, preserves always-visible particles, and applies a cached camera-relative distance policy only when the master switch is enabled. The filter snapshot is rebuilt only when configuration changes. If the render camera is not initialized, the player position is used as a safe lifecycle fallback.
 
-An optional budget resets at the start of each client tick and is reserved only after water-particle distance admission succeeds. This prevents the budget from paying for particles already rejected by the cheaper checks. The budget is local to the client and does not alter particle simulation or non-water particles. The forced-particle switch makes the normally preserved `alwaysShow` water subset obey the same cosmetic policy when explicitly requested.
+An optional budget resets at the start of each client tick and is reserved only after water-particle distance admission succeeds. This prevents the budget from paying for particles already rejected by the cheaper checks. The budget is local to the client and does not alter particle simulation or non-water particles. The forced-particle switch makes the normally preserved `alwaysShow` water subset obey the same cosmetic policy when explicitly requested. The separate `overrideLimiter` argument belongs to vanilla's particle-density limiter, not the camera-distance exception, so the client hook intentionally leaves it unchanged.
 
 ### Diagnostics
 

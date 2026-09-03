@@ -25,14 +25,14 @@ Advanced controls are separate from the main screen and are grouped into three s
 
 - Performance: skipping hidden water blocks, water particles, particle distance, particle fog culling, and the optional per-tick particle budget;
 - Water rendering: the fluid-geometry mode and the optional reduced-face setting;
-- Diagnostics: performance statistics and fallback logging.
+- Diagnostics: performance statistics and fast-path hook status.
 
 Reset preset is kept with the bottom action buttons because it changes the whole
 working copy rather than enabling a diagnostic.
 
 The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
 
-The labels are phrased as short questions so their effect is understandable without renderer knowledge: “Skip hidden water blocks?” and “Limit water particles per tick?”. The reduced-geometry control is marked red as `Experimental: Reduce water geometry?`; hovering it explains that it may cause visual and graphical issues. Sodium ownership displays a short notice and disables the overlapping vanilla geometry controls because Sodium renders water itself; on 1.21.1, the particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
+The labels are phrased as short questions so their effect is understandable without renderer knowledge: “Skip hidden water blocks?” and “Limit water particles per tick?”. The reduced-geometry control is marked red as `Experimental: Reduce inward water faces?`; hovering it explains that it may cause visual and graphical issues. Sodium ownership displays a short notice and disables the overlapping vanilla geometry controls because Sodium renders water itself; on 1.21.1, the reduced-face control is unavailable while the particle and diagnostic controls stay available. The effective-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do.
 
 ## Recovery
 

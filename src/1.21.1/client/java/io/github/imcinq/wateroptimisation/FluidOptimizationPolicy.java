@@ -8,6 +8,7 @@ import net.minecraft.world.level.material.Fluids;
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
+	private static volatile boolean flatWaterFastPathHookObserved;
 
 	private FluidOptimizationPolicy() {
 	}
@@ -32,15 +33,17 @@ public final class FluidOptimizationPolicy {
 		return flatWaterFastPathActive;
 	}
 
-	public static boolean reducedWaterBackfacesActive() {
-		return false;
+	/** Records that the optional compatibility fast-path hook actually ran. */
+	public static void markFlatWaterFastPathHookObserved() {
+		flatWaterFastPathHookObserved = true;
 	}
 
-	public static boolean reducedWaterBackfacesRequested() {
-		WaterOptimisationConfig config = ConfigManager.get();
-		return config.isEnabled()
-				&& config.getPerformanceProfile() != WaterOptimisationConfig.PerformanceProfile.VANILLA
-				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
+	public static boolean flatWaterFastPathHookObserved() {
+		return flatWaterFastPathHookObserved;
+	}
+
+	public static boolean reducedWaterBackfacesActive() {
+		return false;
 	}
 
 	/**

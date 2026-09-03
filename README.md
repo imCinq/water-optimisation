@@ -46,7 +46,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 | **Vanilla** | Turns the mod off and restores vanilla behavior. | A reference comparison. |
 | **Balanced** | Keeps vanilla fluid geometry and nearby particles. | A conservative starting point. |
 | **Performance** | Skips only fully hidden source-water blocks and disables water particles by default. | Safer performance testing. |
-| **Maximum FPS** | Includes the Performance path and removes optional inward water faces for ordinary full source water. | Testing the strongest available water-rendering reduction. |
+| **Maximum FPS** | Includes the Performance path and, on the supported 26.2 vanilla renderer, removes optional inward water faces for ordinary full source water. | Testing the strongest available water-rendering reduction. |
 
 `Maximum FPS` is intentionally opt-in. It can change unusual inside-water or transparent-boundary views. Flowing water, waterlogged blocks, partial shapes, overlays, and ambiguous cases retain vanilla geometry decisions.
 
@@ -66,7 +66,7 @@ The trade-off is visual: reverse faces can matter when looking from inside a flu
 
 ### Cosmetic water particles
 
-The client can reject water-only particles before they are created. Non-water particles and always-visible particles are preserved. When enabled, the filter uses a cached camera-relative distance bound and squared-distance math; an optional fog setting tightens that bound conservatively.
+The client can reject water-only particles before they are created. Non-water particles and always-visible particles are preserved. When enabled, the filter uses a cached camera-relative distance bound and squared-distance math; an optional fog setting tightens that bound conservatively. The separate forced-particle switch controls the `alwaysShow` water subset; Minecraft's `overrideLimiter` flag controls particle-density limiting rather than distance admission and is intentionally left to vanilla.
 
 Maximum FPS disables ordinary water particles by default. Particle settings continue to work when Sodium owns fluid rendering.
 

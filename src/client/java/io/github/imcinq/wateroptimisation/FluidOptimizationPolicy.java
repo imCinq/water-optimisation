@@ -9,6 +9,7 @@ public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
 	private static volatile boolean reducedWaterBackfacesActive;
+	private static volatile boolean flatWaterFastPathHookObserved;
 
 	private FluidOptimizationPolicy() {
 	}
@@ -31,6 +32,15 @@ public final class FluidOptimizationPolicy {
 
 	public static boolean flatWaterFastPathActive() {
 		return flatWaterFastPathActive;
+	}
+
+	/** Records that the optional local-capture fast-path hook actually ran. */
+	public static void markFlatWaterFastPathHookObserved() {
+		flatWaterFastPathHookObserved = true;
+	}
+
+	public static boolean flatWaterFastPathHookObserved() {
+		return flatWaterFastPathHookObserved;
 	}
 
 	/**

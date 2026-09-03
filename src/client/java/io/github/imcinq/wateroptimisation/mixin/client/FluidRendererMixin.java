@@ -97,6 +97,7 @@ public abstract class FluidRendererMixin {
 			FluidState fluidStateEast,
 			boolean renderUp
 	) {
+		FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
 		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
 				|| !FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
 						blockState,

@@ -29,7 +29,6 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Button particleBudgetButton;
 	private Button forcedParticlesButton;
 	private Button diagnosticsButton;
-	private Button fallbackButton;
 	private int contentWidth;
 	private int buttonLeft;
 	private int buttonWidth;
@@ -110,7 +109,6 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		this.diagnosticsSectionY = controlsY + BUTTON_HEIGHT + BUTTON_GAP + 8;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
 		this.diagnosticsButton = addDiagnosticsButton(this.rightColumnLeft, diagnosticsY);
-		this.fallbackButton = addFallbackButton(this.rightColumnLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
 	}
 
 	private void initSingleColumn(int top) {
@@ -131,7 +129,6 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		this.diagnosticsSectionY = cullingY + BUTTON_HEIGHT + BUTTON_GAP + SECTION_GAP;
 		int diagnosticsY = this.diagnosticsSectionY + lineHeight() + 4;
 		this.diagnosticsButton = addDiagnosticsButton(this.buttonLeft, diagnosticsY);
-		this.fallbackButton = addFallbackButton(this.buttonLeft, diagnosticsY + BUTTON_HEIGHT + BUTTON_GAP);
 	}
 
 	private int singleColumnBottom(int top) {
@@ -139,7 +136,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		int safeBottom = controlsY + 6 * (BUTTON_HEIGHT + BUTTON_GAP) - BUTTON_GAP;
 		int cullingY = safeBottom + SECTION_GAP + lineHeight() + 4;
 		int diagnosticsY = cullingY + BUTTON_HEIGHT + BUTTON_GAP + SECTION_GAP + lineHeight() + 4;
-		return diagnosticsY + 2 * BUTTON_HEIGHT + BUTTON_GAP;
+		return diagnosticsY + BUTTON_HEIGHT;
 	}
 
 	private Button addCullingButton(int left, int top) {
@@ -203,13 +200,6 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		return this.addRenderableWidget(Button.builder(diagnosticsLabel(), button -> {
 			this.workingCopy.setDiagnosticsHud(!this.workingCopy.isDiagnosticsHud());
 			button.setMessage(diagnosticsLabel());
-		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
-	}
-
-	private Button addFallbackButton(int left, int top) {
-		return this.addRenderableWidget(Button.builder(fallbackLabel(), button -> {
-			this.workingCopy.setDebugFallbackLogging(!this.workingCopy.isDebugFallbackLogging());
-			button.setMessage(fallbackLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 	}
 
@@ -280,10 +270,6 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private Component diagnosticsLabel() {
 		return Component.translatable("screen.wateroptimisation.diagnostics", yesNo(this.workingCopy.isDiagnosticsHud()));
-	}
-
-	private Component fallbackLabel() {
-		return Component.translatable("screen.wateroptimisation.fallback_logging", yesNo(this.workingCopy.isDebugFallbackLogging()));
 	}
 
 	private Component sodiumNotice() {

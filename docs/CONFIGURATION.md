@@ -10,7 +10,7 @@ The JSON schema is versioned with `configVersion`. Older files are migrated loca
 | --- | --- | --- |
 | enabled | false | Master switch. When off, rendering and particle hooks preserve vanilla behavior. |
 | performanceProfile | balanced | Selects Vanilla, Balanced, Performance, or Maximum FPS defaults. |
-| configVersion | 3 | Local schema version used for safe migration. The removed far-water experiment is discarded when an older file is rewritten. |
+| configVersion | 4 | Local schema version used for safe migration. Removed far-water and fallback-logging fields are discarded when an older file is rewritten. |
 
 The main screen keeps changes in memory until Done. Cancel and Escape discard unsaved edits. The configuration file is replaced through a temporary file and an atomic move when the filesystem supports it.
 
@@ -37,9 +37,8 @@ Selecting a preset resets its Advanced settings values. Choosing Vanilla also tu
 | particleBudget | unlimited | Optional client-side cap on admitted water particles per tick. Available values are unlimited, 64, 128, and 256. The Performance preset uses 128 and Maximum FPS uses 64. |
 | limitForcedWaterParticles | false | If enabled, water particles that normally bypass distance limits are subject to the configured particle setting and budget. This can change cosmetic effects. |
 | diagnosticsHud | false | Shows local counters plus fluid tessellation, section-compilation, translucent-resort averages, and removed reverse-face counts. |
-| debugFallbackLogging | false | Logs local fallback decisions where a hook reports one. |
 
-The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it; Sodium ownership disables the vanilla hook and keeps Sodium's geometry unchanged until a renderer-specific implementation is reviewed. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use the renderer's normal geometry decisions; the mode only changes the optional reverse-face emission after the vanilla renderer has selected a fluid face.
+The reduced-face setting is optional because it can change how ordinary source water looks from inside a fluid volume or through unusual transparent arrangements. It is enabled only by Maximum FPS and by manually selecting it on the supported 26.2 vanilla renderer; 1.21.1 reports it as unavailable until an exact renderer hook is reviewed. Sodium ownership disables the vanilla hook and keeps Sodium's geometry unchanged until a renderer-specific implementation is reviewed. Flowing water, waterlogged blocks, overlays, transparent boundaries, and ambiguous shapes still use the renderer's normal geometry decisions; the mode only changes the optional reverse-face emission after the vanilla renderer has selected a fluid face.
 
 ## Compatibility behavior
 
@@ -47,4 +46,4 @@ If Sodium is detected, the vanilla fluid hooks are disabled so Water Optimisatio
 
 Waterlogged blocks, flowing edges, partial shapes, transparent neighbors, overlays, and unusual block states are left to vanilla behavior. No setting changes FluidState, collision, movement, world updates, or server state.
 
-The effective path is capability-aware. A requested option may be shown as unavailable when Sodium owns fluid geometry or when the target profile has no reviewed implementation. The diagnostics HUD reports the renderer, geometry path, patch candidates, accepted patches, particle budget, and budget rejections so a remote-built validation run can distinguish a request from the work that actually ran.
+The effective path is capability-aware. A requested option may be shown as unavailable when Sodium owns fluid geometry or when the target profile has no reviewed implementation. The diagnostics HUD reports the renderer, geometry path, hook state, particle budget, and budget rejections so a remote-built validation run can distinguish a request from the work that actually ran.

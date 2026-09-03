@@ -75,7 +75,11 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	}
 
 	public static RendererCapabilities rendererCapabilities() {
-		return new RendererCapabilities(sodiumLoaded, sodiumLoaded ? "Sodium" : "Vanilla");
+		return new RendererCapabilities(
+				sodiumLoaded,
+				sodiumLoaded ? "Sodium" : "Vanilla",
+				supportsReducedWaterBackfaces()
+		);
 	}
 
 	public static EffectiveWaterPolicy effectivePolicy(WaterOptimisationConfig config) {
@@ -218,6 +222,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("geometry path: " + policy.geometryPath().name().toLowerCase(java.util.Locale.ROOT)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
 				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
+				Component.literal("fast-path hook: " + (FluidOptimizationPolicy.flatWaterFastPathHookObserved() ? "observed" : "not observed")),
 				Component.literal("water backfaces: " + (sodiumLoaded ? "Sodium-owned" : "vanilla (1.21.1 compatibility)")),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
 				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),

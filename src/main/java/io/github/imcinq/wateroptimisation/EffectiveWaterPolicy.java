@@ -51,7 +51,8 @@ public record EffectiveWaterPolicy(
 		boolean fluidHooksActive = config.getFluidCullingMode() != WaterOptimisationConfig.FluidCullingMode.DISABLED
 				&& !safeCapabilities.sodiumLoaded();
 		boolean flatWaterFastPathActive = fluidHooksActive && config.isFlatWaterFastPath();
-		boolean reducedBackfacesActive = !safeCapabilities.sodiumLoaded()
+		boolean reducedBackfacesActive = safeCapabilities.supportsReducedWaterBackfaces()
+				&& !safeCapabilities.sodiumLoaded()
 				&& config.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL;
 
 		GeometryPath path;

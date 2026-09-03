@@ -27,6 +27,8 @@ public abstract class ClientLevelMixin {
 			double velocityZ,
 			CallbackInfo callback
 	) {
+		// overrideLimiter controls vanilla's particle-density cap. alwaysShow is
+		// the flag that bypasses the camera-distance admission check below.
 		if (!WaterOptimisationClient.shouldKeepWaterParticle(particle, alwaysShow, x, y, z)) {
 			callback.cancel();
 		}
