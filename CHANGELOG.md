@@ -4,10 +4,16 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-- Disable the Sodium reduced-face bridge after confirming that Sodium's `writeQuad` `flip` argument controls winding and normal orientation, not quad emission. Sodium now remains fully renderer-owned; the vanilla reduced-face experiment is unchanged.
-- Make the 26.2 fluid local-capture optimization fail soft when renderer locals change, so an unmatched hook falls back to vanilla behavior instead of failing client initialization.
-- Reduce 1.21.1 fast-path probe overhead by reusing one mutable neighbor position and deriving fluid states from the fetched block states.
-- Remove the unvalidated 26.2 far-water ownership prototype and its public control after visual correctness failures; normal translucent rendering remains authoritative.
+_No unreleased changes._
+
+## 0.0.6 — 2026-09-03
+
+- 🛡️ Restore strict 26.2 mixin hook requirements so a missing required hook cannot silently advertise an inactive optimization; only the local-capture hook remains explicitly fail-soft.
+- 🧹 Remove the unvalidated 26.2 far-water ownership prototype and its public control after visual correctness failures; normal translucent rendering remains authoritative.
+- 🧹 Rewrite older configuration files that contain the retired far-water setting without changing the user's remaining settings.
+- ⚡ Reduce 1.21.1 fast-path probe overhead by reusing one mutable neighbor position and deriving fluid states from the fetched block states.
+- 🛠️ Keep Sodium fully renderer-owned and preserve conservative vanilla fallbacks for unsupported or ambiguous cases.
+- ✅ Remote builds, tests, privacy audits, and client-only audits pass for Minecraft 26.2 and 1.21.1.
 
 ## 0.0.5 — 2026-09-01
 
@@ -123,4 +129,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.5 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.6 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
