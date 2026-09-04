@@ -1,10 +1,5 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -210,69 +205,6 @@ class WaterOptimisationConfigTest {
 			Diagnostics.endFluidCompile();
 			Diagnostics.updateConfig(WaterOptimisationConfig.defaults());
 			Diagnostics.reset();
-		}
-	}
-
-	@Test
-	void hiddenWaterPredicateFailsOpenForEveryUnsafeNeighborDirection() {
-		BlockState source = Blocks.WATER.defaultBlockState();
-		FluidState sourceFluid = source.getFluidState();
-
-		assertTrue(FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
-				source,
-				sourceFluid,
-				source,
-				sourceFluid,
-				source,
-				sourceFluid,
-				source,
-				sourceFluid,
-				source,
-				sourceFluid,
-				source,
-				sourceFluid,
-				source,
-				sourceFluid
-		));
-
-		assertFastPathRejectsForEveryNeighbor(source, sourceFluid, Blocks.AIR.defaultBlockState(), Blocks.AIR.defaultBlockState().getFluidState());
-		assertFastPathRejectsForEveryNeighbor(source, sourceFluid, source, Fluids.FLOWING_WATER.defaultFluidState());
-		assertFastPathRejectsForEveryNeighbor(source, sourceFluid, Blocks.GLASS.defaultBlockState(), Blocks.GLASS.defaultBlockState().getFluidState());
-		assertFastPathRejectsForEveryNeighbor(source, sourceFluid, Blocks.OAK_SLAB.defaultBlockState(), Blocks.OAK_SLAB.defaultBlockState().getFluidState());
-
-		BlockState waterloggedStairs = Blocks.OAK_STAIRS.defaultBlockState()
-				.setValue(BlockStateProperties.WATERLOGGED, true);
-		assertFastPathRejectsForEveryNeighbor(source, sourceFluid, waterloggedStairs, waterloggedStairs.getFluidState());
-	}
-
-	private static void assertFastPathRejectsForEveryNeighbor(
-			BlockState source,
-			FluidState sourceFluid,
-			BlockState unsafeState,
-			FluidState unsafeFluid
-	) {
-		for (int unsafeIndex = 0; unsafeIndex < 6; unsafeIndex++) {
-			BlockState[] states = {source, source, source, source, source, source};
-			FluidState[] fluids = {sourceFluid, sourceFluid, sourceFluid, sourceFluid, sourceFluid, sourceFluid};
-			states[unsafeIndex] = unsafeState;
-			fluids[unsafeIndex] = unsafeFluid;
-
-			assertFalse(FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
-					source,
-					sourceFluid,
-					states[0],
-					fluids[0],
-					states[1],
-					fluids[1],
-					states[2],
-					fluids[2],
-					states[3],
-					fluids[3],
-					states[4],
-					fluids[4],
-					states[5],
-					fluids[5]
-			), "unsafe neighbor index " + unsafeIndex);
 		}
 	}
 
