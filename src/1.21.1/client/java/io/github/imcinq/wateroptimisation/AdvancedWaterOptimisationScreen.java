@@ -239,12 +239,12 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Component cullingLabel() {
 		if (WaterOptimisationClient.isSodiumLoaded()) {
 			return Component.translatable("screen.wateroptimisation.culling_sodium_unavailable")
-					.withStyle(ChatFormatting.RED);
+					.withStyle(ChatFormatting.GRAY);
 		}
 		if (!WaterOptimisationClient.supportsReducedWaterBackfaces()
 				&& this.workingCopy.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL) {
 			return Component.translatable("screen.wateroptimisation.culling_unavailable")
-					.withStyle(ChatFormatting.RED);
+					.withStyle(ChatFormatting.GRAY);
 		}
 		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
 				.withStyle(this.workingCopy.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
@@ -254,7 +254,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	private Component fastPathLabel() {
 		if (WaterOptimisationClient.isSodiumLoaded()) {
-			return Component.translatable("screen.wateroptimisation.fast_path_unavailable");
+			return Component.translatable("screen.wateroptimisation.fast_path_unavailable")
+					.withStyle(ChatFormatting.GRAY);
 		}
 		return Component.translatable("screen.wateroptimisation.fast_path", yesNo(this.workingCopy.isFlatWaterFastPath()));
 	}

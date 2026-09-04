@@ -37,9 +37,9 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 The 26.2 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.1 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
-- Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering. No Sodium geometry mixin is installed;
+- Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering. No Sodium geometry mixin is installed or planned; Sodium remains the geometry owner unless project scope is formally reconsidered;
 - the hidden-water path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
-- flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases return to vanilla.
+- hidden-water skipping leaves flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases on vanilla tessellation; experimental reverse-face reduction is a separate change to ordinary source water and may affect underwater or transparent-boundary views.
 
 The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
 
@@ -59,7 +59,7 @@ An optional budget resets at the start of each client tick and is reserved only 
 
 - Fabric API is the primary client integration surface.
 - Mod Menu is optional and contains no renderer logic.
-- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. Sodium remains fully responsible for water geometry; the mod has no Sodium geometry bridge until an exact renderer-specific cancellation hook is reviewed and validated.
+- Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. Sodium remains fully responsible for water geometry; no Sodium geometry bridge is planned, and the mod will not add one unless project scope is formally reconsidered.
 - On Minecraft 1.21.1, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.

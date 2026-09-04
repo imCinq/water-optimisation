@@ -10,11 +10,13 @@ All notable changes to Water Optimisation are documented here.
 
 - ⚡ Remove unconditional fast-path observer writes and avoid resetting the particle-budget atomic when no budget is active.
 - 🧭 Keep Sodium ownership and the existing narrow 26.2/1.21.1 water-visibility proofs unchanged while reducing hot-path policy overhead.
+- 🧭 Replace separate fast-path observer flags with generation-tagged atomic state so an older observation cannot clear a newer armed generation.
 - 📊 Bind fluid visits, face records, fast-path skips, and sampled timing to the counter generation active when each fluid invocation starts.
 - 🔄 Reset diagnostics and invalidate cached HUD lines immediately after configuration changes.
 - 🔎 Separate configured fast-path state, effective active state, hook observation, and actual skipped fluid blocks in diagnostics.
 - 🛡️ Preserve the 1.21.1 center-source and upward-neighbor early rejection before its remaining conservative source-water probe.
 - 🧾 Clarify advanced rendering-mode labels and explain hidden-water fallbacks in the in-game tooltips.
+- 🛡️ Keep Sodium-owned geometry permanently outside this mod's scope unless the project scope is formally reconsidered.
 - 📝 Clarify target-specific renderer behavior and diagnostics guidance in the README and documentation.
 - ⏳ Runtime FPS, visual, Sodium/no-Sodium, and exact-artifact checks remain required before publication.
 

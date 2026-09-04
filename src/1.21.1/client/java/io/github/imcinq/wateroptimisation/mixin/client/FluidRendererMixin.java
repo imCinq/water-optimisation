@@ -20,8 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * body from the 26.2 renderer and does not expose a stable local-state hook,
  * so the compatibility path performs the six-neighbor probe only after the
  * cheap ordinary-source-water and upward-neighbor checks. Reverse-face
- * reduction stays disabled on this target until an exact renderer hook is
- * reviewed.
+ * reduction is intentionally unsupported on this compatibility target.
  */
 @Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {

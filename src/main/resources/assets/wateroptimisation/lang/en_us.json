@@ -19,7 +19,7 @@
 	"screen.wateroptimisation.culling_sodium_unavailable": "Water rendering mode? Unavailable while Sodium renders water",
 	"screen.wateroptimisation.culling_unavailable": "Water rendering mode? Experimental reduced inward faces unavailable on this version",
 	"screen.wateroptimisation.fast_path": "Skip hidden water blocks? %s",
-	"screen.wateroptimisation.fast_path.tooltip": "Skips only fully hidden source-water blocks. Visible, flowing, waterlogged, transparent, and unusual water stays vanilla.",
+	"screen.wateroptimisation.fast_path.tooltip": "Skips only fully hidden source-water blocks. Flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous cases stay on vanilla tessellation.",
 	"screen.wateroptimisation.fast_path_unavailable": "Skip hidden water blocks? Unavailable while Sodium renders water",
 	"screen.wateroptimisation.particles": "Show water particles? %s",
 	"screen.wateroptimisation.particle_distance": "Show water particles within %s blocks?",

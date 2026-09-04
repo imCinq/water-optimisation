@@ -48,7 +48,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 | **Performance** | Skips only fully hidden source-water blocks and disables water particles by default. | Safer performance testing. |
 | **Maximum FPS** | Includes the Performance path and, on the supported 26.2 vanilla renderer, removes optional inward water faces for ordinary full source water. | Testing the strongest available water-rendering reduction. |
 
-`Maximum FPS` is intentionally opt-in. It can change unusual inside-water or transparent-boundary views. Flowing water, waterlogged blocks, partial shapes, overlays, and ambiguous cases retain vanilla geometry decisions.
+`Maximum FPS` is intentionally opt-in. Hidden-water skipping leaves flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous cases on vanilla tessellation. Experimental mode separately removes optional inward faces from ordinary source water and may affect underwater or transparent-boundary views.
 
 ## What it improves
 
@@ -56,7 +56,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 
 During section compilation, the mod reuses the six neighbor states that Minecraft has already loaded. If an ordinary full source-water block is hidden on every side by source water or a full solid-rendering block, the mod skips its fluid tessellation entirely.
 
-Open-surface water does not qualify, so visible top faces remain. Flowing water, waterlogged blocks, transparent boundaries, partial shapes, and uncertain states fall back to vanilla.
+Open-surface water does not qualify, so visible top faces remain. Flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous states fall back to vanilla tessellation.
 
 ### Optional inward-face reduction
 
@@ -72,7 +72,7 @@ Maximum FPS disables ordinary water particles by default. Particle settings cont
 
 ## Sodium and compatibility
 
-Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. When Sodium is present, Sodium owns all water geometry and Water Optimisation applies only local particle controls. The reduced-inward-face option is available only on the vanilla renderer until a renderer-specific Sodium implementation is reviewed and validated. On 1.21.1, Sodium likewise remains the geometry owner. The effective path is shown in the main settings screen.
+Sodium has its own fluid renderer. Water Optimisation keeps its vanilla fluid hooks disabled instead of competing with or replacing Sodium’s geometry. When Sodium is present, Sodium owns all water geometry and Water Optimisation applies only local particle controls. The reduced-inward-face option is available only on the vanilla renderer. No Sodium geometry bridge is planned; Sodium remains the geometry owner unless project scope is formally reconsidered. The effective path is shown in the main settings screen.
 
 The mod is client-only. It declares no server entrypoint, custom packets, world updates, movement changes, collision changes, player-information features, telemetry, update checker, or outbound network service. Non-water rendering is outside its scope.
 
