@@ -2,7 +2,7 @@
 
 The configuration is local to the client and is written to config/wateroptimisation.json. It contains no server identifiers, telemetry, remote configuration, or network behavior. The master switch is disabled by default.
 
-The JSON schema is versioned with `configVersion`. Older files are migrated locally on load, new fields keep safe defaults, and an interrupted replacement keeps the previous complete file available as `.bak`.
+The JSON schema is versioned with `configVersion`. Older files are migrated locally on load, new fields keep safe defaults, and an interrupted replacement keeps the previous complete file available as `.bak`. If a newer mod has already written a higher schema version, this version uses safe defaults and leaves that file untouched until the newer mod is restored; pressing Done cannot persist edits while that future schema is active.
 
 ## Main screen
 

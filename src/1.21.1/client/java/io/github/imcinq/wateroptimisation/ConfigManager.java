@@ -19,11 +19,14 @@ public final class ConfigManager {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static volatile WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
 	private static volatile Path configPath;
+	// A future schema is read-only for this version so unknown fields cannot be lost.
+	private static volatile boolean futureConfigLoaded;
 
 	private ConfigManager() {
 	}
 
 	public static void load() {
+		futureConfigLoaded = false;
 		Path path = getConfigPath();
 		try {
 			if (!Files.exists(path)) {
@@ -37,19 +40,24 @@ public final class ConfigManager {
 			}
 			JsonObject object = parsed.getAsJsonObject();
 			int sourceVersion = readConfigVersion(object);
+			if (sourceVersion > WaterOptimisationConfig.CURRENT_CONFIG_VERSION) {
+				futureConfigLoaded = true;
+				applyConfig(WaterOptimisationConfig.defaults());
+				WaterOptimisationClient.LOGGER.warn(
+						"Configuration at {} uses newer schema version {}; using safe defaults without rewriting it.",
+						path,
+						sourceVersion
+				);
+				return;
+			}
 			boolean enabledWasPresent = object.has("enabled") && !object.get("enabled").isJsonNull();
-			boolean removedFarWaterFieldPresent = object.has("farWaterPass");
-			boolean removedDebugFallbackLoggingFieldPresent = object.has("debugFallbackLogging");
 			WaterOptimisationConfig loaded = GSON.fromJson(object, WaterOptimisationConfig.class);
 			if (loaded == null) {
 				throw new IllegalStateException("Configuration file contained no object");
 			}
 			loaded.migrateFrom(sourceVersion, enabledWasPresent);
 			applyConfig(loaded);
-			if (sourceVersion != WaterOptimisationConfig.CURRENT_CONFIG_VERSION
-					|| !object.has("configVersion")
-					|| removedFarWaterFieldPresent
-					|| removedDebugFallbackLoggingFieldPresent) {
+			if (shouldRewriteConfig(sourceVersion, object)) {
 				try {
 					writeConfig(path, loaded);
 				} catch (IOException | RuntimeException exception) {
@@ -71,9 +79,17 @@ public final class ConfigManager {
 	}
 
 	public static void save(WaterOptimisationConfig updated) {
+		Path path = getConfigPath();
+		if (futureConfigLoaded
+				|| (updated != null && updated.getConfigVersion() > WaterOptimisationConfig.CURRENT_CONFIG_VERSION)) {
+			WaterOptimisationClient.LOGGER.warn(
+					"Not saving {} because it belongs to a newer configuration schema; upgrade the mod before editing it.",
+					path
+			);
+			return;
+		}
 		WaterOptimisationConfig safeCopy = updated == null ? WaterOptimisationConfig.defaults() : updated.copy();
 		safeCopy.sanitize();
-		Path path = getConfigPath();
 
 		try {
 			writeConfig(path, safeCopy);
@@ -122,6 +138,17 @@ public final class ConfigManager {
 		}
 	}
 
+	static boolean shouldRewriteConfig(int sourceVersion, JsonObject object) {
+		if (sourceVersion < WaterOptimisationConfig.CURRENT_CONFIG_VERSION) {
+			return true;
+		}
+		if (sourceVersion > WaterOptimisationConfig.CURRENT_CONFIG_VERSION) {
+			return false;
+		}
+		return !object.has("configVersion")
+				|| object.has("farWaterPass")
+				|| object.has("debugFallbackLogging");
+	}
 	private static void applyConfig(WaterOptimisationConfig updated) {
 		WaterOptimisationConfig previous = config;
 		config = updated;
