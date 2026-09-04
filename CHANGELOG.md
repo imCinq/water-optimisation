@@ -4,6 +4,10 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
+- 🛡️ Preserve newer configuration files during a downgrade by using safe defaults and refusing to rewrite the unsupported schema.
+- 🧹 Remove the remaining 1.21.1 global text-scrolling hook so both targets use vanilla widget scrolling.
+- 🧰 Keep the repository privacy audit from scanning linked-worktree metadata pointers.
+- 🧪 Add a tag/manual exact-artifact production-client startup smoke for both Minecraft targets.
 - ⚡ Make the 1.21.1 water probe fail fast after each neighbor rejection and avoid fluid-state extraction for non-water neighbors.
 
 ## 0.0.8.1 — emergency hotfix

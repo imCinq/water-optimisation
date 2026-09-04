@@ -123,12 +123,15 @@ public final class WaterOptimisationConfig {
 	}
 
 	/**
-	 * Upgrades the pre-versioned JSON format without changing an explicit user
-	 * choice. New fields intentionally keep their safe defaults when they were
-	 * absent from an older file. Removed experimental fields are dropped when
-	 * the migrated configuration is written back.
+	 * Upgrades an older JSON format without changing an explicit user choice.
+	 * New fields intentionally keep their safe defaults when they were absent
+	 * from an older file. A future-version file is left untouched; its caller
+	 * must avoid rewriting the file until a compatible mod version is installed.
 	 */
 	void migrateFrom(int sourceVersion, boolean enabledWasPresent) {
+		if (sourceVersion > CURRENT_CONFIG_VERSION) {
+			return;
+		}
 		if (!enabledWasPresent) {
 			this.enabled = this.performanceProfile != PerformanceProfile.VANILLA;
 		}

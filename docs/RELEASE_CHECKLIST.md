@@ -25,6 +25,7 @@ Use this checklist before publishing a Water Optimisation artifact. A passing CI
 - [ ] The runtime JAR and sources JAR are identified under `build/libs/`.
 - [ ] The runtime JAR contents are inspected and contain no build cache, logs, screenshots, or private data.
 - [ ] SHA-256 checksums are calculated for the files that will be published.
+- [ ] The production startup smoke workflow passes for both target artifacts; its logs are retained with the release evidence.
 
 ## Local Minecraft validation
 

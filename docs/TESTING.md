@@ -12,6 +12,25 @@ bash scripts/audit-client-only.sh
 
 The CI workflow validates the Gradle wrapper, Java 25/21 target toolchains, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
 
+The release smoke workflow (`production-smoke.yml`) launches Loom's production
+client task for both targets. That task assembles the same user-facing runtime
+JAR path (the remapped JAR for 1.21.1 and the ordinary JAR for the no-remap
+26.2 profile), supplies the matching Fabric API as a production mod, and
+requires the mod's initialization log line to appear before the client remains
+alive for a short grace period. It runs on version tags or by manual dispatch;
+the smoke is a startup/crash check, not visual or performance evidence.
+
+To run one target remotely or on a machine with the matching Java runtime and
+an available display, use:
+
+```bash
+bash scripts/smoke-production-client.sh 26.2
+bash scripts/smoke-production-client.sh 1.21.1
+```
+
+Set `PRODUCTION_SMOKE_USE_XVFB=true` on a headless Linux machine. The script
+keeps its log under `build/production-smoke/` and bounds the client lifetime.
+
 The remote build matrix also compiles Minecraft 1.21.1 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
 Unit coverage includes:
@@ -23,6 +42,7 @@ Unit coverage includes:
 - camera-relative particle-distance math;
 - conservative fog scaling;
 - null enum recovery;
+- future configuration versions are preserved without migration;
 - independent configuration copies;
 - separation of cosmetic settings from fluid-section invalidation.
 

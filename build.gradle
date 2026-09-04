@@ -69,6 +69,9 @@ dependencies {
 	}
 	add(modDependencyConfiguration, "net.fabricmc:fabric-loader:${targetLoaderVersion}")
 	add(modDependencyConfiguration, "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}")
+	// ProductionRunTask does not infer implementation dependencies. Keep the
+	// matching Fabric API in the exact production client classpath as well.
+	productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}"
 	add(modCompileOnlyConfiguration, "com.terraformersmc:modmenu:${targetModMenuVersion}")
 	testImplementation "org.junit.jupiter:junit-jupiter:5.13.4"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.13.4"
@@ -91,6 +94,29 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.test {
 	useJUnitPlatform()
+}
+
+// Loom's production client task launches the same remapped (or, for the
+// no-remap 26.2 profile, ordinary) runtime JAR that is distributed to users.
+// It is intentionally opt-in: the smoke script supplies a bounded lifetime
+// and watches for the mod's initialization marker before stopping the client.
+def productionRunDir = providers.gradleProperty("production_run_dir")
+def productionUseXvfb = providers.gradleProperty("production_use_xvfb")
+		.map { it.toBoolean() }
+		.orElse(false)
+
+tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+	group = "verification"
+	description = "Launch the exact production client artifact until the startup smoke marker is observed."
+	useXVFB.set(productionUseXvfb)
+	if (productionRunDir.isPresent()) {
+		runDir.set(project.file(productionRunDir.get()))
+	} else {
+		runDir.set(layout.buildDirectory.dir("production-run/${targetMinecraft}"))
+	}
+	doFirst {
+		logger.lifecycle("Production client mod inputs: ${mods.files.collect { it.name }.join(', ')}")
+	}
 }
 
 java {

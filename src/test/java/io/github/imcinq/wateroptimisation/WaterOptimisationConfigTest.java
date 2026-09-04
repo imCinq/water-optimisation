@@ -1,5 +1,7 @@
 package io.github.imcinq.wateroptimisation;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,6 +93,28 @@ class WaterOptimisationConfigTest {
 
 		config.migrateFrom(0, false);
 		assertTrue(config.isEnabled());
+	}
+
+	@Test
+	void futureConfigVersionsArePreservedAndNeverRewritten() {
+		JsonObject future = new JsonObject();
+		future.addProperty("configVersion", WaterOptimisationConfig.CURRENT_CONFIG_VERSION + 1);
+		future.addProperty("futureOnlySetting", true);
+
+		assertFalse(ConfigManager.shouldRewriteConfig(
+				WaterOptimisationConfig.CURRENT_CONFIG_VERSION + 1,
+				future
+		));
+		JsonObject older = new JsonObject();
+		older.addProperty("configVersion", WaterOptimisationConfig.CURRENT_CONFIG_VERSION - 1);
+		assertTrue(ConfigManager.shouldRewriteConfig(
+				WaterOptimisationConfig.CURRENT_CONFIG_VERSION - 1,
+				older
+		));
+
+		WaterOptimisationConfig config = new Gson().fromJson(future, WaterOptimisationConfig.class);
+		config.migrateFrom(WaterOptimisationConfig.CURRENT_CONFIG_VERSION + 1, true);
+		assertEquals(WaterOptimisationConfig.CURRENT_CONFIG_VERSION + 1, config.getConfigVersion());
 	}
 
 	@Test

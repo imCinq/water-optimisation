@@ -9,6 +9,7 @@ email_pattern='[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}'
 search_repository() {
 	local pattern=$1
 	grep -RInEI \
+		--exclude=.git \
 		--exclude-dir=.git \
 		--exclude-dir=.gradle \
 		--exclude-dir=build \
