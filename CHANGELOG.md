@@ -18,7 +18,7 @@ All notable changes to Water Optimisation are documented here.
 - 🧾 Clarify advanced rendering-mode labels and explain hidden-water fallbacks in the in-game tooltips.
 - 🛡️ Keep Sodium-owned geometry permanently outside this mod's scope unless the project scope is formally reconsidered.
 - 📝 Clarify target-specific renderer behavior and diagnostics guidance in the README and documentation.
-- ⏳ Runtime FPS, visual, Sodium/no-Sodium, and exact-artifact checks remain required before publication.
+- ✅ Automated tests, privacy and client-only audits, packaging checks, and code review completed. Exact-artifact runtime and visual validation with and without Sodium remains outstanding; no universal FPS claim is made.
 
 ## 0.0.7 — 2026-09-03
 
