@@ -38,11 +38,14 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
+		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
+		if (fastPathActive && FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
+			FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
+		}
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.beginFluidCompile();
 		}
-		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
+		if (!fastPathActive
 				|| !FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
 			return;
 		}
@@ -69,13 +72,9 @@ public abstract class FluidRendererMixin {
 		BlockState blockStateEast = level.getBlockState(neighborPos.setWithOffset(pos, Direction.EAST));
 		FluidState fluidStateEast = blockStateEast.getFluidState();
 
-		if (!FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
-				blockState,
-				fluidState,
+		if (!FluidOptimizationPolicy.areRemainingNeighborsOrdinarySourceWater(
 				blockStateDown,
 				fluidStateDown,
-				blockStateUp,
-				fluidStateUp,
 				blockStateNorth,
 				fluidStateNorth,
 				blockStateSouth,

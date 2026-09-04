@@ -125,10 +125,13 @@ public final class ConfigManager {
 	private static void applyConfig(WaterOptimisationConfig updated) {
 		WaterOptimisationConfig previous = config;
 		config = updated;
+		// Update the diagnostics gate before refreshing the cached renderer policy
+		// so a newly enabled HUD can arm its one-shot hook observation immediately.
+		Diagnostics.updateConfig(updated);
 		FluidOptimizationPolicy.refresh();
 		WaterOptimisationClient.refreshParticleFiltering(updated);
-		Diagnostics.updateConfig(updated);
 		Diagnostics.reset();
+		WaterOptimisationClient.invalidateDiagnosticsHud();
 
 		if (previous == null || !previous.sameFluidRenderingConfiguration(updated)) {
 			Minecraft client = Minecraft.getInstance();

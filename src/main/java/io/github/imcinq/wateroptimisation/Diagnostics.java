@@ -34,21 +34,21 @@ public final class Diagnostics {
 	}
 
 	public static void recordFluidFastPathSkip() {
-		Counters counters = activeCounters();
+		Counters counters = activeFluidCounters();
 		if (counters != null) {
 			counters.fluidFastPathSkips.increment();
 		}
 	}
 
 	public static void recordReducedWaterBackface() {
-		Counters counters = activeCounters();
+		Counters counters = activeFluidCounters();
 		if (counters != null) {
 			counters.reducedWaterBackfaces.increment();
 		}
 	}
 
 	public static void recordFluidFace(boolean reverseFaceRequested) {
-		Counters counters = activeCounters();
+		Counters counters = activeFluidCounters();
 		if (counters == null) {
 			return;
 		}
@@ -102,30 +102,34 @@ public final class Diagnostics {
 		// A diagnostics toggle can skip the previous return hook. Clear the prior
 		// invocation before deciding whether this one is sampled, so an unsampled
 		// call can never close a stale sample from before the toggle.
-		timing.active = false;
+		timing.timingActive = false;
 		timing.counters = null;
 		Counters counters = activeCounters();
 		if (counters == null) {
 			return;
 		}
+		// Keep the complete fluid invocation on the counter generation selected at
+		// its entry. Face and fast-path records must not move to a new generation
+		// if the HUD is reset while this invocation is still running.
+		timing.counters = counters;
 		counters.fluidBlocksVisited.increment();
 		if ((timing.sampleIndex++ & FLUID_TIMING_SAMPLE_MASK) != 0) {
 			return;
 		}
 		timing.startNanos = System.nanoTime();
-		timing.counters = counters;
-		timing.active = true;
+		timing.timingActive = true;
 	}
 
 	public static void endFluidCompile() {
 		FluidTiming timing = FLUID_TIMING.get();
-		if (!timing.active) {
-			return;
-		}
-		timing.active = false;
 		Counters counters = timing.counters;
 		timing.counters = null;
+		boolean timingActive = timing.timingActive;
+		timing.timingActive = false;
 		if (counters == null) {
+			return;
+		}
+		if (!timingActive) {
 			return;
 		}
 		counters.fluidCompileCalls.increment();
@@ -223,6 +227,19 @@ public final class Diagnostics {
 		return instrumentationEnabled ? ACTIVE_COUNTERS.get() : null;
 	}
 
+	/**
+	 * Returns the counter generation captured when the current fluid renderer
+	 * invocation began. Returning no counter when the invocation was not opened
+	 * by the diagnostics hook is safer than silently mixing a face record into a
+	 * later generation.
+	 */
+	private static Counters activeFluidCounters() {
+		if (!instrumentationEnabled) {
+			return null;
+		}
+		return FLUID_TIMING.get().counters;
+	}
+
 	private static final class Counters {
 		private final LongAdder fluidBlocksVisited = new LongAdder();
 		private final LongAdder fluidFastPathSkips = new LongAdder();
@@ -246,7 +263,7 @@ public final class Diagnostics {
 		private int sampleIndex;
 		private long startNanos;
 		private Counters counters;
-		private boolean active;
+		private boolean timingActive;
 	}
 
 	private static final class PhaseTiming {

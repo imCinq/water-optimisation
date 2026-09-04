@@ -5,11 +5,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
 	private static volatile boolean reducedWaterBackfacesActive;
-	private static volatile boolean flatWaterFastPathHookObserved;
+	private static volatile boolean flatWaterFastPathObservationActive;
+	private static final AtomicBoolean flatWaterFastPathHookObserved = new AtomicBoolean();
 
 	private FluidOptimizationPolicy() {
 	}
@@ -24,6 +27,8 @@ public final class FluidOptimizationPolicy {
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
 		reducedWaterBackfacesActive = policy.reducedWaterBackfacesActive();
+		flatWaterFastPathHookObserved.set(false);
+		flatWaterFastPathObservationActive = flatWaterFastPathActive && Diagnostics.isEnabled();
 	}
 
 	public static boolean fluidHooksActive() {
@@ -36,11 +41,22 @@ public final class FluidOptimizationPolicy {
 
 	/** Records that the optional local-capture fast-path hook actually ran. */
 	public static void markFlatWaterFastPathHookObserved() {
-		flatWaterFastPathHookObserved = true;
+		if (!flatWaterFastPathObservationActive
+				|| !flatWaterFastPathHookObserved.compareAndSet(false, true)) {
+			return;
+		}
+		// The HUD needs the observed bit, but no later render call needs to enter
+		// the observer once the first hook has been seen.
+		flatWaterFastPathObservationActive = false;
+	}
+
+	/** Returns whether a diagnostics-only first-hook observation is still needed. */
+	public static boolean flatWaterFastPathObservationActive() {
+		return flatWaterFastPathObservationActive;
 	}
 
 	public static boolean flatWaterFastPathHookObserved() {
-		return flatWaterFastPathHookObserved;
+		return flatWaterFastPathHookObserved.get();
 	}
 
 	/**
@@ -49,8 +65,7 @@ public final class FluidOptimizationPolicy {
 	 * there and the experimental mode is unavailable while Sodium is present.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
-		return !WaterOptimisationClient.isSodiumLoaded()
-				&& reducedWaterBackfacesActive;
+		return reducedWaterBackfacesActive;
 	}
 
 	/**

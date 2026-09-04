@@ -5,10 +5,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
-	private static volatile boolean flatWaterFastPathHookObserved;
+	private static volatile boolean flatWaterFastPathObservationActive;
+	private static final AtomicBoolean flatWaterFastPathHookObserved = new AtomicBoolean();
 
 	private FluidOptimizationPolicy() {
 	}
@@ -23,6 +26,8 @@ public final class FluidOptimizationPolicy {
 		EffectiveWaterPolicy policy = WaterOptimisationClient.effectivePolicy(config);
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
+		flatWaterFastPathHookObserved.set(false);
+		flatWaterFastPathObservationActive = flatWaterFastPathActive && Diagnostics.isEnabled();
 	}
 
 	public static boolean fluidHooksActive() {
@@ -35,11 +40,20 @@ public final class FluidOptimizationPolicy {
 
 	/** Records that the optional compatibility fast-path hook actually ran. */
 	public static void markFlatWaterFastPathHookObserved() {
-		flatWaterFastPathHookObserved = true;
+		if (!flatWaterFastPathObservationActive
+				|| !flatWaterFastPathHookObserved.compareAndSet(false, true)) {
+			return;
+		}
+		flatWaterFastPathObservationActive = false;
+	}
+
+	/** Returns whether a diagnostics-only first-hook observation is still needed. */
+	public static boolean flatWaterFastPathObservationActive() {
+		return flatWaterFastPathObservationActive;
 	}
 
 	public static boolean flatWaterFastPathHookObserved() {
-		return flatWaterFastPathHookObserved;
+		return flatWaterFastPathHookObserved.get();
 	}
 
 	public static boolean reducedWaterBackfacesActive() {
@@ -88,6 +102,30 @@ public final class FluidOptimizationPolicy {
 				&& hidesFluidFace(blockStateSouth, fluidStateSouth)
 				&& hidesFluidFace(blockStateWest, fluidStateWest)
 				&& hidesFluidFace(blockStateEast, fluidStateEast);
+	}
+
+	/**
+	 * Completes the already-gated 1.21.1 probe after the center and upward
+	 * neighbors have passed their cheap early checks. Keeping that ordering in
+	 * the renderer hook avoids five extra block reads for open-surface water.
+	 */
+	public static boolean areRemainingNeighborsOrdinarySourceWater(
+			BlockState blockStateDown,
+			FluidState fluidStateDown,
+			BlockState blockStateNorth,
+			FluidState fluidStateNorth,
+			BlockState blockStateSouth,
+			FluidState fluidStateSouth,
+			BlockState blockStateWest,
+			FluidState fluidStateWest,
+			BlockState blockStateEast,
+			FluidState fluidStateEast
+	) {
+		return isOrdinarySourceWater(blockStateDown, fluidStateDown)
+				&& isOrdinarySourceWater(blockStateNorth, fluidStateNorth)
+				&& isOrdinarySourceWater(blockStateSouth, fluidStateSouth)
+				&& isOrdinarySourceWater(blockStateWest, fluidStateWest)
+				&& isOrdinarySourceWater(blockStateEast, fluidStateEast);
 	}
 
 	private static boolean hidesFluidFace(BlockState blockState, FluidState fluidState) {
