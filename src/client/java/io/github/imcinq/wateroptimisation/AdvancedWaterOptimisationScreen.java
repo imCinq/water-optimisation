@@ -154,6 +154,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			this.workingCopy.setFlatWaterFastPath(!this.workingCopy.isFlatWaterFastPath());
 			clicked.setMessage(fastPathLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
+		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.fast_path.tooltip")));
 		button.active = !WaterOptimisationClient.isSodiumLoaded();
 		return button;
 	}
@@ -232,7 +233,9 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 					.withStyle(ChatFormatting.RED);
 		}
 		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
-				.withStyle(ChatFormatting.RED);
+				.withStyle(this.workingCopy.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
+						? ChatFormatting.RED
+						: ChatFormatting.WHITE);
 	}
 
 	private Component fastPathLabel() {

@@ -14,6 +14,7 @@ All notable changes to Water Optimisation are documented here.
 - 🔄 Reset diagnostics and invalidate cached HUD lines immediately after configuration changes.
 - 🔎 Separate configured fast-path state, effective active state, hook observation, and actual skipped fluid blocks in diagnostics.
 - 🛡️ Preserve the 1.21.1 center-source and upward-neighbor early rejection before its remaining conservative source-water probe.
+- 🧾 Clarify advanced rendering-mode labels and explain hidden-water fallbacks in the in-game tooltips.
 - 📝 Clarify target-specific renderer behavior and diagnostics guidance in the README and documentation.
 - ⏳ Runtime FPS, visual, Sodium/no-Sodium, and exact-artifact checks remain required before publication.
 

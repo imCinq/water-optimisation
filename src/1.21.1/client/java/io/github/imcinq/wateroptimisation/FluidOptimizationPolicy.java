@@ -12,6 +12,8 @@ public final class FluidOptimizationPolicy {
 	private static volatile boolean flatWaterFastPathActive;
 	private static final long OBSERVATION_ARMED = 1L;
 	private static final long OBSERVATION_OBSERVED = 1L << 1;
+	// The low two bits are flags; the remaining bits identify the refresh generation.
+	// Keeping them in one atomic word prevents a hook from mutating a newer reset.
 	private static final int OBSERVATION_GENERATION_SHIFT = 2;
 	private static final AtomicLong flatWaterFastPathObservationState = new AtomicLong();
 
@@ -76,6 +78,8 @@ public final class FluidOptimizationPolicy {
 		long nextState;
 		do {
 			currentState = flatWaterFastPathObservationState.get();
+			// Advance the generation even when the new state is not armed so an
+			// in-flight hook from the previous configuration cannot be reused.
 			long generation = currentState >>> OBSERVATION_GENERATION_SHIFT;
 			nextState = (generation + 1) << OBSERVATION_GENERATION_SHIFT;
 			if (armed) {
