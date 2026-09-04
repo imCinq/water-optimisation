@@ -19,8 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Conservative 1.21.1 adapter. LiquidBlockRenderer has a different method
  * body from the 26.2 renderer and does not expose a stable local-state hook,
  * so the compatibility path performs the six-neighbor probe only after the
- * cheap ordinary-source-water and upward-neighbor checks. Reverse-face
- * reduction is intentionally unsupported on this compatibility target.
+ * cheap ordinary-source-water and upward-neighbor checks, and stops at the
+ * first non-water neighbor. Reverse-face reduction is intentionally
+ * unsupported on this compatibility target.
  */
 @Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {
@@ -56,36 +57,32 @@ public abstract class FluidRendererMixin {
 		// for a block to qualify, so fail before the remaining five lookups.
 		BlockPos.MutableBlockPos neighborPos = wateroptimisation$neighborPosition.get();
 		BlockState blockStateUp = level.getBlockState(neighborPos.setWithOffset(pos, Direction.UP));
-		FluidState fluidStateUp = blockStateUp.getFluidState();
-		if (!FluidOptimizationPolicy.isOrdinarySourceWater(blockStateUp, fluidStateUp)) {
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(blockStateUp)) {
 			return;
 		}
 
-		// Derive every fluid state from the one block-state lookup for that
-		// direction. This keeps the compatibility proof narrow and allocation-free.
-		BlockState blockStateDown = level.getBlockState(neighborPos.setWithOffset(pos, Direction.DOWN));
-		FluidState fluidStateDown = blockStateDown.getFluidState();
-		BlockState blockStateNorth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.NORTH));
-		FluidState fluidStateNorth = blockStateNorth.getFluidState();
-		BlockState blockStateSouth = level.getBlockState(neighborPos.setWithOffset(pos, Direction.SOUTH));
-		FluidState fluidStateSouth = blockStateSouth.getFluidState();
-		BlockState blockStateWest = level.getBlockState(neighborPos.setWithOffset(pos, Direction.WEST));
-		FluidState fluidStateWest = blockStateWest.getFluidState();
-		BlockState blockStateEast = level.getBlockState(neighborPos.setWithOffset(pos, Direction.EAST));
-		FluidState fluidStateEast = blockStateEast.getFluidState();
-
-		if (!FluidOptimizationPolicy.areRemainingNeighborsOrdinarySourceWater(
-				blockStateDown,
-				fluidStateDown,
-				blockStateNorth,
-				fluidStateNorth,
-				blockStateSouth,
-				fluidStateSouth,
-				blockStateWest,
-				fluidStateWest,
-				blockStateEast,
-				fluidStateEast
-		)) {
+		// Probe one direction at a time and stop at the first rejection. This
+		// preserves the same all-six-source-water proof without paying for the
+		// remaining lookups after an open side is found. The block-only predicate
+		// also avoids extracting a fluid state for non-water blocks.
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(
+				level.getBlockState(neighborPos.setWithOffset(pos, Direction.DOWN)))) {
+			return;
+		}
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(
+				level.getBlockState(neighborPos.setWithOffset(pos, Direction.NORTH)))) {
+			return;
+		}
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(
+				level.getBlockState(neighborPos.setWithOffset(pos, Direction.SOUTH)))) {
+			return;
+		}
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(
+				level.getBlockState(neighborPos.setWithOffset(pos, Direction.WEST)))) {
+			return;
+		}
+		if (!FluidOptimizationPolicy.isOrdinarySourceWater(
+				level.getBlockState(neighborPos.setWithOffset(pos, Direction.EAST)))) {
 			return;
 		}
 

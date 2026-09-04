@@ -4,7 +4,7 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-No changes yet.
+- ⚡ Make the 1.21.1 water probe fail fast after each neighbor rejection and avoid fluid-state extraction for non-water neighbors.
 
 ## 0.0.8.1 — emergency hotfix
 

@@ -137,9 +137,23 @@ public final class FluidOptimizationPolicy {
 	}
 
 	/**
-	 * Completes the already-gated 1.21.1 probe after the center and upward
-	 * neighbors have passed their cheap early checks. Keeping that ordering in
-	 * the renderer hook avoids five extra block reads for open-surface water.
+	 * Checks a fetched neighbor without extracting a fluid state for air, solid,
+	 * waterlogged, or other non-water blocks. The renderer uses this overload for
+	 * fail-fast neighbor probes; the supplied-fluid overload remains for the
+	 * center state and already-captured vanilla values.
+	 */
+	public static boolean isOrdinarySourceWater(BlockState blockState) {
+		if (!blockState.is(Blocks.WATER)) {
+			return false;
+		}
+		FluidState fluidState = blockState.getFluidState();
+		return fluidState.getType() == Fluids.WATER && fluidState.isSource();
+	}
+
+	/**
+	 * Retains the all-neighbor predicate for callers that already have fetched
+	 * fluid states. The renderer uses the short-circuiting block-only overload
+	 * above so rejected probes do not fetch the remaining directions.
 	 */
 	public static boolean areRemainingNeighborsOrdinarySourceWater(
 			BlockState blockStateDown,
