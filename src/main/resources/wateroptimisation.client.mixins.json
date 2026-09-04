@@ -4,7 +4,6 @@
 	"package": "io.github.imcinq.wateroptimisation.mixin.client",
 	"compatibilityLevel": "${java_compatibility_level}",
 	"client": [
-		"ActiveTextCollectorMixin",
 		"ClientLevelMixin",
 		"FluidRendererMixin",
 		"SectionCompilerMixin",

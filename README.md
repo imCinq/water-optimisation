@@ -30,12 +30,12 @@ Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current public [0.0.7 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.7) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. The v0.0.8 candidate contains a diagnostics-accuracy and hot-path-overhead cleanup; it is not the public download until its exact-artifact runtime and visual checks pass. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current public [0.0.8.1 emergency hotfix](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.8.1) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. It supersedes v0.0.8 by removing an optional 26.2 startup-crash path. On 26.2, long settings labels use vanilla scrolling; the 1.21.1 label-speed polish remains enabled. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | Minecraft | Java | Build status | Geometry scope |
 | --- | --- | --- | --- |
-| 26.2 | 25+ | 0.0.8 candidate | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
-| 1.21.1 | 21+ | 0.0.8 candidate | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
+| 26.2 | 25+ | 0.0.8.1 | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
+| 1.21.1 | 21+ | 0.0.8.1 | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 
 ## Pick a preset
 
