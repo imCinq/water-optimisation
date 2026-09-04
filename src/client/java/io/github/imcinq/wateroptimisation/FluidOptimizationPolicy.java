@@ -146,6 +146,19 @@ public final class FluidOptimizationPolicy {
 				&& fluidState.isSource();
 	}
 
+	/**
+	 * Checks a fetched block state without extracting a fluid state for non-water
+	 * blocks. This keeps the target-shared policy API aligned with the 1.21.1
+	 * compatibility probe; the 26.2 renderer continues to use captured fluids.
+	 */
+	public static boolean isOrdinarySourceWater(BlockState blockState) {
+		if (!blockState.is(Blocks.WATER)) {
+			return false;
+		}
+		FluidState fluidState = blockState.getFluidState();
+		return fluidState.getType() == Fluids.WATER && fluidState.isSource();
+	}
+
 	private static boolean hidesFluidFace(BlockState blockState, FluidState fluidState) {
 		// Source-water neighbors are common in the only dense case this probe
 		// can skip. Test that cheap identity/type path before asking a solid
