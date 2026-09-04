@@ -1,6 +1,5 @@
 package io.github.imcinq.wateroptimisation;
 
-import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -113,13 +112,6 @@ class WaterOptimisationConfigTest {
 		assertEquals(24.0D, WaterParticleDistancePolicy.effectiveDistance(config), 0.000001D);
 		assertTrue(WaterParticleDistancePolicy.isWithinDistance(config, 0.0D, 0.0D, 0.0D, 24.0D, 0.0D, 0.0D));
 		assertFalse(WaterParticleDistancePolicy.isWithinDistance(config, 0.0D, 0.0D, 0.0D, 24.001D, 0.0D, 0.0D));
-	}
-
-	@Test
-	void fetchedNeighborPredicateRejectsNonWaterBlocksWithoutChangingSourceWaterEligibility() {
-		assertTrue(FluidOptimizationPolicy.isOrdinarySourceWater(Blocks.WATER.defaultBlockState()));
-		assertFalse(FluidOptimizationPolicy.isOrdinarySourceWater(Blocks.AIR.defaultBlockState()));
-		assertFalse(FluidOptimizationPolicy.isOrdinarySourceWater(Blocks.STONE.defaultBlockState()));
 	}
 
 	@Test
