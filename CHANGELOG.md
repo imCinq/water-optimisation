@@ -4,9 +4,17 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-- The v0.0.8 candidate is being prepared; it will not replace the public 0.0.7 download until exact-artifact runtime and visual validation is complete.
+No changes yet.
 
-## 0.0.8 — candidate
+## 0.0.8.1 — emergency hotfix
+
+- 🚑 Remove the optional 26.2 text-scrolling mixin that could crash the client during startup.
+- ✅ Keep the water-rendering, diagnostics, and 1.21.1 improvements from v0.0.8.
+- 📦 Publish replacement runtime JARs for Minecraft 26.2 and 1.21.1.
+
+## 0.0.8 — superseded
+
+- ⚠️ Superseded by v0.0.8.1 for Minecraft 26.2 because its optional text-scrolling mixin could crash startup.
 
 - ⚡ Remove unconditional fast-path observer writes and avoid resetting the particle-budget atomic when no budget is active.
 - 🧭 Keep Sodium ownership and the existing narrow 26.2/1.21.1 water-visibility proofs unchanged while reducing hot-path policy overhead.
@@ -152,4 +160,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.8 entry is a candidate until its exact artifacts pass runtime and visual validation; the 0.0.7 package remains the current published release for Minecraft 26.2 and 1.21.1.
+The preview entries below are retained as development history. The 0.0.8.1 package is the current emergency-hotfix release for Minecraft 26.2 and 1.21.1.
