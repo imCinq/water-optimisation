@@ -40,8 +40,8 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		ConfigManager.load();
 		sodiumLoaded = FabricLoader.getInstance().isModLoaded("sodium");
+		ConfigManager.load();
 		FluidOptimizationPolicy.refresh();
 		openConfigKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.wateroptimisation.open_config",
@@ -104,6 +104,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	public static void refreshParticleFiltering(WaterOptimisationConfig config) {
 		if (config == null) {
 			particleFilterSettings = ParticleFilterSettings.INACTIVE;
+			PARTICLE_BUDGET_USED.set(0);
 			return;
 		}
 
@@ -116,6 +117,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				policy.particleBudget(),
 				policy.limitForcedWaterParticles()
 		);
+		PARTICLE_BUDGET_USED.set(0);
+	}
+
+	/** Forces the HUD to rebuild its cached lines after a reset or config change. */
+	public static void invalidateDiagnosticsHud() {
+		diagnosticsLines = new Component[0];
+		diagnosticsRefreshDeadlineNanos = 0L;
 	}
 
 	public static boolean shouldKeepWaterParticle(ParticleOptions particle, boolean alwaysShow, double x, double y, double z) {
@@ -167,7 +175,10 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 	}
 
 	private static void beginParticleTick() {
-		PARTICLE_BUDGET_USED.set(0);
+		ParticleFilterSettings settings = particleFilterSettings;
+		if (settings.active() && settings.particleBudget() > WaterOptimisationConfig.UNLIMITED_PARTICLE_BUDGET) {
+			PARTICLE_BUDGET_USED.set(0);
+		}
 	}
 
 	private static boolean reserveParticleBudget(int budget) {
@@ -228,11 +239,12 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 				Component.literal("renderer: " + rendererCapabilities().rendererName()),
 				Component.literal("geometry path: " + policy.geometryPath().name().toLowerCase(java.util.Locale.ROOT)),
 				Component.literal("fluid hooks: " + onOff(FluidOptimizationPolicy.fluidHooksActive())),
-				Component.literal("fast path: " + onOff(FluidOptimizationPolicy.flatWaterFastPathActive())),
-				Component.literal("fast-path hook: " + (FluidOptimizationPolicy.flatWaterFastPathHookObserved() ? "observed" : "not observed")),
+				Component.literal("fast path setting: " + onOff(config.isFlatWaterFastPath())),
+				Component.literal("fast path active: " + onOff(policy.flatWaterFastPathActive())),
+				Component.literal("fast-path hook: " + fastPathHookLabel(policy)),
 				Component.literal("water backfaces: " + (sodiumLoaded ? "Sodium-owned" : FluidOptimizationPolicy.reducedWaterBackfacesActive() ? "reduced" : "vanilla")),
 				Component.literal("fluid blocks: " + snapshot.fluidBlocksVisited()),
-				Component.literal("fast-path skips: " + snapshot.fluidFastPathSkips()),
+				Component.literal("fast-path skips (actual): " + snapshot.fluidFastPathSkips()),
 				Component.literal("mod reverse faces removed: " + snapshot.reducedWaterBackfaces()),
 				Component.literal("fluid avg (1/16): " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageFluidCompileMillis())),
 				Component.literal("section compile avg: " + String.format(java.util.Locale.ROOT, "%.3f ms", snapshot.averageSectionCompileMillis())),
@@ -256,6 +268,13 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 
 	private static String onOff(boolean value) {
 		return value ? "on" : "off";
+	}
+
+	private static String fastPathHookLabel(EffectiveWaterPolicy policy) {
+		if (!policy.flatWaterFastPathActive()) {
+			return "inactive";
+		}
+		return FluidOptimizationPolicy.flatWaterFastPathHookObserved() ? "observed" : "not observed";
 	}
 
 	private static String particleBudgetLabel(int budget) {

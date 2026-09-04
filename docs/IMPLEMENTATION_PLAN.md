@@ -2,9 +2,9 @@
 
 Water Optimisation is developed as a conservative, client-only rendering mod. Every optimization must be measurable, visually reviewable, and safe to disable.
 
-## Current release
+## Current release baseline
 
-The 0.0.7 release contains the current client-only implementation for Minecraft 26.2 and the target-isolated compatibility implementation for Minecraft 1.21.1:
+The 0.0.7 release is the public baseline for the client-only implementation for Minecraft 26.2 and the target-isolated compatibility implementation for Minecraft 1.21.1:
 
 - local configuration and native settings screens;
 - opt-in particle filtering;
@@ -20,7 +20,19 @@ The 0.0.7 release contains the current client-only implementation for Minecraft 
 
 The 0.0.7 release packages both target-specific builds from the same reviewed source line. Remote build, test, privacy, client-only, and artifact checks pass. Local visual, performance, backend, companion-mod, and multiplayer measurements remain evidence work for the target hardware and exact modpack.
 
-The Minecraft 1.21.1 profile uses Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative and has no Sodium geometry bridge yet.
+The Minecraft 1.21.1 profile uses Java 21, remapping Loom, official Mojang mappings, and target-isolated client sources. Its geometry path is intentionally more conservative, and Sodium remains the permanent geometry owner when present; no Sodium geometry bridge is planned unless project scope is formally reconsidered.
+
+## v0.0.8 candidate scope
+
+The current candidate keeps the rendering proof and compatibility boundary unchanged while tightening the implementation around measurable overhead and truthful diagnostics:
+
+- remove disabled-path observer, thread-local, and unnecessary particle-budget work;
+- bind all fluid diagnostics for one invocation to its entry counter generation;
+- invalidate HUD lines immediately after diagnostics resets and configuration changes;
+- distinguish configured, effective, observed, and actually skipped fast-path state;
+- preserve the 1.21.1 center-source and upward-neighbor early rejection before the remaining conservative probe;
+- document the difference between 26.2 reused renderer locals and 1.21.1 explicit neighbor reads;
+- require remote dual-target CI plus exact-artifact runtime and visual validation before publication.
 
 ## Active Phase 1–3 extension
 
@@ -59,15 +71,15 @@ Sodium ownership detection disables the vanilla fluid hooks rather than replacin
 
 ### Phase 6 — Experimental reduced faces
 
-The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering; no Sodium geometry bridge is currently installed.
+The reduced-face mode keeps vanilla's outward fluid face and removes only its optional reverse face for ordinary full source-water blocks. Flowing and waterlogged states stay on vanilla. It is available manually and in the Maximum FPS profile because inside-water and unusual transparency views can change. It is disabled when Sodium owns fluid rendering; no Sodium geometry bridge is planned, and Sodium remains the permanent geometry owner unless project scope is formally reconsidered.
 
 ## Next priorities
 
 - Revisit a separate water-owned GPU/fill-rate path only after a new design has a correctness proof and a repeatable win; the previous prototype was removed after visual failures.
 - Complete local visual and performance validation.
-- Re-review a future Sodium reduced-face implementation only after an exact emission-cancellation hook and artifact-specific runtime validation exist.
+- Do not add a Sodium geometry bridge; issue #30 is closed as not planned. Sodium remains the permanent geometry owner unless project scope is formally reconsidered.
 - Add direct tests if the fluid classifier expands beyond the exact source-water subset.
-- Consider rolling diagnostics and fallback reason reporting.
+- Keep diagnostics generation and hook-observation state truthful across reset, toggle, and target changes.
 - Measure the reduced-face experiment on the target hardware, including underwater and transparent-boundary scenes.
 - Keep camera-relative water-distance fading deferred until a separate water-owned pass is independently proven safe and useful.
 - Re-evaluate broader shape-aware culling only after measurements and visual tests justify it.

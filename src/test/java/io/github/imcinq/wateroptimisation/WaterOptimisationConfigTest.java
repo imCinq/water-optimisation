@@ -177,6 +177,38 @@ class WaterOptimisationConfigTest {
 	}
 
 	@Test
+	void fluidRecordsStayWithTheInvocationGenerationAfterReset() {
+		WaterOptimisationConfig enabled = WaterOptimisationConfig.defaults();
+		enabled.setDiagnosticsHud(true);
+
+		Diagnostics.updateConfig(enabled);
+		Diagnostics.reset();
+		try {
+			Diagnostics.beginFluidCompile();
+			Diagnostics.recordFluidFastPathSkip();
+			Diagnostics.recordFluidFace(true);
+			Diagnostics.recordReducedWaterBackface();
+
+			// A reset must not move records from this in-flight invocation into the
+			// newly visible generation, including sampled timing completion.
+			Diagnostics.reset();
+			Diagnostics.endFluidCompile();
+
+			Diagnostics.Snapshot snapshot = Diagnostics.snapshot();
+			assertEquals(0, snapshot.fluidBlocksVisited());
+			assertEquals(0, snapshot.fluidFastPathSkips());
+			assertEquals(0, snapshot.fluidFaces());
+			assertEquals(0, snapshot.fluidReverseFaceRequests());
+			assertEquals(0, snapshot.reducedWaterBackfaces());
+			assertEquals(0, snapshot.fluidCompileCalls());
+		} finally {
+			Diagnostics.endFluidCompile();
+			Diagnostics.updateConfig(WaterOptimisationConfig.defaults());
+			Diagnostics.reset();
+		}
+	}
+
+	@Test
 	void experimentalFluidModeRequiresFluidSectionRefresh() {
 		WaterOptimisationConfig original = WaterOptimisationConfig.defaults();
 		WaterOptimisationConfig changed = original.copy();

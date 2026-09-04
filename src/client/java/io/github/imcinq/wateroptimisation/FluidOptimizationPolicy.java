@@ -5,11 +5,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public final class FluidOptimizationPolicy {
 	private static volatile boolean fluidHooksActive;
 	private static volatile boolean flatWaterFastPathActive;
 	private static volatile boolean reducedWaterBackfacesActive;
-	private static volatile boolean flatWaterFastPathHookObserved;
+	private static final long OBSERVATION_ARMED = 1L;
+	private static final long OBSERVATION_OBSERVED = 1L << 1;
+	// The low two bits are flags; the remaining bits identify the refresh generation.
+	// Keeping them in one atomic word prevents a hook from mutating a newer reset.
+	private static final int OBSERVATION_GENERATION_SHIFT = 2;
+	private static final AtomicLong flatWaterFastPathObservationState = new AtomicLong();
 
 	private FluidOptimizationPolicy() {
 	}
@@ -24,6 +31,7 @@ public final class FluidOptimizationPolicy {
 		fluidHooksActive = policy.fluidHooksActive();
 		flatWaterFastPathActive = policy.flatWaterFastPathActive();
 		reducedWaterBackfacesActive = policy.reducedWaterBackfacesActive();
+		resetFlatWaterFastPathObservation(flatWaterFastPathActive && Diagnostics.isEnabled());
 	}
 
 	public static boolean fluidHooksActive() {
@@ -36,11 +44,49 @@ public final class FluidOptimizationPolicy {
 
 	/** Records that the optional local-capture fast-path hook actually ran. */
 	public static void markFlatWaterFastPathHookObserved() {
-		flatWaterFastPathHookObserved = true;
+		long currentState;
+		do {
+			currentState = flatWaterFastPathObservationState.get();
+			if ((currentState & OBSERVATION_ARMED) == 0
+					|| (currentState & OBSERVATION_OBSERVED) != 0) {
+				return;
+			}
+		} while (!flatWaterFastPathObservationState.compareAndSet(
+				currentState,
+				currentState | OBSERVATION_OBSERVED
+		));
+
+		// Clear only this generation's armed bit. If refresh() installed a newer
+		// generation meanwhile, the CAS fails and leaves that new state intact.
+		long observedState = currentState | OBSERVATION_OBSERVED;
+		flatWaterFastPathObservationState.compareAndSet(
+				observedState,
+				observedState & ~OBSERVATION_ARMED
+		);
+	}
+
+	/** Returns whether a diagnostics-only first-hook observation is still needed. */
+	public static boolean flatWaterFastPathObservationActive() {
+		return (flatWaterFastPathObservationState.get() & OBSERVATION_ARMED) != 0;
 	}
 
 	public static boolean flatWaterFastPathHookObserved() {
-		return flatWaterFastPathHookObserved;
+		return (flatWaterFastPathObservationState.get() & OBSERVATION_OBSERVED) != 0;
+	}
+
+	private static void resetFlatWaterFastPathObservation(boolean armed) {
+		long currentState;
+		long nextState;
+		do {
+			currentState = flatWaterFastPathObservationState.get();
+			// Advance the generation even when the new state is not armed so an
+			// in-flight hook from the previous configuration cannot be reused.
+			long generation = currentState >>> OBSERVATION_GENERATION_SHIFT;
+			nextState = (generation + 1) << OBSERVATION_GENERATION_SHIFT;
+			if (armed) {
+				nextState |= OBSERVATION_ARMED;
+			}
+		} while (!flatWaterFastPathObservationState.compareAndSet(currentState, nextState));
 	}
 
 	/**
@@ -49,8 +95,7 @@ public final class FluidOptimizationPolicy {
 	 * there and the experimental mode is unavailable while Sodium is present.
 	 */
 	public static boolean reducedWaterBackfacesActive() {
-		return !WaterOptimisationClient.isSodiumLoaded()
-				&& reducedWaterBackfacesActive;
+		return reducedWaterBackfacesActive;
 	}
 
 	/**

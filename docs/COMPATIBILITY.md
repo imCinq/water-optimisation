@@ -17,7 +17,7 @@ Mod Menu is an optional compile-only dependency: 19.0.0-alpha.1 for 26.2 and 11.
 
 ## Sodium
 
-Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables all of its vanilla fluid geometry hooks. Sodium remains fully responsible for visibility, fluid shaping, lighting, hidden-fluid culling, translucent collection, and sorting; Water Optimisation applies only local particle settings. The reduced-inward-face experiment is available only on the vanilla renderer until a renderer-specific Sodium cancellation hook is reviewed against an exact artifact. The main settings screen reports the effective path and labels overlapping geometry controls as unavailable while Sodium renders water.
+Sodium has its own optimized fluid renderer. When the Sodium mod id is detected, Water Optimisation disables all of its vanilla fluid geometry hooks. Sodium remains fully responsible for visibility, fluid shaping, lighting, hidden-fluid culling, translucent collection, and sorting; Water Optimisation applies only local particle settings. The reduced-inward-face experiment is available only on the vanilla renderer. No Sodium geometry bridge is planned; Sodium remains the geometry owner unless project scope is formally reconsidered. The main settings screen reports the effective path and labels overlapping geometry controls as unavailable while Sodium renders water.
 
 ## Rendering backends
 
@@ -29,4 +29,4 @@ The mod is client-only and render-focused. It does not add packets, change movem
 
 ## Fallback behavior
 
-If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Flowing, partial, waterlogged, overlay, transparent, and unusual states remain on the normal renderer.
+If a hook is unavailable, another renderer owns the fluid path, Mod Menu is absent, or a shape cannot be classified safely, the relevant feature preserves normal behavior. Hidden-water skipping leaves flowing, partial, waterlogged, overlay, transparent, and unusual states on the normal renderer. Experimental inward-face reduction is separate and may change underwater or transparent-boundary views for eligible ordinary source water.

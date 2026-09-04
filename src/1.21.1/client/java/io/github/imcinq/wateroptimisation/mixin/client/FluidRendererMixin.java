@@ -20,8 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * body from the 26.2 renderer and does not expose a stable local-state hook,
  * so the compatibility path performs the six-neighbor probe only after the
  * cheap ordinary-source-water and upward-neighbor checks. Reverse-face
- * reduction stays disabled on this target until an exact renderer hook is
- * reviewed.
+ * reduction is intentionally unsupported on this compatibility target.
  */
 @Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {
@@ -38,11 +37,17 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
-		if (Diagnostics.isEnabled()) {
+		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (fastPathActive
+				&& diagnosticsEnabled
+				&& FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
+			FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
+		}
+		if (diagnosticsEnabled) {
 			Diagnostics.beginFluidCompile();
 		}
-		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
+		if (!fastPathActive
 				|| !FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
 			return;
 		}
@@ -69,13 +74,9 @@ public abstract class FluidRendererMixin {
 		BlockState blockStateEast = level.getBlockState(neighborPos.setWithOffset(pos, Direction.EAST));
 		FluidState fluidStateEast = blockStateEast.getFluidState();
 
-		if (!FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
-				blockState,
-				fluidState,
+		if (!FluidOptimizationPolicy.areRemainingNeighborsOrdinarySourceWater(
 				blockStateDown,
 				fluidStateDown,
-				blockStateUp,
-				fluidStateUp,
 				blockStateNorth,
 				fluidStateNorth,
 				blockStateSouth,

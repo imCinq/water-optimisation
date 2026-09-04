@@ -28,16 +28,20 @@ public abstract class FluidRendererMixin {
 	 */
 	@ModifyVariable(method = "addFace", at = @At("HEAD"), argsOnly = true, ordinal = 0)
 	private boolean wateroptimisation$disableOptionalBackFace(boolean addBackFace) {
-		if (Diagnostics.isEnabled()) {
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (diagnosticsEnabled) {
 			Diagnostics.recordFluidFace(addBackFace);
 		}
-		if (!addBackFace || !FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
+		if (!addBackFace) {
+			return addBackFace;
+		}
+		if (!FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			return addBackFace;
 		}
 		if (!Boolean.TRUE.equals(wateroptimisation$waterTessellation.get())) {
 			return addBackFace;
 		}
-		if (Diagnostics.isEnabled()) {
+		if (diagnosticsEnabled) {
 			Diagnostics.recordReducedWaterBackface();
 		}
 		return false;
@@ -52,7 +56,8 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
+		boolean reducedBackfacesActive = FluidOptimizationPolicy.reducedWaterBackfacesActive();
+		if (reducedBackfacesActive) {
 			if (FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
 				wateroptimisation$waterTessellation.set(Boolean.TRUE);
 			} else {
@@ -97,8 +102,13 @@ public abstract class FluidRendererMixin {
 			FluidState fluidStateEast,
 			boolean renderUp
 	) {
-		FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
-		if (!FluidOptimizationPolicy.flatWaterFastPathActive()
+		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
+		if (fastPathActive
+				&& Diagnostics.isEnabled()
+				&& FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
+			FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
+		}
+		if (!fastPathActive
 				|| !FluidOptimizationPolicy.shouldSkipInteriorSourceWater(
 						blockState,
 						fluidState,
@@ -135,7 +145,9 @@ public abstract class FluidRendererMixin {
 			FluidState fluidState,
 			CallbackInfo callback
 	) {
-		wateroptimisation$waterTessellation.remove();
+		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
+			wateroptimisation$waterTessellation.remove();
+		}
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.endFluidCompile();
 		}

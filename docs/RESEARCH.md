@@ -6,7 +6,7 @@ The practical client-side FPS targets are translucent water geometry, chunk-rebu
 
 The earlier dedicated far-water pass prototype was removed after visual correctness failures. A future GPU/fill-rate path must first prove water ownership, camera following, translucent ordering, and measurable frame-time benefit before it returns to the public build.
 
-The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched until an exact older-renderer bridge is reviewed.
+The project also has a target-isolated Minecraft 1.21.1 compatibility profile. It uses the older liquid-renderer and client GUI/HUD APIs, keeps the geometry proof narrower than 26.2, and leaves Sodium-owned fluid geometry untouched. No Sodium geometry bridge is planned unless project scope is formally reconsidered.
 
 ## Vanilla rendering path
 
@@ -62,7 +62,7 @@ The practical additions from this review are split by confidence:
 
 - ready now: target-isolated 1.21.1 build/API support, conservative fallbacks, and clearer compatibility documentation;
 - deferred experiment: a water-owned GPU/fill-rate path with a new correctness proof and controlled measurements;
-- deferred compatibility work: a Sodium-specific reverse-face reduction requires an emission-cancellation hook, not a winding argument rewrite;
+- out of scope: a Sodium-specific reverse-face reduction; Sodium remains the geometry owner unless project scope is formally reconsidered;
 - later prototype: a fade, independent fog policy, reduced vertex density, or half-resolution far water;
 - not approved: a shared-translucent distance cull, global sort bypass, raw OpenGL path, or returning the failed far-water prototype without new evidence.
 
