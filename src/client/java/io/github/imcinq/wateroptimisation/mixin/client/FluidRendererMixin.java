@@ -29,11 +29,13 @@ public abstract class FluidRendererMixin {
 	@ModifyVariable(method = "addFace", at = @At("HEAD"), argsOnly = true, ordinal = 0)
 	private boolean wateroptimisation$disableOptionalBackFace(boolean addBackFace) {
 		boolean diagnosticsEnabled = Diagnostics.isEnabled();
-		boolean reducedBackfacesActive = FluidOptimizationPolicy.reducedWaterBackfacesActive();
 		if (diagnosticsEnabled) {
 			Diagnostics.recordFluidFace(addBackFace);
 		}
-		if (!addBackFace || !reducedBackfacesActive) {
+		if (!addBackFace) {
+			return addBackFace;
+		}
+		if (!FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
 			return addBackFace;
 		}
 		if (!Boolean.TRUE.equals(wateroptimisation$waterTessellation.get())) {
