@@ -39,10 +39,13 @@ public abstract class FluidRendererMixin {
 			CallbackInfo callback
 	) {
 		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
-		if (fastPathActive && FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (fastPathActive
+				&& diagnosticsEnabled
+				&& FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
 			FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
 		}
-		if (Diagnostics.isEnabled()) {
+		if (diagnosticsEnabled) {
 			Diagnostics.beginFluidCompile();
 		}
 		if (!fastPathActive

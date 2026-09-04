@@ -103,7 +103,9 @@ public abstract class FluidRendererMixin {
 			boolean renderUp
 	) {
 		boolean fastPathActive = FluidOptimizationPolicy.flatWaterFastPathActive();
-		if (fastPathActive && FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
+		if (fastPathActive
+				&& Diagnostics.isEnabled()
+				&& FluidOptimizationPolicy.flatWaterFastPathObservationActive()) {
 			FluidOptimizationPolicy.markFlatWaterFastPathHookObserved();
 		}
 		if (!fastPathActive
