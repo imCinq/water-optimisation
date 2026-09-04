@@ -17,7 +17,7 @@ client task for both targets. That task assembles the same user-facing runtime
 JAR path (the remapped JAR for 1.21.1 and the ordinary JAR for the no-remap
 26.2 profile), supplies the matching Fabric API as a production mod, and
 requires the mod's initialization log line to appear before the client remains
-alive for a short grace period. It runs on version tags or by manual dispatch;
+alive for a short grace period. It runs on pull requests, version tags, or by manual dispatch;
 the smoke is a startup/crash check, not visual or performance evidence.
 
 To run one target remotely or on a machine with the matching Java runtime and
