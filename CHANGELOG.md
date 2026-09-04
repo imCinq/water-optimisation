@@ -4,7 +4,18 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-- No unreleased changes.
+- The v0.0.8 candidate is being prepared; it will not replace the public 0.0.7 download until exact-artifact runtime and visual validation is complete.
+
+## 0.0.8 — candidate
+
+- ⚡ Remove unconditional fast-path observer writes and avoid resetting the particle-budget atomic when no budget is active.
+- 🧭 Keep Sodium ownership and the existing narrow 26.2/1.21.1 water-visibility proofs unchanged while reducing hot-path policy overhead.
+- 📊 Bind fluid visits, face records, fast-path skips, and sampled timing to the counter generation active when each fluid invocation starts.
+- 🔄 Reset diagnostics and invalidate cached HUD lines immediately after configuration changes.
+- 🔎 Separate configured fast-path state, effective active state, hook observation, and actual skipped fluid blocks in diagnostics.
+- 🛡️ Preserve the 1.21.1 center-source and upward-neighbor early rejection before its remaining conservative source-water probe.
+- 📝 Clarify target-specific renderer behavior and diagnostics guidance in the README and documentation.
+- ⏳ Runtime FPS, visual, Sodium/no-Sodium, and exact-artifact checks remain required before publication.
 
 ## 0.0.7 — 2026-09-03
 
@@ -138,4 +149,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.7 package is the current published release for Minecraft 26.2 and 1.21.1; the 1.21.1 compatibility build and all optional performance modes should still be validated on the intended hardware and modpack.
+The preview entries below are retained as development history. The 0.0.8 entry is a candidate until its exact artifacts pass runtime and visual validation; the 0.0.7 package remains the current published release for Minecraft 26.2 and 1.21.1.
