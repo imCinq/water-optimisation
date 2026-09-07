@@ -24,8 +24,40 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and test NeoForge 26.2
         run: ./gradlew -p neoforge-26.2 test build --no-daemon --console=plain
+      - name: Install headless display support
+        run: sudo apt-get update && sudo apt-get install --yes xvfb
+      - name: Run NeoForge 26.2 client startup smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="neoforge-26.2/build/smoke"
+          log_file="$smoke_dir/client.log"
+          mkdir -p "$smoke_dir"
+          : > "$log_file"
+          setsid xvfb-run -a ./gradlew -p neoforge-26.2 runClient --no-daemon --console=plain >"$log_file" 2>&1 &
+          launcher_pid=$!
+          marker="Water Optimisation initialized"
+          for attempt in $(seq 1 90); do
+            if grep -Fq "$marker" "$log_file"; then
+              kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+              wait "$launcher_pid" 2>/dev/null || true
+              echo "NeoForge client startup marker observed."
+              exit 0
+            fi
+            if ! kill -0 "$launcher_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          echo "NeoForge client did not reach the startup marker." >&2
+          tail -n 200 "$log_file" >&2 || true
+          kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+          wait "$launcher_pid" 2>/dev/null || true
+          exit 1
       - name: Capture NeoForge artifact
         uses: actions/upload-artifact@v7
         with:
           name: water-optimisation-26.2-neoforge-artifacts
-          path: neoforge-26.2/build/libs/
+          path: |
+            neoforge-26.2/build/libs/
+            neoforge-26.2/build/smoke/
