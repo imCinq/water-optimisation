@@ -1,0 +1,92 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.146'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "water-optimisation-neoforge-\${minecraft_version}"
+}
+
+// Mojang ships Java 25 to end users in 26.2, so the NeoForge target uses Java 25.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+sourceSets {
+    main {
+        java {
+            srcDir('../src/main/java')
+            srcDir('src/main/java')
+        }
+        resources {
+            // Reuse only shared assets and translations; Fabric metadata/mixin
+            // descriptors are excluded from the NeoForge jar below.
+            srcDir('../src/main/resources')
+            srcDir('src/main/resources')
+            exclude('fabric.mod.json')
+            exclude('wateroptimisation.client.mixins.json')
+            exclude('wateroptimisation.legacy.mixins.json')
+        }
+    }
+    test {
+        java.srcDir('../src/test/java')
+    }
+}
+
+sourceSets.main.resources.srcDir('src/generated/resources')
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+    }
+
+    mods {
+        "\${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources.srcDir(generateModMetadata)
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    withSourcesJar()
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
