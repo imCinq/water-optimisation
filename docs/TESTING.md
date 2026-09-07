@@ -33,6 +33,14 @@ keeps its log under `build/production-smoke/` and bounds the client lifetime.
 
 The remote build matrix also compiles Minecraft 1.21.1 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
+The `neoforge-26.2.yml` workflow builds exactly one NeoForge runtime JAR,
+checks its expanded metadata, license, mixin descriptor/classes, and absence of
+Fabric descriptors, then launches that packaged JAR in isolated client and
+dedicated-server runs. The client run performs a Mixin audit; the target-specific
+fast-path injection is required, so mapping or local-capture drift fails CI.
+The server run must reach the ready marker without loading the client entrypoint.
+Runtime, sources, and smoke logs are uploaded as separate artifacts.
+
 Unit coverage includes:
 
 - safe configuration defaults;
@@ -58,7 +66,8 @@ Test with the feature disabled and enabled in:
 - underwater views;
 - chunk loading and block updates;
 - Sodium absent and present;
-- Minecraft 1.21.1 compatibility artifact, with Sodium absent and present;
+- each supported loader artifact, including NeoForge 26.2;
+- Minecraft 1.21.1 Fabric compatibility artifact, with Sodium absent and present;
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.
 

@@ -14,28 +14,30 @@
   <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <img src="https://img.shields.io/badge/Minecraft-26.2-2563eb.svg" alt="Minecraft 26.2">
   <img src="https://img.shields.io/badge/Minecraft-1.21.1-2563eb.svg" alt="Minecraft 1.21.1">
-  <img src="https://img.shields.io/badge/Fabric-client--side-2563eb.svg" alt="Fabric client-side mod">
+  <img src="https://img.shields.io/badge/Fabric%20%7C%20NeoForge-client--side-2563eb.svg" alt="Fabric and NeoForge client-side mod">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
 
-Water Optimisation is a small, opt-in Fabric mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry.
+Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry. Fabric builds support Minecraft 26.2 and 1.21.1; NeoForge support currently targets Minecraft 26.2.
 
 > This mod only changes what is rendered on the client. It does not change fluid simulation, terrain, collision, movement, networking, gameplay, or server state.
 
 ## Start here
 
-1. Download the [latest release](https://github.com/imCinq/water-optimisation/releases/latest) and choose the JAR for Minecraft 26.2 or 1.21.1.
+1. Download the [latest release](https://github.com/imCinq/water-optimisation/releases/latest) and choose the JAR matching both your Minecraft version and loader.
 2. Put the runtime JAR in the client’s `mods` folder.
-3. Launch a supported Minecraft version with Fabric.
-4. Open the settings from Mod Menu, or press `O` in the client.
+3. Launch a supported Minecraft version with Fabric or NeoForge. NeoForge is currently supported on 26.2 only.
+4. Open the settings from Mod Menu on Fabric or the Mods screen on NeoForge, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
 The current public [0.0.8.1 emergency hotfix](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.8.1) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. It supersedes v0.0.8 by removing an optional 26.2 startup-crash path. On 26.2, long settings labels use vanilla scrolling; the next release will use vanilla scrolling on both targets. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
-| Minecraft | Java | Build status | Geometry scope |
+| Minecraft | Loader | Java | Geometry scope |
 | --- | --- | --- | --- |
-| 26.2 | 25+ | 0.0.8.1 | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
-| 1.21.1 | 21+ | 0.0.8.1 | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
+| 26.2 | Fabric | 25+ | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
+| 26.2 | NeoForge 26.2.0.77+ | 25+ | Conservative vanilla hooks; packaged client/server smoke and mixin audit are enforced in CI. |
+| 1.21.1 | Fabric | 21+ | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
+| 1.21.1 | NeoForge | — | Not yet supported. |
 
 ## Pick a preset
 
@@ -91,6 +93,7 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 | Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
 | Fabric API | `0.158.0+26.2` for 26.2; `0.116.12+1.21.1` for 1.21.1 |
 | Mod Menu | Optional: `19.0.0-alpha.1` for 26.2; `11.0.4` for 1.21.1 |
+| NeoForge | `26.2.0.77+` for Minecraft 26.2 |
 | Environment | Client only |
 
 ## Documentation
