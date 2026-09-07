@@ -12,6 +12,7 @@ Water Optimisation 0.0.8.1 is the current public GitHub emergency hotfix with ta
 | Minecraft | 26.2 and 1.21.1, with target-specific artifacts |
 | Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
 | Fabric API | 0.158.0+26.2; 0.116.12+1.21.1 |
+| NeoForge | 26.2.0.77+ for Minecraft 26.2 |
 | Java | 25 for 26.2; 21 for 1.21.1 |
 | Mod Menu | Optional, 19.0.0-alpha.1 for 26.2; 11.0.4 for 1.21.1 |
 | Environment | Client |
@@ -28,8 +29,8 @@ GitHub Actions artifacts remain temporary build outputs. They expire and are not
 
 Before publishing a stable artifact:
 
-- the exact Minecraft, Fabric Loader, Fabric API, Java, Mod Menu, and companion-mod versions are documented;
-- the version in `gradle.properties`, generated `fabric.mod.json`, changelog, and release notes agrees;
+- the exact Minecraft, loader, loader API, Java, optional integration, and companion-mod versions are documented;
+- the version in `gradle.properties`, generated loader metadata, changelog, and release notes agrees;
 - the JAR is built from a reviewed tagged commit in a clean environment;
 - the runtime JAR contents and SHA-256 checksum are inspected and recorded;
 - privacy and client-only audits, tests, and the build pass;
@@ -57,12 +58,12 @@ Publishing is intentionally manual. No publishing automation or update checker i
 - Name: Water Optimisation
 - Creator attribution: Cinq
 - Category: Client-side rendering optimisation
-- Loader: Fabric
+- Loader: Fabric for 26.2 and 1.21.1; NeoForge for 26.2
 - Environment: Client
 - Minecraft target: 26.2 and 1.21.1, with target-specific artifacts
 - Java target: 25 for 26.2; 21 for 1.21.1
 - License: MIT
-- Required dependency: matching Fabric API build
+- Required dependency: matching Fabric API build on Fabric; NeoForge 26.2.0.77+ on NeoForge
 
 ## Credential boundary
 

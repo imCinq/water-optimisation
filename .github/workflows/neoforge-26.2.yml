@@ -24,9 +24,41 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and test NeoForge 26.2
         run: ./gradlew -p neoforge-26.2 test build --no-daemon --console=plain
+      - name: Verify packaged NeoForge 26.2 jar
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t runtime_jars < <(find neoforge-26.2/build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' | sort)
+          if [[ ${#runtime_jars[@]} -ne 1 ]]; then
+            echo "Expected exactly one runtime jar, found ${#runtime_jars[@]}" >&2
+            printf '%s\n' "${runtime_jars[@]}" >&2
+            exit 1
+          fi
+          runtime_jar="${runtime_jars[0]}"
+          entries="$(unzip -Z1 "$runtime_jar")"
+          grep -Fxq 'META-INF/neoforge.mods.toml' <<<"$entries"
+          grep -Fxq 'wateroptimisation.neoforge.mixins.json' <<<"$entries"
+          grep -Fxq 'LICENSE_water-optimisation-neoforge-26.2' <<<"$entries"
+          grep -Fxq 'io/github/imcinq/wateroptimisation/mixin/client/FluidRendererMixin.class' <<<"$entries"
+          if grep -Eq '(^|/)(fabric\.mod\.json|wateroptimisation\.(client|legacy)\.mixins\.json)$' <<<"$entries"; then
+            echo 'Fabric metadata was packaged in the NeoForge jar.' >&2
+            exit 1
+          fi
+          metadata="$(unzip -p "$runtime_jar" META-INF/neoforge.mods.toml)"
+          mod_version="$(sed -n 's/^mod_version=//p' neoforge-26.2/gradle.properties)"
+          neo_version_range="$(sed -n 's/^neo_version_range=//p' neoforge-26.2/gradle.properties)"
+          minecraft_version_range="$(sed -n 's/^minecraft_version_range=//p' neoforge-26.2/gradle.properties)"
+          grep -Fq 'modId="wateroptimisation"' <<<"$metadata"
+          grep -Fq "version=\"$mod_version\"" <<<"$metadata"
+          grep -Fq "versionRange=\"$neo_version_range\"" <<<"$metadata"
+          grep -Fq "versionRange=\"$minecraft_version_range\"" <<<"$metadata"
+          if grep -Fq '${' <<<"$metadata"; then
+            echo 'Unexpanded metadata placeholder found.' >&2
+            exit 1
+          fi
       - name: Install headless display support
         run: sudo apt-get update && sudo apt-get install --yes xvfb
-      - name: Run NeoForge 26.2 client startup smoke
+      - name: Run packaged NeoForge 26.2 client and mixin audit smoke
         shell: bash
         run: |
           set -euo pipefail
@@ -34,14 +66,14 @@ jobs:
           log_file="$smoke_dir/client.log"
           mkdir -p "$smoke_dir"
           : > "$log_file"
-          setsid xvfb-run -a ./gradlew -p neoforge-26.2 runClient --no-daemon --console=plain >"$log_file" 2>&1 &
+          setsid xvfb-run -a ./gradlew -p neoforge-26.2 runPackagedClient --no-daemon --console=plain >"$log_file" 2>&1 &
           launcher_pid=$!
-          marker="Water Optimisation initialized"
+          marker="Water Optimisation mixin audit completed"
           for attempt in $(seq 1 90); do
             if grep -Fq "$marker" "$log_file"; then
               kill -TERM -- "-$launcher_pid" 2>/dev/null || true
               wait "$launcher_pid" 2>/dev/null || true
-              echo "NeoForge client startup marker observed."
+              echo "Packaged NeoForge client startup and mixin audit markers observed."
               exit 0
             fi
             if ! kill -0 "$launcher_pid" 2>/dev/null; then
@@ -49,15 +81,57 @@ jobs:
             fi
             sleep 2
           done
-          echo "NeoForge client did not reach the startup marker." >&2
+          echo "Packaged NeoForge client did not complete the mixin audit." >&2
           tail -n 200 "$log_file" >&2 || true
           kill -TERM -- "-$launcher_pid" 2>/dev/null || true
           wait "$launcher_pid" 2>/dev/null || true
           exit 1
-      - name: Capture NeoForge artifact
+      - name: Run packaged NeoForge 26.2 dedicated-server smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="neoforge-26.2/build/smoke"
+          log_file="$smoke_dir/server.log"
+          mkdir -p "$smoke_dir"
+          : > "$log_file"
+          setsid ./gradlew -p neoforge-26.2 runPackagedServer --no-daemon --console=plain >"$log_file" 2>&1 &
+          launcher_pid=$!
+          marker='Done ('
+          for attempt in $(seq 1 90); do
+            if grep -Fq "$marker" "$log_file"; then
+              kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+              wait "$launcher_pid" 2>/dev/null || true
+              echo "Packaged NeoForge dedicated server reached ready state."
+              exit 0
+            fi
+            if ! kill -0 "$launcher_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          echo "Packaged NeoForge dedicated server did not reach ready state." >&2
+          tail -n 200 "$log_file" >&2 || true
+          kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+          wait "$launcher_pid" 2>/dev/null || true
+          exit 1
+      - name: Capture NeoForge runtime artifact
         uses: actions/upload-artifact@v7
         with:
-          name: water-optimisation-26.2-neoforge-artifacts
+          name: water-optimisation-26.2-neoforge-runtime
           path: |
-            neoforge-26.2/build/libs/
-            neoforge-26.2/build/smoke/
+            neoforge-26.2/build/libs/*.jar
+            !neoforge-26.2/build/libs/*-sources.jar
+          if-no-files-found: error
+      - name: Capture NeoForge sources artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: water-optimisation-26.2-neoforge-sources
+          path: neoforge-26.2/build/libs/*-sources.jar
+          if-no-files-found: error
+      - name: Capture NeoForge smoke logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: water-optimisation-26.2-neoforge-smoke-logs
+          path: neoforge-26.2/build/smoke/
+          if-no-files-found: warn

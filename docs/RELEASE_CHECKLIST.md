@@ -4,10 +4,10 @@ Use this checklist before publishing a Water Optimisation artifact. A passing CI
 
 ## Product and metadata
 
-- [ ] The release version is consistent in `gradle.properties`, generated `fabric.mod.json`, `CHANGELOG.md`, README release notes, and the GitHub Release.
+- [ ] The release version is consistent in `gradle.properties`, generated Fabric/NeoForge metadata, `CHANGELOG.md`, README release notes, and the GitHub Release.
 - [ ] The runtime product name and description remain focused on Water Optimisation; creator attribution is limited to project metadata, the license, and project documentation.
 - [ ] The README displays the creator logo from `assets/`, and the packaged runtime icon at `src/main/resources/assets/wateroptimisation/icon.png` is referenced by `fabric.mod.json`.
-- [ ] Installation requirements state the exact release target: Minecraft 26.2 with Java 25, Fabric Loader 0.19.3+, Fabric API 0.158.0+26.2, and optional Mod Menu 19.0.0-alpha.1; or Minecraft 1.21.1 with Java 21, Fabric Loader 0.16.13+, Fabric API 0.116.12+1.21.1, and optional Mod Menu 11.0.4.
+- [ ] Installation requirements state the exact release target: Minecraft 26.2 Fabric with Java 25, Fabric Loader 0.19.3+, Fabric API 0.158.0+26.2, and optional Mod Menu 19.0.0-alpha.1; Minecraft 26.2 NeoForge with Java 25 and NeoForge 26.2.0.77+; or Minecraft 1.21.1 Fabric with Java 21, Fabric Loader 0.16.13+, Fabric API 0.116.12+1.21.1, and optional Mod Menu 11.0.4.
 - [ ] Known limitations, visual trade-offs, fallback behavior, and the client-only boundary are documented.
 
 ## Source and privacy
@@ -26,10 +26,11 @@ Use this checklist before publishing a Water Optimisation artifact. A passing CI
 - [ ] The runtime JAR contents are inspected and contain no build cache, logs, screenshots, or private data.
 - [ ] SHA-256 checksums are calculated for the files that will be published.
 - [ ] The production startup smoke workflow passes for both target artifacts; its logs are retained with the release evidence.
+- [ ] The NeoForge runtime JAR passes archive-content, packaged-client Mixin audit, and packaged dedicated-server smoke checks.
 
 ## Local Minecraft validation
 
-- [ ] The exact artifacts are tested in clean Minecraft 26.2 and 1.21.1 Fabric clients.
+- [ ] The exact artifacts are tested in clean Minecraft 26.2 Fabric and NeoForge clients and a Minecraft 1.21.1 Fabric client.
 - [ ] Disabled, Balanced, and Performance modes are compared in the same warmed scenes.
 - [ ] Flat water, oceans, flowing water, waterfalls, waterlogged blocks, leaves, transparent blocks, flooded caves, and underwater views are checked.
 - [ ] No missing planes, seams, z-fighting, overlay errors, lighting differences, wrong flow orientation, stale geometry, or clipped settings text are observed.

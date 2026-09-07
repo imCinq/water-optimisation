@@ -26,6 +26,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -68,6 +69,10 @@ public final class WaterOptimisationClient {
 		sodiumLoaded = ModList.get().isLoaded("sodium");
 		ConfigManager.load();
 		FluidOptimizationPolicy.refresh();
+		if (Boolean.getBoolean("wateroptimisation.verifyMixins")) {
+			MixinEnvironment.getCurrentEnvironment().audit();
+			LOGGER.info("Water Optimisation mixin audit completed");
+		}
 
 		if (sodiumLoaded) {
 			LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and Sodium remains the water-geometry owner. Water Optimisation applies local particle controls only.");

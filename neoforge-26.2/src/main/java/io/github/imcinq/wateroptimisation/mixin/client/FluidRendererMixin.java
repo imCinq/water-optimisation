@@ -78,7 +78,7 @@ public abstract class FluidRendererMixin {
 					ordinal = 0
 			),
 			cancellable = true,
-			require = 0,
+			require = 1,
 			locals = LocalCapture.CAPTURE_FAILSOFT
 	)
 	private void wateroptimisation$skipInteriorSourceWater(

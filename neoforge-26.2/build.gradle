@@ -32,6 +32,10 @@ sourceSets {
     test {
         java.srcDir('../src/test/java')
     }
+    // Empty source set used by CI to launch Minecraft with only the packaged
+    // runtime jar on the mod classpath. This catches packaging differences
+    // that the normal development source-set run cannot see.
+    packagedSmoke
 }
 
 sourceSets.main.resources.srcDir('src/generated/resources')
@@ -44,6 +48,18 @@ neoForge {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
+        packagedClient {
+            client()
+            sourceSet = sourceSets.packagedSmoke
+            loadedMods = []
+            systemProperty 'wateroptimisation.verifyMixins', 'true'
+        }
+        packagedServer {
+            server()
+            sourceSet = sourceSets.packagedSmoke
+            loadedMods = []
+            programArgument '--nogui'
+        }
     }
 
     mods {
@@ -53,17 +69,20 @@ neoForge {
     }
 }
 
+neoForge.addModdingDependenciesTo sourceSets.packagedSmoke
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testImplementation 'com.google.code.gson:gson:2.13.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
+    packagedSmokeRuntimeOnly files(tasks.named('jar'))
 }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def replaceProperties = [
         minecraft_version      : minecraft_version,
         minecraft_version_range: minecraft_version_range,
-        neo_version            : neo_version,
+        neo_version_range      : neo_version_range,
         mod_id                 : mod_id,
         mod_name               : mod_name,
         mod_license            : mod_license,
@@ -84,6 +103,12 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
+}
+
+jar {
+    from('../LICENSE') {
+        rename { "LICENSE_${project.name}" }
+    }
 }
 
 tasks.test {
