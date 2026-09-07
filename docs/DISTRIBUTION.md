@@ -2,13 +2,13 @@
 
 ## Current status
 
-Water Optimisation 0.0.8.1 is the current public GitHub emergency hotfix with target-specific artifacts for Minecraft 26.2 and 1.21.1. It supersedes v0.0.8 because the earlier 26.2 package could crash during startup through an optional text-scrolling mixin. Earlier releases remain in the changelog and tags as historical records. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation 0.0.9 is the current public GitHub release. It adds standalone NeoForge 26.2 support alongside Fabric 26.2 and 1.21.1 artifacts, with packaged NeoForge client/server smoke and renderer-mixin checks. Earlier releases remain in the changelog and tags as historical records. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
 
 ## Current build profile
 
 | Field | Value |
 | --- | --- |
-| Mod version | 0.0.8.1 |
+| Mod version | 0.0.9 |
 | Minecraft | 26.2 and 1.21.1, with target-specific artifacts |
 | Fabric Loader | 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
 | Fabric API | 0.158.0+26.2; 0.116.12+1.21.1 |
@@ -21,7 +21,7 @@ Water Optimisation 0.0.8.1 is the current public GitHub emergency hotfix with ta
 
 ## Release artifacts
 
-Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.8.1) for the current target-specific runtime JARs, matching sources JARs, and `SHA256SUMS-0.0.8.1.txt`. The v0.0.8 release is superseded for 26.2 by this emergency hotfix.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.9) for the current target-specific Fabric and NeoForge runtime JARs, matching sources JARs, and `SHA256SUMS-0.0.9.txt`.
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 

@@ -30,7 +30,7 @@ Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu on Fabric or the Mods screen on NeoForge, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current public [0.0.8.1 emergency hotfix](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.8.1) provides target-specific artifacts for Minecraft 26.2 and 1.21.1 in one GitHub Release. It supersedes v0.0.8 by removing an optional 26.2 startup-crash path. On 26.2, long settings labels use vanilla scrolling; the next release will use vanilla scrolling on both targets. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current public [0.0.9 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.9) adds a standalone NeoForge 26.2 build alongside Fabric builds for Minecraft 26.2 and 1.21.1. NeoForge 26.2 requires Java 25 and NeoForge 26.2.0.77+; its packaged runtime is checked with client/server smoke tests and a renderer-mixin audit. Both Fabric targets use vanilla widget scrolling. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | Minecraft | Loader | Java | Geometry scope |
 | --- | --- | --- | --- |

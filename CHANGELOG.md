@@ -4,6 +4,10 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
+No changes yet.
+
+## 0.0.9 — 2026-09-07
+
 - 🧱 Add a standalone Minecraft 26.2 NeoForge target with loader-specific entrypoint, events, metadata, screens, and mixins while reusing version-neutral policy and assets.
 - 📦 Verify the exact NeoForge runtime JAR contents and launch that packaged artifact in both client and dedicated-server CI runs.
 - 🔎 Require and audit the NeoForge 26.2 renderer mixins so target drift cannot silently disable an advertised optimization.
@@ -169,4 +173,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.8.1 package is the current emergency-hotfix release for Minecraft 26.2 and 1.21.1.
+The preview entries below are retained as development history. The 0.0.9 package is the current release for Minecraft 26.2 Fabric/NeoForge and Minecraft 1.21.1 Fabric.
