@@ -58,6 +58,18 @@ jobs:
           fi
       - name: Install headless display support
         run: sudo apt-get update && sudo apt-get install --yes xvfb
+      - name: Capture NeoForge fluid renderer bytecode signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="neoforge-26.2/build/smoke"
+          mkdir -p "$smoke_dir"
+          minecraft_jar="$(find neoforge-26.2/build /home/runner/.gradle/caches -type f -name 'minecraft-patched-*.jar' -print -quit)"
+          if [[ -z "$minecraft_jar" ]]; then
+            echo 'Unable to locate the patched Minecraft jar.' >&2
+            exit 1
+          fi
+          javap -classpath "$minecraft_jar" -c -p net.minecraft.client.renderer.block.FluidRenderer > "$smoke_dir/FluidRenderer.javap"
       - name: Run packaged NeoForge 26.2 client and mixin audit smoke
         shell: bash
         run: |
@@ -69,7 +81,7 @@ jobs:
           setsid xvfb-run -a ./gradlew -p neoforge-26.2 runPackagedClient --no-daemon --console=plain >"$log_file" 2>&1 &
           launcher_pid=$!
           marker="Water Optimisation mixin audit completed"
-          for attempt in $(seq 1 90); do
+          for attempt in $(seq 1 30); do
             if grep -Fq "$marker" "$log_file"; then
               kill -TERM -- "-$launcher_pid" 2>/dev/null || true
               wait "$launcher_pid" 2>/dev/null || true
