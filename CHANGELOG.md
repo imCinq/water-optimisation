@@ -7,6 +7,7 @@ All notable changes to Water Optimisation are documented here.
 - 🧱 Add a standalone Minecraft 26.2 NeoForge target with loader-specific entrypoint, events, metadata, screens, and mixins while reusing version-neutral policy and assets.
 - 📦 Verify the exact NeoForge runtime JAR contents and launch that packaged artifact in both client and dedicated-server CI runs.
 - 🔎 Require and audit the NeoForge 26.2 renderer mixins so target drift cannot silently disable an advertised optimization.
+- 🛠️ Target NeoForge's patched `FluidRenderer.shouldRenderFace` overload so the hidden-water fast path applies in the packaged runtime.
 - 📄 Package the MIT license, separate runtime/sources/log artifacts, and document the initial NeoForge 26.2.0.77+ support floor.
 - 🛡️ Preserve newer configuration files during a downgrade by using safe defaults and refusing to rewrite the unsupported schema.
 - 🧹 Remove the remaining 1.21.1 global text-scrolling hook so both targets use vanilla widget scrolling.
