@@ -9,7 +9,7 @@ version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = "water-optimisation-neoforge-\${minecraft_version}"
+    archivesName = "water-optimisation-neoforge-${minecraft_version}"
 }
 
 // Mojang ships Java 25 to end users in 26.2, so the NeoForge target uses Java 25.
@@ -47,7 +47,7 @@ neoForge {
     }
 
     mods {
-        "\${mod_id}" {
+        "${mod_id}" {
             sourceSet(sourceSets.main)
         }
     }
