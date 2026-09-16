@@ -24,7 +24,7 @@ Install that runtime JAR, not the sources JAR, in an isolated Minecraft 26.3 Fab
 ./gradlew -Ptarget_minecraft=26.3 prodClient
 ```
 
-Close the client manually when finished. Do not assume the existing release smoke scripts or CI matrix cover this preview.
+Close the client manually when finished. For bounded startup testing, run `bash scripts/smoke-production-client.sh 26.3`. The build and production-smoke CI matrices now include 26.3, with a separate artifact upload path. Local packaged-JAR startup passed (initialization marker plus five seconds alive); CI has not yet run on GitHub. Mod Menu/Sodium combination checks remain outstanding.
 
 ## Scope and validation
 
