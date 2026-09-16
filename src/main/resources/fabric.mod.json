@@ -22,7 +22,10 @@
 		]
 	},
 	"mixins": [
-		${client_mixin_entry}
+		{
+			"config": "${client_mixin_config}",
+			"environment": "client"
+		}
 	],
 	"suggests": {
 		"modmenu": "${modmenu_dependency}"

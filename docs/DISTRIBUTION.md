@@ -25,6 +25,12 @@ Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
+## Fabric 26.3 preview — unpublished
+
+The separate `0.0.10-26.3-preview.1` build uses `-Ptarget_minecraft=26.3` and `version_263`, producing `build/26.3/libs/water-optimisation-0.0.10-26.3-preview.1-mc26.3-fabric.jar`. It requires Java 25, Fabric Loader `0.19.5`, and Fabric API `0.160.6+26.3`; Mod Menu `21.0.0-beta.1` is optional. The 16 policy tests pass, but in-world visual and FPS validation remain outstanding.
+
+This preview is not published and does not extend the public 0.0.9 support claims or listing facts. Any publication must be a separate, explicitly labeled pre-release with its own artifacts, checksum, and validation caveats—not a replacement for 0.0.9. Follow the [26.3 preview build/test/release guide](FABRIC_26_3.md), including OIT on/off, hook observation and skips, Sodium particle-only behavior, both backends on supported hardware, and mod-off/on comparisons.
+
 ## Stable release requirements
 
 Before publishing a stable artifact:

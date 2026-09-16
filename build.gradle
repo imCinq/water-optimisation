@@ -5,33 +5,39 @@ plugins {
 }
 
 def targetMinecraft = providers.gradleProperty("target_minecraft").orElse("26.2").get()
-def legacyTarget = targetMinecraft == "1.21.1"
-if (!legacyTarget && targetMinecraft != "26.2") {
-	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2 or 1.21.1.")
+def targetProfiles = ["26.2": "", "1.21.1": "_1211", "26.3": "_263"]
+if (!targetProfiles.containsKey(targetMinecraft)) {
+	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2, 1.21.1 or 26.3.")
 }
+def legacyTarget = targetMinecraft == "1.21.1"
+def target263 = targetMinecraft == "26.3"
+def propertySuffix = targetProfiles[targetMinecraft]
 apply plugin: legacyTarget ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
 
-def targetMinecraftVersion = legacyTarget ? project.minecraft_version_1211 : project.minecraft_version
-def targetLoaderVersion = legacyTarget ? project.loader_version_1211 : project.loader_version
-def targetFabricApiVersion = legacyTarget ? project.fabric_api_version_1211 : project.fabric_api_version
-def targetModMenuVersion = legacyTarget ? project.modmenu_version_1211 : project.modmenu_version
+// Keep the new target's outputs and version separate from existing releases.
+if (target263) {
+	layout.buildDirectory = layout.projectDirectory.dir("build/26.3")
+	version = project.version_263
+	base.archivesName = "water-optimisation"
+}
+def targetMinecraftVersion = project.property("minecraft_version${propertySuffix}")
+def targetLoaderVersion = project.property("loader_version${propertySuffix}")
+def targetFabricApiVersion = project.property("fabric_api_version${propertySuffix}")
+def targetModMenuVersion = project.property("modmenu_version${propertySuffix}")
 def targetJavaVersion = legacyTarget ? 21 : 25
 def modDependencyConfiguration = legacyTarget ? "modImplementation" : "implementation"
 def modCompileOnlyConfiguration = legacyTarget ? "modCompileOnly" : "compileOnly"
-def targetDescription = "Client-side water rendering optimisation for Minecraft 26.2 and 1.21.1 with conservative geometry culling, particle filtering, and diagnostics."
-def clientMixinEntry = """{
-			"config": "${legacyTarget ? "wateroptimisation.legacy.mixins.json" : "wateroptimisation.client.mixins.json"}",
-			"environment": "client"
-		}"""
+def targetDescription = "Client-side water rendering optimisation for Minecraft ${targetMinecraftVersion} with conservative geometry culling, particle filtering, and diagnostics."
+def clientMixinConfig = legacyTarget ? "wateroptimisation.legacy.mixins.json" : "wateroptimisation.client.mixins.json"
 
 def resourceExpansion = [
 	version: project.version,
 	target_description: targetDescription,
 	loader_dependency: ">=${targetLoaderVersion}",
-	minecraft_dependency: "~${targetMinecraftVersion}",
+	minecraft_dependency: target263 ? "${targetMinecraftVersion}" : "~${targetMinecraftVersion}",
 	java_dependency: ">=${targetJavaVersion}",
 	modmenu_dependency: ">=${targetModMenuVersion}",
-	client_mixin_entry: clientMixinEntry,
+	client_mixin_config: clientMixinConfig,
 	java_compatibility_level: "JAVA_${targetJavaVersion}",
 	mixin_default_require: legacyTarget ? 0 : 1
 ]
@@ -55,12 +61,17 @@ loom {
 	}
 }
 
-// The two Minecraft lines have incompatible client APIs. Keep the source
-// variants separate so a target can never accidentally load the other line's
-// GUI or renderer classes.
+// Modern renderer/UI code is shared; only the input adapter differs after SDL.
+// The legacy client remains entirely isolated.
 sourceSets.client.java.setSrcDirs(legacyTarget
 		? ["src/1.21.1/client/java"]
-		: ["src/client/java"])
+		: ["src/client/java", "src/${targetMinecraft}/client/java"])
+
+if (target263) {
+	tasks.withType(Jar).configureEach {
+		archiveVersion = "${project.version}-mc26.3-fabric"
+	}
+}
 
 dependencies {
 	minecraft "com.mojang:minecraft:${targetMinecraftVersion}"
@@ -86,7 +97,42 @@ processResources {
 	filesMatching("wateroptimisation.client.mixins.json") {
 		expand resourceExpansion
 	}
+	// Only ship the descriptor used by this target.
+	exclude legacyTarget ? "wateroptimisation.client.mixins.json" : "wateroptimisation.legacy.mixins.json"
 }
+
+// Validate the distributed artifact, not just the unexpanded source template.
+tasks.register("verifyArtifact") {
+	group = "verification"
+	def runtimeJar = tasks.named(legacyTarget ? "remapJar" : "jar")
+	dependsOn runtimeJar
+	inputs.file(runtimeJar.flatMap { it.archiveFile })
+	doLast {
+		def archive = runtimeJar.get().archiveFile.get().asFile
+		new java.util.zip.ZipFile(archive).withCloseable { zip ->
+			def json = new groovy.json.JsonSlurper()
+			def metadata = json.parse(zip.getInputStream(zip.getEntry("fabric.mod.json")))
+			assert metadata.id == "wateroptimisation"
+			assert metadata.version == project.version.toString()
+			assert metadata.environment == "client"
+			assert metadata.depends.minecraft == resourceExpansion.minecraft_dependency
+			assert metadata.depends.fabricloader == resourceExpansion.loader_dependency
+			assert metadata.depends.java == resourceExpansion.java_dependency
+			assert metadata.mixins*.config == [clientMixinConfig]
+			assert metadata.entrypoints.keySet() == ["client", "modmenu"] as Set
+			assert zip.getEntry("assets/wateroptimisation/icon.png") != null
+			def mixins = json.parse(zip.getInputStream(zip.getEntry(clientMixinConfig)))
+			assert mixins.compatibilityLevel == "JAVA_${targetJavaVersion}"
+			mixins.client.each { name ->
+				assert zip.getEntry("${mixins.package.replace('.', '/')}/${name}.class") != null
+			}
+			assert zip.getEntry(legacyTarget ? "wateroptimisation.client.mixins.json" : "wateroptimisation.legacy.mixins.json") == null
+			assert (zip.getEntry("io/github/imcinq/wateroptimisation/KeyboardInput.class") != null) == !legacyTarget
+		}
+		logger.lifecycle("Verified ${archive.name}: Minecraft ${targetMinecraftVersion}, Java ${targetJavaVersion}, client-only.")
+	}
+}
+tasks.named("check") { dependsOn "verifyArtifact" }
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = targetJavaVersion

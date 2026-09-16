@@ -4,7 +4,12 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-No changes yet.
+### Fabric 26.3 preview — not published
+
+- Add the separate `-Ptarget_minecraft=26.3` preview target with `version_263=0.0.10-26.3-preview.1` and isolated output under `build/26.3/libs/`; public 0.0.9 support and artifacts remain unchanged.
+- Use Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3`, and optional Mod Menu `21.0.0-beta.1`.
+- Adapt only the keyboard input adapter for 26.3 while sharing the remaining modern client code; Sodium continues to own geometry with a particle-only fallback.
+- Record 16 passing policy tests, not in-world visual or FPS validation. OIT on/off, visual, hook-observation/skip, backend, and mod-off/on benchmark checks remain outstanding; see the [preview guide](docs/FABRIC_26_3.md).
 
 ## 0.0.9 — 2026-09-07
 

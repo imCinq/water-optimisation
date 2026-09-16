@@ -39,6 +39,10 @@ The current public [0.0.9 release](https://github.com/imCinq/water-optimisation/
 | 1.21.1 | Fabric | 21+ | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 | 1.21.1 | NeoForge | — | Not yet supported. |
 
+## Minecraft 26.3 Fabric preview — unpublished
+
+A separate `0.0.10-26.3-preview.1` target is available to build with `-Ptarget_minecraft=26.3`, using Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3`, and optional Mod Menu `21.0.0-beta.1`. Only the keyboard input adapter differs from the shared modern client code. The 16 policy tests pass, but in-world visuals and FPS are **not validated**. This preview has not been published and does not change the public 0.0.9 support matrix above. See the [26.3 preview build, test, and release guide](docs/FABRIC_26_3.md).
+
 ## Pick a preset
 
 The preset selector gives the common choices clear names. Selecting a preset resets its advanced values.
