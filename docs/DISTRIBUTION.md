@@ -25,6 +25,12 @@ Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
+## Fabric 26.3 preview — unpublished
+
+The separate `0.0.10-26.3-preview.2` build uses `-Ptarget_minecraft=26.3` and `version_263`, producing `build/26.3/libs/water-optimisation-0.0.10-26.3-preview.2-mc26.3-fabric.jar`. It requires Java 25, Fabric Loader `0.19.5`, and Fabric API `0.160.6+26.3`; the API metadata floor is `>=0.160.6+26.3` for 26.3 only. Mod Menu `21.0.0-beta.1` is optional. The expected Fabric 26.3 suite is now 25 tests: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. The newer historical local result passed all 25 via `test` only. Earlier evidence separately records a forced `test build verifyArtifact --rerun-tasks` pass with 20 tests, not a 25-test full build. A separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. Current-SHA CI passed for builds and startup smoke per runs 35237266215 and 35237266249; transformed-Mixin cancellation/exception validation remains an open nonvisual gate, and startup success alone does not prove optional local-capture hook execution. No project-run in-game tests were run for this hardening, and in-world visual and FPS validation remain outstanding. The [PREVIEW release notes](FABRIC_26_3_RELEASE_NOTES.md) describe the fixes and remaining limitations. A user-reported pass dated 2026-09-17 covered Apple M2 hardware, macOS 27, OpenGL, Sodium absent, and Mod Menu present on CI runtime `water-optimisation-0.0.10-26.3-preview.2-mc26.3-fabric.jar` (SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`); the full visual matrix and FPS remain unvalidated.
+
+This preview is not published and does not extend the public 0.0.9 support claims or listing facts. Any publication must be a separate, explicitly labeled pre-release with its own artifacts, checksum, and validation caveats—not a replacement for 0.0.9. Follow the [26.3 preview build/test/release guide](FABRIC_26_3.md), including OIT on/off, hook observation and skips, Sodium particle-only behavior, both backends on supported hardware, and mod-off/on comparisons.
+
 ## Stable release requirements
 
 Before publishing a stable artifact:

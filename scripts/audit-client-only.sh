@@ -25,10 +25,15 @@ fi
 # entire network package.
 forbidden_pattern='ClientPlayNetworking|ServerPlayNetworking|ClientPacket|ServerPacket|net\.minecraft\.network\.(protocol|Connection|FriendlyByteBuf|RegistryFriendlyByteBuf|Packet|PacketListener)|net\.minecraft\.server\.|ServerTickEvents|ServerLifecycleEvents|setBlockAndUpdate|setDeltaMovement|setVelocity|teleportTo|clickSlot|sendChat'
 
-if grep -RInE \
+# The modern predicate fixture initializes vanilla registries without starting
+# a server. Permit only its exact Bootstrap import, not server APIs generally.
+violations=$(grep -RInE \
 	--include='*.java' \
 	--include='*.kt' \
-	"$forbidden_pattern" "$source_root"; then
+	"$forbidden_pattern" "$source_root" || true)
+violations=$(printf '%s\n' "$violations" | grep -vE '^src/test/java/io/github/imcinq/wateroptimisation/FluidOptimizationPolicyTest\.java:[0-9]+:import net\.minecraft\.server\.Bootstrap;$' || true)
+if [[ -n "$violations" ]]; then
+	printf '%s\n' "$violations"
 	echo "Client-only audit failed: a forbidden networking, server, or gameplay mutation reference was found." >&2
 	exit 1
 fi

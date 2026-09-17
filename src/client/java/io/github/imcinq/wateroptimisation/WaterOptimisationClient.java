@@ -45,7 +45,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		FluidOptimizationPolicy.refresh();
 		openConfigKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.wateroptimisation.open_config",
-				InputConstants.Type.KEYSYM,
+				KeyboardInput.type(),
 				InputConstants.KEY_O,
 				KEY_CATEGORY
 		));

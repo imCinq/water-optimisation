@@ -39,6 +39,10 @@ The current public [0.0.9 release](https://github.com/imCinq/water-optimisation/
 | 1.21.1 | Fabric | 21+ | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
 | 1.21.1 | NeoForge | — | Not yet supported. |
 
+## Minecraft 26.3 Fabric preview — unpublished
+
+A separate `0.0.10-26.3-preview.2` target is available to build with `-Ptarget_minecraft=26.3`, using Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3` (metadata floor `>=0.160.6+26.3` for 26.3 only), and optional Mod Menu `21.0.0-beta.1`. Only the keyboard input adapter differs from the shared modern client code. Preview.2 hardens configuration-log privacy, pins the Gradle distribution checksum, brackets fluid tessellation with try/finally cleanup, and corrects hidden-water skipping beneath solid ceilings. The newer historical local Fabric 26.3 result is 25 tests passed via `test`: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. Earlier evidence separately records a forced `test build verifyArtifact --rerun-tasks` pass with 20 tests and clean repository/client-only audits and whitespace checks; it is not a 25-test full-build result. A separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. Current-SHA CI passed for builds and startup smoke per runs 35237266215 and 35237266249, and no project-run in-game tests were run for this hardening. Transformed-Mixin cancellation/exception validation remains an open nonvisual gate; helper tests and startup success do not prove transformed behavior or optional local-capture hook execution. A user-reported pass dated 2026-09-17 covered Apple M2 hardware, macOS 27, OpenGL, Sodium absent, and Mod Menu present on CI runtime `water-optimisation-0.0.10-26.3-preview.2-mc26.3-fabric.jar` (SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`); the full visual matrix and FPS remain unvalidated. This preview has not been published and does not change the public 0.0.9 support matrix above. See the [26.3 preview build, test, and release guide](docs/FABRIC_26_3.md) and [PREVIEW release notes](docs/FABRIC_26_3_RELEASE_NOTES.md).
+
 ## Pick a preset
 
 The preset selector gives the common choices clear names. Selecting a preset resets its advanced values.
@@ -56,7 +60,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 
 ### Fully hidden water blocks
 
-During section compilation, the mod reuses the six neighbor states that Minecraft has already loaded. If an ordinary full source-water block is hidden on every side by source water or a full solid-rendering block, the mod skips its fluid tessellation entirely.
+During section compilation, the modern renderer hook reuses the six neighbor states that Minecraft has already loaded to identify hidden ordinary source water. In the preview.2 hardening, shared modern Fabric and NeoForge require ordinary source water **above**; source water or full solid-rendering blocks may hide the down/side faces. A solid ceiling alone is not sufficient because a water surface can remain visible beneath it. This correction does not retroactively change the published 0.0.9 artifacts.
 
 Open-surface water does not qualify, so visible top faces remain. Flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous states fall back to vanilla tessellation.
 
