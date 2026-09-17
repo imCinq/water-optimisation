@@ -4,7 +4,9 @@ import io.github.imcinq.wateroptimisation.Diagnostics;
 import io.github.imcinq.wateroptimisation.FluidOptimizationPolicy;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import io.github.imcinq.wateroptimisation.TessellationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -19,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(FluidRenderer.class)
 public abstract class FluidRendererMixin {
 	@Unique
-	private static final ThreadLocal<Boolean> wateroptimisation$waterTessellation = new ThreadLocal<>();
+	private static final TessellationContext wateroptimisation$waterTessellation = new TessellationContext();
 
 	/**
 	 * Vanilla's addFace method emits the outward face and, when requested, its
@@ -32,13 +34,8 @@ public abstract class FluidRendererMixin {
 		if (diagnosticsEnabled) {
 			Diagnostics.recordFluidFace(addBackFace);
 		}
-		if (!addBackFace) {
-			return addBackFace;
-		}
-		if (!FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
-			return addBackFace;
-		}
-		if (!Boolean.TRUE.equals(wateroptimisation$waterTessellation.get())) {
+		if (!addBackFace || !FluidOptimizationPolicy.reducedWaterBackfacesActive()
+				|| !wateroptimisation$waterTessellation.isOrdinaryWater()) {
 			return addBackFace;
 		}
 		if (diagnosticsEnabled) {
@@ -47,26 +44,30 @@ public abstract class FluidRendererMixin {
 		return false;
 	}
 
-	@Inject(method = "tesselate", at = @At("HEAD"))
-	private void wateroptimisation$beforeTesselate(
+	/** Bracket the complete transformed method, including cancellation and exceptions. */
+	@WrapMethod(method = "tesselate")
+	private void wateroptimisation$withInvocationState(
 			BlockAndTintGetter level,
 			BlockPos pos,
 			FluidRenderer.Output output,
 			BlockState blockState,
 			FluidState fluidState,
-			CallbackInfo callback
+			Operation<Void> original
 	) {
-		boolean reducedBackfacesActive = FluidOptimizationPolicy.reducedWaterBackfacesActive();
-		if (reducedBackfacesActive) {
-			if (FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState)) {
-				wateroptimisation$waterTessellation.set(Boolean.TRUE);
-			} else {
-				wateroptimisation$waterTessellation.set(Boolean.FALSE);
-			}
-		}
 		boolean diagnosticsEnabled = Diagnostics.isEnabled();
-		if (diagnosticsEnabled) {
-			Diagnostics.beginFluidCompile();
+		boolean reducedBackfacesActive = FluidOptimizationPolicy.reducedWaterBackfacesActive();
+		Boolean previous = wateroptimisation$waterTessellation.enter(
+				reducedBackfacesActive && FluidOptimizationPolicy.isOrdinarySourceWater(blockState, fluidState));
+		try {
+			if (diagnosticsEnabled) {
+				Diagnostics.beginFluidCompile();
+			}
+			original.call(level, pos, output, blockState, fluidState);
+		} finally {
+			wateroptimisation$waterTessellation.exit(previous);
+			if (diagnosticsEnabled) {
+				Diagnostics.endFluidCompile();
+			}
 		}
 	}
 
@@ -130,26 +131,8 @@ public abstract class FluidRendererMixin {
 
 		if (Diagnostics.isEnabled()) {
 			Diagnostics.recordFluidFastPathSkip();
-			Diagnostics.endFluidCompile();
 		}
-		wateroptimisation$waterTessellation.remove();
+		// The enclosing WrapMethod finally block closes diagnostics and state.
 		callback.cancel();
-	}
-
-	@Inject(method = "tesselate", at = @At("RETURN"))
-	private void wateroptimisation$afterTesselate(
-			BlockAndTintGetter level,
-			BlockPos pos,
-			FluidRenderer.Output output,
-			BlockState blockState,
-			FluidState fluidState,
-			CallbackInfo callback
-	) {
-		if (FluidOptimizationPolicy.reducedWaterBackfacesActive()) {
-			wateroptimisation$waterTessellation.remove();
-		}
-		if (Diagnostics.isEnabled()) {
-			Diagnostics.endFluidCompile();
-		}
 	}
 }

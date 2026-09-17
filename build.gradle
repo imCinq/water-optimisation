@@ -34,6 +34,7 @@ def resourceExpansion = [
 	version: project.version,
 	target_description: targetDescription,
 	loader_dependency: ">=${targetLoaderVersion}",
+	fabric_api_dependency: target263 ? ">=${targetFabricApiVersion}" : "*",
 	minecraft_dependency: target263 ? "${targetMinecraftVersion}" : "~${targetMinecraftVersion}",
 	java_dependency: ">=${targetJavaVersion}",
 	modmenu_dependency: ">=${targetModMenuVersion}",
@@ -85,6 +86,7 @@ dependencies {
 	productionRuntimeMods "net.fabricmc.fabric-api:fabric-api:${targetFabricApiVersion}"
 	add(modCompileOnlyConfiguration, "com.terraformersmc:modmenu:${targetModMenuVersion}")
 	testImplementation "org.junit.jupiter:junit-jupiter:5.13.4"
+	testImplementation "org.mockito:mockito-core:5.18.0"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.13.4"
 }
 
@@ -117,6 +119,7 @@ tasks.register("verifyArtifact") {
 			assert metadata.environment == "client"
 			assert metadata.depends.minecraft == resourceExpansion.minecraft_dependency
 			assert metadata.depends.fabricloader == resourceExpansion.loader_dependency
+			assert metadata.depends['fabric-api'] == resourceExpansion.fabric_api_dependency
 			assert metadata.depends.java == resourceExpansion.java_dependency
 			assert metadata.mixins*.config == [clientMixinConfig]
 			assert metadata.entrypoints.keySet() == ["client", "modmenu"] as Set
@@ -136,6 +139,11 @@ tasks.named("check") { dependsOn "verifyArtifact" }
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = targetJavaVersion
+}
+
+// The mocked block fixture targets the modern Fabric Minecraft API only.
+if (legacyTarget) {
+	sourceSets.test.java.exclude('**/FluidOptimizationPolicyTest.java')
 }
 
 tasks.test {

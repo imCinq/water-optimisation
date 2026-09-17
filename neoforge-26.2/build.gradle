@@ -31,6 +31,8 @@ sourceSets {
     }
     test {
         java.srcDir('../src/test/java')
+        // This mocked fixture targets the modern Fabric test environment.
+        java.exclude('**/FluidOptimizationPolicyTest.java')
     }
     // Empty source set used by CI to launch Minecraft with only the packaged
     // runtime jar on the mod classpath. This catches packaging differences

@@ -128,7 +128,8 @@ public final class FluidOptimizationPolicy {
 
 		// Surface water is the common case in oceans and open pools. Check the
 		// upward face first so visible water fails before testing every neighbor.
-		return hidesFluidFace(blockStateUp, fluidStateUp)
+		// A solid ceiling does not hide a surface below full block height.
+		return isOrdinarySourceWater(blockStateUp, fluidStateUp)
 				&& hidesFluidFace(blockStateDown, fluidStateDown)
 				&& hidesFluidFace(blockStateNorth, fluidStateNorth)
 				&& hidesFluidFace(blockStateSouth, fluidStateSouth)

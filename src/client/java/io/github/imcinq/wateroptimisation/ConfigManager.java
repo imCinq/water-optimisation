@@ -17,6 +17,8 @@ import java.nio.file.StandardOpenOption;
 
 public final class ConfigManager {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	// Fixed privacy-safe label for log messages; the absolute config path is never logged.
+	private static final String CONFIG_FILE_NAME = "config/wateroptimisation.json";
 	private static volatile WaterOptimisationConfig config = WaterOptimisationConfig.defaults();
 	private static volatile Path configPath;
 	// A future schema is read-only for this version so unknown fields cannot be lost.
@@ -44,9 +46,8 @@ public final class ConfigManager {
 				futureConfigLoaded = true;
 				applyConfig(WaterOptimisationConfig.defaults());
 				WaterOptimisationClient.LOGGER.warn(
-						"Configuration at {} uses newer schema version {}; using safe defaults without rewriting it.",
-						path,
-						sourceVersion
+						"Configuration {} uses a newer schema; using safe defaults without rewriting it.",
+						CONFIG_FILE_NAME
 				);
 				return;
 			}
@@ -61,12 +62,20 @@ public final class ConfigManager {
 				try {
 					writeConfig(path, loaded);
 				} catch (IOException | RuntimeException exception) {
-					WaterOptimisationClient.LOGGER.warn("Could not persist the migrated configuration at {}.", path, exception);
+					WaterOptimisationClient.LOGGER.warn(
+							"Could not persist the migrated configuration in {}: {}.",
+							CONFIG_FILE_NAME,
+							exception instanceof IOException ? "I/O error" : "invalid configuration"
+					);
 				}
 			}
 		} catch (IOException | RuntimeException exception) {
 			applyConfig(WaterOptimisationConfig.defaults());
-			WaterOptimisationClient.LOGGER.warn("Could not load {}, using safe defaults.", path, exception);
+			WaterOptimisationClient.LOGGER.warn(
+					"Could not load {}, using safe defaults: {}.",
+					CONFIG_FILE_NAME,
+					exception instanceof IOException ? "I/O error" : "invalid configuration"
+			);
 		}
 	}
 
@@ -84,7 +93,7 @@ public final class ConfigManager {
 				|| (updated != null && updated.getConfigVersion() > WaterOptimisationConfig.CURRENT_CONFIG_VERSION)) {
 			WaterOptimisationClient.LOGGER.warn(
 					"Not saving {} because it belongs to a newer configuration schema; upgrade the mod before editing it.",
-					path
+					CONFIG_FILE_NAME
 			);
 			return;
 		}
@@ -95,7 +104,11 @@ public final class ConfigManager {
 			writeConfig(path, safeCopy);
 			applyConfig(safeCopy);
 		} catch (IOException | RuntimeException exception) {
-			WaterOptimisationClient.LOGGER.error("Could not save {}.", path, exception);
+			WaterOptimisationClient.LOGGER.error(
+					"Could not save {}: {}.",
+					CONFIG_FILE_NAME,
+					exception instanceof IOException ? "I/O error" : "invalid configuration"
+			);
 		}
 	}
 

@@ -2,7 +2,23 @@
 
 Date: 16 September 2026. Implementation audited: `a3ab4c5`, following `7fae4fb`. Scope: Water Optimisation only; Fabric 26.3. No Minecraft client was launched for this audit. Prior startup evidence is not counted as scene/mixin verification.
 
-## Verdict
+## Follow-up — 16 September 2026, preview.2 hardening
+
+**This document is a historical audit of the commits identified above, not a current verification report for preview.2.** The original findings below are retained as evidence of what was reviewed then; source line numbers, the 16-test count, and the metadata/cleanup findings refer to that snapshot. Consult the [current preview guide](FABRIC_26_3.md) and [PREVIEW release notes](FABRIC_26_3_RELEASE_NOTES.md) for current scope and outstanding gates.
+
+**Correction of the ceiling-water finding:** the earlier review erroneously dismissed the visual-review report about water under a solid ceiling. That dismissal was wrong. Section 3 accurately described the old all-six-neighbor predicate but did not establish visual safety: a solid block above does not necessarily hide a water surface below full block height. The old predicate could therefore skip visible ceiling-adjacent water. Preview.2 corrects the shared modern Fabric and NeoForge 26.2 predicates to require **ordinary source water above**. Source water or solid-rendering blocks may still hide the down/side faces. This supersedes any earlier implication that the old predicate proved ceiling-water safety; the fix has not been validated in a game scene.
+
+Other hardening changes since the original audit:
+
+- The Gradle 9.7.1 distribution SHA-256 checksum is pinned in the wrapper configuration.
+- Modern Fabric, legacy Fabric 1.21.1, and NeoForge configuration logs use a fixed relative label and generic error categories, avoiding absolute paths, configuration values, and exception payloads.
+- The shared modern fluid mixin now uses a real MixinExtras `@WrapMethod` around `tesselate`, with try/finally cleanup rather than policy-gated HEAD/RETURN cleanup. `TessellationContext` clears per-worker eligibility on ordinary returns, cancellation, and exceptions, and restores the outer eligibility after nested calls. Fluid diagnostics closure uses the entry-time enabled flag. This addresses the fluid-invocation cleanup finding in sections 4 and 7; it is not proof of nested diagnostics accounting or a blanket fix for other timing hooks.
+- Generated Fabric API metadata now requires `>=0.160.6+26.3` for 26.3 only, superseding section 1's wildcard finding for that target. Other targets retain their prior metadata behavior.
+- The expected test suite is now **20 tests: 16 existing plus 4 context tests** for ordinary/cancelled returns, exceptional exit, nested eligibility restoration, and worker isolation. These isolated tests do not exercise a transformed Minecraft renderer or water scenes.
+
+**Still open:** optional `require=0` / `CAPTURE_FAILSOFT` local capture can leave vanilla running without the fast path; selected/active state is not proof of hook availability. Unknown replacement renderers, actual mod combinations, OIT/backend behavior, visuals and FPS remain unverified. Opt-in backface reduction can lose underwater inward faces; cleanup hardening does not remove that visual trade-off. No in-game tests were run for this follow-up, and CI is pending. Historical build/startup evidence below must not be carried forward as exact-artifact preview.2 validation.
+
+## Original audit verdict (historical)
 
 **The 26.3 source port and vanilla hook locations check out. The complete checklist does not pass yet.** There are non-play-test hardening gaps around optional hook detection and invocation cleanup, plus limitations in diagnostic interpretation. Visual, performance, hardware and mod-combination assertions cannot be signed off from source inspection.
 
@@ -129,3 +145,11 @@ Project files: `build.gradle`; `src/main/resources/fabric.mod.json`; `src/client
 Official JARs: 26.3 SHA-1 above, 26.2 SHA-1 `2dc72797acbc1b63fc16a11c4ac393605f453754`. `javap` evidence includes FluidRenderer with locals, SectionCompiler, CompileTask, ResortTransparencyTask, RenderSection, LevelRenderer, GameRenderer, MeshData and SortState. Offsets quoted are method bytecode offsets, not Java source line numbers.
 
 Research background: [Fabric 26.3 guide](https://fabricmc.net/2026/09/15/263.html), [OIT changes](https://www.minecraft.net/en-us/article/minecraft-26-3-snapshot-2), [indirect terrain changes](https://www.minecraft.net/en-us/article/minecraft-26-3-snapshot-6). The conclusions about remaining initial sorting are from final-release bytecode, not assumptions from those announcements.
+
+## Current evidence note — 17 September 2026
+
+Historical entries above are retained unchanged. The newer reported historical local Fabric 26.3 result is **25 tests passed via `test`**: 16 config-model tests (`WaterOptimisationConfigTest`), 4 context helper tests (`TessellationContextTest`), and 5 mocked predicate tests (`FluidOptimizationPolicyTest`, using Mockito 5.18.0). Config-model tests are not captured logging tests. Earlier evidence separately records a forced `test build verifyArtifact --rerun-tasks` pass with 20 tests and clean repository/client-only audits and whitespace checks; that earlier result must not be described as a 25-test full-build pass. A separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added.
+
+The wrapper source review reported no defect, but did not demonstrate transformed-Mixin execution. Helper tests do not demonstrate transformed cancellation/exception behavior; exact-artifact transformed-Mixin validation remains an open **nonvisual** gate. Startup success alone does not prove the optional local-capture hook executed. Current-change CI, exact CI artifact inspection, and fresh artifact checksums remain pending.
+
+The ceiling-water correction above stands: solid ceilings do not establish top-surface occlusion; ordinary source water above is now required. In-world hook observation/skips, visual scenes, OIT/backend and companion-mod combinations, and performance validation remain open and were not performed for this note. No stable acceptance or publication is implied.

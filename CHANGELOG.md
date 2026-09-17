@@ -6,10 +6,14 @@ All notable changes to Water Optimisation are documented here.
 
 ### Fabric 26.3 preview — not published
 
-- Add the separate `-Ptarget_minecraft=26.3` preview target with `version_263=0.0.10-26.3-preview.1` and isolated output under `build/26.3/libs/`; public 0.0.9 support and artifacts remain unchanged.
-- Use Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3`, and optional Mod Menu `21.0.0-beta.1`.
+- Add the separate `-Ptarget_minecraft=26.3` preview target with `version_263=0.0.10-26.3-preview.2` and isolated output under `build/26.3/libs/`; public 0.0.9 support and artifacts remain unchanged.
+- Use Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3`, and optional Mod Menu `21.0.0-beta.1`. Enforce the Fabric API metadata floor `>=0.160.6+26.3` for the 26.3 target only; older targets retain their metadata behavior.
 - Adapt only the keyboard input adapter for 26.3 while sharing the remaining modern client code; Sodium continues to own geometry with a particle-only fallback.
-- Record 16 passing policy tests, not in-world visual or FPS validation. OIT on/off, visual, hook-observation/skip, backend, and mod-off/on benchmark checks remain outstanding; see the [preview guide](docs/FABRIC_26_3.md).
+- Pin the Gradle 9.7.1 distribution SHA-256 checksum in the wrapper configuration.
+- Make configuration logging privacy-safe in modern Fabric, legacy Fabric 1.21.1, and NeoForge: use a fixed relative configuration label and generic error categories rather than absolute paths, configuration values, or exception payloads.
+- Replace modern fluid invocation HEAD/RETURN cleanup with a real MixinExtras `@WrapMethod` try/finally. `TessellationContext` clears eligibility on ordinary returns, cancellation, and exceptions, and restores outer eligibility after nested invocations; fluid diagnostics closure uses the entry-time flag.
+- Correct the ceiling-water predicate bug in shared modern Fabric and NeoForge 26.2: require ordinary source water above before skipping tessellation. Solid-rendering neighbors remain allowed below and at the sides, but a solid ceiling alone does not hide the water surface beneath it. The [historical audit follow-up](docs/FABRIC_26_3_CHECKLIST_AUDIT.md) explicitly retracts the earlier dismissal of this visual-review issue.
+- Expand the expected Fabric 26.3 suite to 25 tests: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. The newer historical local result passed all 25 via `test` only. The earlier forced `test build verifyArtifact --rerun-tasks` pass had 20 tests, not 25; a separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. No in-game tests were run for this hardening; CI is pending. OIT on/off, visual, transformed-hook observation/skips, backend, unknown-renderer compatibility, and mod-off/on benchmark checks remain outstanding; see the [preview guide](docs/FABRIC_26_3.md) and [PREVIEW release notes](docs/FABRIC_26_3_RELEASE_NOTES.md).
 
 ## 0.0.9 — 2026-09-07
 
