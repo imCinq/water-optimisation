@@ -39,9 +39,9 @@ For the separate **Fabric 26.3 `0.0.10-26.3-preview.2`** target, use the [previe
 - [ ] Optional local-capture availability and unknown-renderer/mod-combination limitations are recorded without inferring compatibility from the Sodium gate.
 - [ ] No missing planes, seams, z-fighting, overlay errors, lighting differences, wrong flow orientation, stale geometry, or clipped settings text are observed.
 - [ ] A normal non-water scene shows no unacceptable regression.
-- [ ] Sodium absent and present are tested with the exact companion versions. — untested: only Sodium absent was exercised; Sodium present was not.
-- [ ] OpenGL and Vulkan are tested separately where available. — untested: only OpenGL was exercised; Vulkan was not.
-- [ ] Mod Menu present and absent, keybind behavior, persistence, Cancel, and Escape are checked.
+- [ ] Sodium absent and present are tested with the exact companion versions. — untested: only Sodium absent was exercised; 17 September 2026: Sodium present was tested with the version unrecorded and no failures were observed. Exact companion versions, resource packs, and shaders remain untested.
+- [ ] OpenGL and Vulkan are tested separately where available. — untested: only OpenGL was exercised; 17 September 2026: Vulkan was tested on Apple M2 with no failures observed. Exact version details remain unrecorded and untested.
+- [ ] Mod Menu present and absent, keybind behavior, persistence, Cancel, and Escape are checked. — 17 September 2026: Mod Menu present was tested with most settings and no failures were observed; Mod Menu absent, keybind behavior, persistence, Cancel, and Escape remain untested.
 - [ ] Average FPS, 1% lows, p95/p99 frame time, hitches, fluid compilation, section compilation, translucent resorting, and particle counters are recorded where relevant. — untested: no FPS, frame-time, compilation, or counter measurements were recorded.
 
 ## Multiplayer and publication
@@ -60,4 +60,6 @@ Record the accepted commit, artifact filenames, checksums, CI run, target hardwa
 - 17 September 2026 user general pass. Accepted commit: `6ec94a9374a1109cd129afc799ce0781d9868ce8`. Artifact: `build/26.3/libs/water-optimisation-0.0.10-26.3-preview.2-mc26.3-fabric.jar`. Artifact SHA-256: `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`.
 - CI runs: https://github.com/imCinq/water-optimisation/actions/runs/35237266215 and https://github.com/imCinq/water-optimisation/actions/runs/35237266249.
 - User configuration: Apple M2 hardware, macOS 27, OpenGL renderer backend, Sodium absent, Mod Menu present. Resource packs/shaders, scene settings, and sample duration were not recorded.
-- Visual result: a general client pass was reported on the configuration above. The full scene matrix, OIT on/off, Sodium-present, Vulkan, and all FPS/frame-time/compilation/particle benchmark gates remain unchecked and untested; no stable acceptance is implied.
+- Visual result: a general client pass was reported on the configuration above. The full scene matrix, OIT on/off, the unrecorded Sodium version and Vulkan detail checks, and all FPS/frame-time/compilation/particle benchmark gates remain unchecked and untested; no stable acceptance is implied.
+- 17 September 2026 follow-up user pass: Mod Menu present and most settings were covered with no failures observed, on the same configuration and artifact SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`.
+- 17 September 2026 further user pass: Sodium present and the Vulkan backend were covered with no failures observed, against artifact SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`. Sodium version and scenes were not specified.
