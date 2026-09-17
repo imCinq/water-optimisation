@@ -1,3 +1,5 @@
+> Superseded by the stable [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10). Kept below as the historical preview.2 record.
+
 # Water Optimisation 0.0.10 — STABLE
 
 This is a **supported stable Fabric 26.3 release**, an extension of the public 0.0.9 support matrix. No NeoForge 26.3 artifact is provided. No project-run in-game tests were run for this hardening; CI passed for the current SHA for builds and startup smoke per runs 35237266215 and 35237266249, and a dated user-reported client pass is recorded below. Visual correctness and FPS benefits are not validated.

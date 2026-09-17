@@ -23,3 +23,6 @@ benchmarks/*.csv
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local release archive (downloaded GitHub release assets, never publish from here)
+releases/
