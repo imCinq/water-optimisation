@@ -4,16 +4,16 @@ All notable changes to Water Optimisation are documented here.
 
 ## Unreleased
 
-### Fabric 26.3 preview — not published
+## 0.0.10
 
-- Add the separate `-Ptarget_minecraft=26.3` preview target with `version_263=0.0.10-26.3-preview.2` and isolated output under `build/26.3/libs/`; public 0.0.9 support and artifacts remain unchanged.
+- Add Fabric 26.3 as a supported target alongside the existing Fabric 26.2, NeoForge 26.2, and Fabric 1.21.1 targets using `-Ptarget_minecraft=26.3`, with isolated output under `build/26.3/libs/` producing `water-optimisation-0.0.10-mc26.3-fabric.jar`.
 - Use Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3`, and optional Mod Menu `21.0.0-beta.1`. Enforce the Fabric API metadata floor `>=0.160.6+26.3` for the 26.3 target only; older targets retain their metadata behavior.
 - Adapt only the keyboard input adapter for 26.3 while sharing the remaining modern client code; Sodium continues to own geometry with a particle-only fallback.
 - Pin the Gradle 9.7.1 distribution SHA-256 checksum in the wrapper configuration.
 - Make configuration logging privacy-safe in modern Fabric, legacy Fabric 1.21.1, and NeoForge: use a fixed relative configuration label and generic error categories rather than absolute paths, configuration values, or exception payloads.
 - Replace modern fluid invocation HEAD/RETURN cleanup with a real MixinExtras `@WrapMethod` try/finally. `TessellationContext` clears eligibility on ordinary returns, cancellation, and exceptions, and restores outer eligibility after nested invocations; fluid diagnostics closure uses the entry-time flag.
 - Correct the ceiling-water predicate bug in shared modern Fabric and NeoForge 26.2: require ordinary source water above before skipping tessellation. Solid-rendering neighbors remain allowed below and at the sides, but a solid ceiling alone does not hide the water surface beneath it. The [historical audit follow-up](docs/FABRIC_26_3_CHECKLIST_AUDIT.md) explicitly retracts the earlier dismissal of this visual-review issue.
-- Expand the expected Fabric 26.3 suite to 25 tests: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. The newer historical local result passed all 25 via `test` only. The earlier forced `test build verifyArtifact --rerun-tasks` pass had 20 tests, not 25; a separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. No project-run in-game tests were run for this hardening; CI passed for the current SHA for builds and startup smoke per runs 35237266215 and 35237266249. OIT on/off, visual, transformed-hook observation/skips, backend, unknown-renderer compatibility, and mod-off/on benchmark checks remain outstanding; see the [preview guide](docs/FABRIC_26_3.md) and [PREVIEW release notes](docs/FABRIC_26_3_RELEASE_NOTES.md). A user-reported pass dated 2026-09-17 covered Apple M2 hardware, macOS 27, OpenGL, Sodium absent, and Mod Menu present on CI runtime `water-optimisation-0.0.10-26.3-preview.2-mc26.3-fabric.jar` (SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`); the full visual matrix and FPS remain unvalidated.
+- Expand the Fabric 26.3 suite to 25 tests: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests; the local `test` run passed all 25. The earlier forced `test build verifyArtifact --rerun-tasks` pass had 20 tests, not 25, and a separate NeoForge 26.2 build passed 20 tests before the mocked predicate fixture was added. No project-run in-game tests were run for this hardening; CI passed for the current SHA for builds and startup smoke per runs 35237266215 and 35237266249. Recorded user validation dated 2026-09-17 covered Apple M2 hardware, macOS 27, OpenGL, Sodium absent, and Mod Menu present on the Fabric 26.3 artifact (SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`); a follow-up pass covered Mod Menu present with most settings, and a further pass covered Sodium present and the Vulkan backend, with no failures observed, though the Sodium version and scenes were unspecified. OIT on/off, the full visual matrix, transformed-hook observation/skips, other backends, unknown-renderer compatibility, mod-off/on benchmark checks, and FPS remain untested; see the [Fabric 26.3 guide](docs/FABRIC_26_3.md) and [release notes](docs/FABRIC_26_3_RELEASE_NOTES.md).
 
 ## 0.0.9 — 2026-09-07
 
@@ -182,4 +182,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The preview entries below are retained as development history. The 0.0.9 package is the current release for Minecraft 26.2 Fabric/NeoForge and Minecraft 1.21.1 Fabric.
+The 0.1.0-preview entries below are retained as development history. The 0.0.10 package is the current release for Minecraft 26.3, Minecraft 26.2 Fabric/NeoForge, and Minecraft 1.21.1 Fabric; 0.0.9 is the prior release.

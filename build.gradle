@@ -14,7 +14,7 @@ def target263 = targetMinecraft == "26.3"
 def propertySuffix = targetProfiles[targetMinecraft]
 apply plugin: legacyTarget ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
 
-// Keep the new target's outputs and version separate from existing releases.
+// Keep each target's outputs and version separate per target.
 if (target263) {
 	layout.buildDirectory = layout.projectDirectory.dir("build/26.3")
 	version = project.version_263
