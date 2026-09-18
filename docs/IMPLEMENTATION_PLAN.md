@@ -1,5 +1,8 @@
 # Roadmap
 
+Note: the 0.0.7 baseline and 0.0.8 candidate below are historical; 0.0.10 is the current release.
+See README.md, docs/DISTRIBUTION.md, and docs/FABRIC_26_3.md for current support.
+
 Water Optimisation is developed as a conservative, client-only rendering mod. Every optimization must be measurable, visually reviewable, and safe to disable.
 
 ## Current release baseline

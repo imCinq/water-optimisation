@@ -13,7 +13,7 @@ search_repository() {
 		--exclude-dir=.git \
 		--exclude-dir=.gradle \
 		--exclude-dir=build \
-		--exclude-dir=release \
+		--exclude-dir=releases \
 		--exclude-dir=run \
 		--exclude-dir=ci-artifacts \
 		--exclude-dir=benchmarks \

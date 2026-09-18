@@ -13,7 +13,7 @@ bash scripts/audit-client-only.sh
 The CI workflow validates the Gradle wrapper, Java 25/21 target toolchains, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
 
 The release smoke workflow (`production-smoke.yml`) launches Loom's production
-client task for both targets. That task assembles the same user-facing runtime
+client task for all three Fabric targets. That task assembles the same user-facing runtime
 JAR path (the remapped JAR for 1.21.1 and the ordinary JAR for the no-remap
 26.2 profile), supplies the matching Fabric API as a production mod, and
 requires the mod's initialization log line to appear before the client remains
@@ -24,6 +24,7 @@ To run one target remotely or on a machine with the matching Java runtime and
 an available display, use:
 
 ```bash
+bash scripts/smoke-production-client.sh 26.3
 bash scripts/smoke-production-client.sh 26.2
 bash scripts/smoke-production-client.sh 1.21.1
 ```

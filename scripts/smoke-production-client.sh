@@ -40,7 +40,6 @@ gradle_args=(
 	--no-daemon
 	--console=plain
 	"-Ptarget_minecraft=$target"
-	"-Pminecraft_version=$target"
 	"-Pproduction_run_dir=$run_dir"
 	"-Pproduction_use_xvfb=$use_xvfb"
 	prodClient

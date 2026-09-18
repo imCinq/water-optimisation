@@ -83,7 +83,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		);
 	}
 
-	/** The 26.2 renderer has the reviewed optional reverse-face hook. */
+	/** The 26.2/26.3 modern renderer has the reviewed optional reverse-face hook. */
 	public static boolean supportsReducedWaterBackfaces() {
 		return true;
 	}

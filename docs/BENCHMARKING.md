@@ -13,7 +13,7 @@ Use:
 3. Performance;
 4. Advanced particle settings where relevant;
 5. Sodium absent and present where relevant;
-6. OpenGL and Vulkan as separate comparisons on 26.2.
+6. OpenGL and Vulkan as separate comparisons on 26.3 and 26.2.
 7. The same warmed scenes on the 1.21.1 compatibility artifact, with Sodium absent and present.
 
 Warm the scene before measuring. Use multiple captures rather than a single F3 screenshot.

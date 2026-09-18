@@ -12,13 +12,21 @@ Thanks for helping improve Water Optimisation.
 
 ## Build and audit
 
-Use Java 25 and run:
+Use Java 25 for the 26.2 and 26.3 targets and Java 21 for 1.21.1, then run each
+target profile plus the standalone NeoForge build:
 
 ```bash
-./gradlew test build
+./gradlew -Ptarget_minecraft=26.2 test build
+./gradlew -Ptarget_minecraft=26.3 test build
+./gradlew -Ptarget_minecraft=1.21.1 test build
+./gradlew -p neoforge-26.2 test build
 bash scripts/audit-repository.sh
 bash scripts/audit-client-only.sh
 ```
+
+The root build defaults to 26.2, so a bare `./gradlew test build` only covers
+that target. NeoForge 26.2 is a separate Gradle project and is not included in
+the root build.
 
 ## Pull requests
 

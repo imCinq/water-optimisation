@@ -4,7 +4,7 @@ The settings are implemented with target-specific native Minecraft screen APIs. 
 
 ## Mod Menu integration
 
-Mod Menu is compile-only and suggested: version 19.0.0-alpha.1 for 26.2 and 11.0.4 for 1.21.1. The core client entrypoint does not import Mod Menu. If Mod Menu is absent, the mod keeps its keybind and native settings screen and continues to load.
+Mod Menu is compile-only and suggested: version 21.0.0-beta.1 for 26.3, 19.0.0-alpha.1 for 26.2 and 11.0.4 for 1.21.1. The core client entrypoint does not import Mod Menu. If Mod Menu is absent, the mod keeps its keybind and native settings screen and continues to load.
 
 ## Main screen
 

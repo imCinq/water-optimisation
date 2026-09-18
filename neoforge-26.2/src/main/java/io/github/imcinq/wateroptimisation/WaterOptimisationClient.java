@@ -118,7 +118,7 @@ public final class WaterOptimisationClient {
 		);
 	}
 
-	/** The 26.2 renderer has the reviewed optional reverse-face hook. */
+	/** The 26.2/26.3 modern renderer has the reviewed optional reverse-face hook. */
 	public static boolean supportsReducedWaterBackfaces() {
 		return true;
 	}
