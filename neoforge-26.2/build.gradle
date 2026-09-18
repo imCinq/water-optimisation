@@ -75,7 +75,7 @@ neoForge.addModdingDependenciesTo sourceSets.packagedSmoke
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testImplementation 'com.google.code.gson:gson:2.13.1'
+    testImplementation 'com.google.code.gson:gson:2.14.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
     packagedSmokeRuntimeOnly files(tasks.named('jar'))
 }
