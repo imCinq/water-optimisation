@@ -2,7 +2,12 @@
 
 All notable changes to Water Optimisation are documented here.
 
-## Unreleased
+## 1.0.0
+
+- Release the v1.0.0 Fabric line for Minecraft 26.3 and 1.21.11; Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are retired after the 0.0.10 release. NeoForge 26.3 remains planned as a later support update after its development beta stabilises.
+- Add the isolated Fabric 1.21.11 client baseline and migrate its HUD registration to `HudElementRegistry`.
+- Unify the native Fabric and NeoForge settings semantics around a derived `Custom` state, an explicit hidden-water skipping toggle, and a capability-aware reduced-inward-faces toggle while preserving Apply/Cancel behavior.
+- Add bounded mouse-wheel scrolling and clipped content to the Advanced settings screen while keeping Reset and Done fixed at the bottom.
 
 ## 0.0.10
 

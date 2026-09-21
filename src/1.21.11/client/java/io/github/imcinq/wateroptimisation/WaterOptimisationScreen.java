@@ -2,7 +2,7 @@ package io.github.imcinq.wateroptimisation;
 
 import java.util.List;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -71,7 +71,7 @@ public final class WaterOptimisationScreen extends Screen {
 		y += BUTTON_HEIGHT + BUTTON_GAP;
 		this.addRenderableWidget(Button.builder(
 				Component.translatable("screen.wateroptimisation.advanced"),
-				button -> this.minecraft.gui.setScreen(new AdvancedWaterOptimisationScreen(this, this.workingCopy))
+				button -> this.minecraft.setScreen(new AdvancedWaterOptimisationScreen(this, this.workingCopy))
 		).bounds(this.buttonLeft, y, this.buttonWidth, BUTTON_HEIGHT).build());
 
 		int actionWidth = Math.max(1, (this.buttonWidth - 10) / 2);
@@ -88,8 +88,8 @@ public final class WaterOptimisationScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		super.render(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.description"), this.descriptionY, 0xFFFFFFFF);
 		drawCenteredWrapped(graphics, effectivePathLabel(), this.effectivePathY, 0xFFB0B0B0);
 		drawCenteredWrapped(graphics, profileDescription(), this.profileDescriptionY, 0xFFB0B0B0);
@@ -102,11 +102,11 @@ public final class WaterOptimisationScreen extends Screen {
 
 	private void saveAndClose() {
 		ConfigManager.save(this.workingCopy);
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	private void closeWithoutSaving() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	private Component enabledLabel() {
@@ -142,12 +142,12 @@ public final class WaterOptimisationScreen extends Screen {
 		return Math.max(1, this.font.split(text, this.contentWidth).size()) * lineHeight();
 	}
 
-	private void drawCenteredWrapped(GuiGraphicsExtractor graphics, Component text, int top, int color) {
+	private void drawCenteredWrapped(GuiGraphics graphics, Component text, int top, int color) {
 		List<FormattedCharSequence> lines = this.font.split(text, this.contentWidth);
 		int y = top;
 		int center = this.width / 2;
 		for (FormattedCharSequence line : lines) {
-			graphics.text(this.font, line, center - this.font.width(line) / 2, y, color, false);
+			graphics.drawString(this.font, line, center - this.font.width(line) / 2, y, color);
 			y += lineHeight();
 		}
 	}

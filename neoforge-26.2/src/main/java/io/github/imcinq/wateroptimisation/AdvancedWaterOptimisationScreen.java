@@ -29,6 +29,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private Button particleBudgetButton;
 	private Button forcedParticlesButton;
 	private Button diagnosticsButton;
+	private Button resetButton;
+	private Button doneButton;
 	private int contentWidth;
 	private int buttonLeft;
 	private int buttonWidth;
@@ -40,6 +42,11 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	private int diagnosticsSectionY;
 	private int actionY;
 	private int sodiumNoticeY;
+	private int viewportTop;
+	private int viewportBottom;
+	private int contentBottom;
+	private int maxScrollOffset;
+	private int scrollOffset;
 	private boolean columns;
 
 	public AdvancedWaterOptimisationScreen(Screen parent, WaterOptimisationConfig workingCopy) {
@@ -63,6 +70,10 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		} else {
 			this.sodiumNoticeY = -1;
 		}
+		this.actionY = this.height - 34;
+		this.viewportTop = y;
+		this.viewportBottom = Math.max(this.viewportTop + BUTTON_HEIGHT, this.actionY - 8);
+		this.scrollOffset = 0;
 		this.columns = this.contentWidth >= 600
 				|| (this.contentWidth >= 360 && singleColumnBottom(y) > this.height - 42);
 		if (this.columns) {
@@ -77,9 +88,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			initSingleColumn(y);
 		}
 
-		this.actionY = this.height - 34;
 		int actionWidth = Math.max(1, (this.buttonWidth - 10) / 2);
-		this.addRenderableWidget(Button.builder(
+		this.resetButton = this.addRenderableWidget(Button.builder(
 				Component.translatable("screen.wateroptimisation.reset"),
 				button -> {
 					this.workingCopy.resetToProfile();
@@ -87,10 +97,13 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 				}
 		).bounds(this.buttonLeft, this.actionY, actionWidth, BUTTON_HEIGHT).build());
 
-		this.addRenderableWidget(Button.builder(
+		this.doneButton = this.addRenderableWidget(Button.builder(
 				Component.translatable("gui.done"),
 				button -> this.minecraft.gui.setScreen(this.parent)
 		).bounds(this.buttonLeft + actionWidth + 10, this.actionY, this.buttonWidth - actionWidth - 10, BUTTON_HEIGHT).build());
+		this.contentBottom = calculateContentBottom();
+		this.maxScrollOffset = Math.max(0, this.contentBottom - this.viewportBottom);
+		updateContentVisibility();
 	}
 
 	private void initColumns(int top) {
@@ -139,19 +152,91 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		return diagnosticsY + BUTTON_HEIGHT;
 	}
 
+	private Button[] contentButtons() {
+		return new Button[] {
+				this.fastPathButton,
+				this.particlesButton,
+				this.particleDistanceButton,
+				this.fogButton,
+				this.particleBudgetButton,
+				this.forcedParticlesButton,
+				this.cullingButton,
+				this.diagnosticsButton
+		};
+	}
+
+	private int calculateContentBottom() {
+		int bottom = this.viewportTop;
+		for (Button button : contentButtons()) {
+			bottom = Math.max(bottom, button.getBottom());
+		}
+		return bottom + 8;
+	}
+
+	private void updateContentVisibility() {
+		for (Button button : contentButtons()) {
+			button.visible = this.maxScrollOffset == 0
+					|| (button.getBottom() > this.viewportTop && button.getY() < this.viewportBottom);
+		}
+	}
+
+	private void setContentVisible(boolean visible) {
+		for (Button button : contentButtons()) {
+			button.visible = visible;
+		}
+	}
+
+	private void setFooterVisible(boolean visible) {
+		this.resetButton.visible = visible;
+		this.doneButton.visible = visible;
+	}
+
+	private void applyScrollOffset(int newOffset) {
+		newOffset = Math.max(0, Math.min(this.maxScrollOffset, newOffset));
+		int delta = this.scrollOffset - newOffset;
+		if (delta == 0) {
+			return;
+		}
+		for (Button button : contentButtons()) {
+			button.setY(button.getY() + delta);
+		}
+		this.safeSectionY += delta;
+		this.experimentalSectionY += delta;
+		this.diagnosticsSectionY += delta;
+		this.scrollOffset = newOffset;
+		updateContentVisibility();
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+		if (this.maxScrollOffset > 0
+				&& mouseY >= this.viewportTop
+				&& mouseY <= this.viewportBottom
+				&& verticalAmount != 0) {
+			int nextOffset = this.scrollOffset - (int) Math.round(verticalAmount * (BUTTON_HEIGHT + BUTTON_GAP));
+			int previousOffset = this.scrollOffset;
+			applyScrollOffset(nextOffset);
+			if (this.scrollOffset != previousOffset) {
+				return true;
+			}
+		}
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+	}
+
 	private Button addCullingButton(int left, int top) {
 		Button button = this.addRenderableWidget(Button.builder(cullingLabel(), clicked -> {
-			this.workingCopy.setFluidCullingMode(this.workingCopy.getFluidCullingMode().next());
+			SettingsPresentation.setReducedInwardFaces(this.workingCopy, !SettingsPresentation.reducedInwardFaces(this.workingCopy));
 			clicked.setMessage(cullingLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
-		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.culling.tooltip")));
-		button.active = !WaterOptimisationClient.isSodiumLoaded();
+		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.reduced_faces.tooltip")));
+		button.active = !WaterOptimisationClient.isSodiumLoaded()
+				&& WaterOptimisationClient.supportsReducedWaterBackfaces();
 		return button;
 	}
 
 	private Button addFastPathButton(int left, int top) {
 		Button button = this.addRenderableWidget(Button.builder(fastPathLabel(), clicked -> {
-			this.workingCopy.setFlatWaterFastPath(!this.workingCopy.isFlatWaterFastPath());
+			SettingsPresentation.setHiddenWaterSkipping(this.workingCopy, !SettingsPresentation.hiddenWaterSkipping(this.workingCopy));
 			clicked.setMessage(fastPathLabel());
 		}).bounds(left, top, this.buttonWidth, BUTTON_HEIGHT).build());
 		button.setTooltip(Tooltip.create(Component.translatable("screen.wateroptimisation.fast_path.tooltip")));
@@ -206,11 +291,20 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+		setFooterVisible(false);
+		graphics.enableScissor(contentClipLeft(), this.viewportTop, contentClipRight(), this.viewportBottom);
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		graphics.disableScissor();
+		setContentVisible(false);
+		setFooterVisible(true);
+		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		setContentVisible(true);
+		updateContentVisibility();
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.advanced.description"), this.descriptionY, 0xFFFFFFFF);
 		if (this.sodiumNoticeY >= 0) {
 			drawCenteredWrapped(graphics, sodiumNotice(), this.sodiumNoticeY, 0xFFB0B0B0);
 		}
+		graphics.enableScissor(contentClipLeft(), this.viewportTop, contentClipRight(), this.viewportBottom);
 		if (this.columns) {
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.safe"), this.buttonLeft, this.safeSectionY, this.columnWidth);
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.experimental"), this.rightColumnLeft, this.experimentalSectionY, this.columnWidth);
@@ -220,6 +314,16 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.experimental"), this.buttonLeft, this.experimentalSectionY, this.buttonWidth);
 			drawSectionLabel(graphics, Component.translatable("screen.wateroptimisation.section.diagnostics"), this.buttonLeft, this.diagnosticsSectionY, this.buttonWidth);
 		}
+		graphics.disableScissor();
+	}
+
+	private int contentClipLeft() {
+		return Math.max(0, this.buttonLeft - 2);
+	}
+
+	private int contentClipRight() {
+		int right = this.columns ? this.rightColumnLeft + this.columnWidth : this.buttonLeft + this.buttonWidth;
+		return Math.min(this.width, right + 2);
 	}
 
 	@Override
@@ -232,8 +336,8 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 			return Component.translatable("screen.wateroptimisation.culling_sodium_unavailable")
 					.withStyle(ChatFormatting.GRAY);
 		}
-		return Component.translatable("screen.wateroptimisation.culling", Component.translatable(this.workingCopy.getFluidCullingMode().translationKey()))
-				.withStyle(this.workingCopy.getFluidCullingMode() == WaterOptimisationConfig.FluidCullingMode.EXPERIMENTAL
+		return Component.translatable("screen.wateroptimisation.reduced_faces", yesNo(SettingsPresentation.reducedInwardFaces(this.workingCopy)))
+				.withStyle(SettingsPresentation.reducedInwardFaces(this.workingCopy)
 						? ChatFormatting.RED
 						: ChatFormatting.WHITE);
 	}
