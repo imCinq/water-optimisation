@@ -14,11 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 26.2
-            java: '25'
           - target: 26.3
             java: '25'
-          - target: 1.21.1
+          - target: 1.21.11
             java: '21'
     steps:
       - name: Check out repository

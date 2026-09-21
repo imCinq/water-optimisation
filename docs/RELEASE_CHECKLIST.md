@@ -2,14 +2,14 @@
 
 Use this checklist before publishing a Water Optimisation artifact. A passing CI build is necessary but does not by itself establish visual equivalence, an FPS improvement, or server compatibility.
 
-For the **Fabric 26.3** target, use the [26.3 guide](FABRIC_26_3.md) and [26.3 release notes](FABRIC_26_3_RELEASE_NOTES.md). Target the exact runtime JAR at `build/26.3/libs/water-optimisation-0.0.10-mc26.3-fabric.jar`; do not substitute a default-target artifact or overwrite public 0.0.9 artifacts. The newer historical local Fabric 26.3 result is 25 tests passed via `test`: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. Earlier evidence separately records `./gradlew -Ptarget_minecraft=26.3 test build verifyArtifact --rerun-tasks` passing with 20 tests, with forced reruns and clean repository/client-only audits and whitespace checks; it is not a 25-test full-build result. A separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. Current-SHA CI passed for builds and startup smoke per runs 35237266215 and 35237266249, and no project-run in-game tests were run for this hardening. Transformed-Mixin cancellation/exception validation remains an open nonvisual gate; wrapper helper tests do not demonstrate it, and startup success alone does not prove optional local-capture hook execution. All gates below remain unchecked; record unavailable checks as untested, not passed, and do not claim stable support. The [checklist audit](FABRIC_26_3_CHECKLIST_AUDIT.md) is historical and includes a dated correction, not a current acceptance record. **User test — 17 September 2026:** a user reported a general pass on Apple M2, macOS 27, OpenGL, Sodium absent, Mod Menu present, against the exact CI runtime SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`. This is a single general client pass on one configuration; it does not establish the unchecked visual, backend, companion-mod, or performance gates below.
+For the **v1.0.0 Fabric line**, use the [26.3 guide](FABRIC_26_3.md) and the release assets linked from [Distribution](DISTRIBUTION.md). Target the exact runtime JAR for the selected profile: `build/26.3/libs/water-optimisation-1.0.0-mc26.3-fabric.jar` for Fabric 26.3 or `build/libs/water-optimisation-1.0.0.jar` for Fabric 1.21.11. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets and are not active release checks. The 26.3 and 1.21.11 builds, metadata, checksums, privacy audit, and client-only audit passed for the v1.0.0 release; the full visual and performance matrix remains optional user validation rather than an FPS promise.
 
 ## Product and metadata
 
 - [ ] The release version is consistent in `gradle.properties`, generated Fabric/NeoForge metadata, `CHANGELOG.md`, README release notes, and the GitHub Release.
 - [ ] The runtime product name and description remain focused on Water Optimisation; creator attribution is limited to project metadata, the license, and project documentation.
 - [ ] The README displays the creator logo from `assets/`, and the packaged runtime icon at `src/main/resources/assets/wateroptimisation/icon.png` is referenced by `fabric.mod.json`.
-- [ ] Installation requirements state the exact release target: Minecraft 26.3 Fabric with Java 25, Fabric Loader 0.19.5+, Fabric API 0.160.6+26.3 (metadata floor `>=0.160.6+26.3` for 26.3 only), and optional Mod Menu 21.0.0-beta.1; Minecraft 26.2 Fabric with Java 25, Fabric Loader 0.19.3+, Fabric API 0.158.0+26.2, and optional Mod Menu 19.0.0-alpha.1; Minecraft 26.2 NeoForge with Java 25 and NeoForge 26.2.0.77+; or Minecraft 1.21.1 Fabric with Java 21, Fabric Loader 0.16.13+, Fabric API 0.116.12+1.21.1, and optional Mod Menu 11.0.4.
+- [ ] Installation requirements state the exact v1.0.0 release targets: Fabric 26.3 with Java 25, Fabric Loader 0.19.5+, Fabric API 0.160.6+26.3, and optional Mod Menu 21.0.0-beta.1; or Fabric 1.21.11 with Java 21, Fabric Loader 0.18.5+, Fabric API 0.141.4+1.21.11, and optional Mod Menu 17.0.1-beta.1.
 - [ ] Known limitations, visual trade-offs, fallback behavior, and the client-only boundary are documented.
 
 ## Source and privacy
@@ -21,18 +21,18 @@ For the **Fabric 26.3** target, use the [26.3 guide](FABRIC_26_3.md) and [26.3 r
 
 ## Automated build
 
-- [ ] A clean target-specific build passes: `./gradlew -Ptarget_minecraft=26.3 clean test build verifyArtifact` for the Fabric 26.3 target; use the matching selector for other targets.
+- [ ] Clean target-specific builds pass: `./gradlew -Ptarget_minecraft=26.3 clean test build verifyArtifact` and `./gradlew -Ptarget_minecraft=1.21.11 clean test build verifyArtifact`.
 - [ ] The Gradle wrapper validation passes, including the pinned distribution checksum.
 - [ ] The exact commit, test results (historical local Fabric 26.3: 25 passed via `test`—16 config-model, 4 context helper, 5 mocked predicate; earlier forced `test build verifyArtifact` pass: 20; separate NeoForge 26.2 build: 20 before the new fixture), and current-SHA CI runs are recorded; current-SHA builds and startup smoke passed per runs 35237266215 and 35237266249.
-- [ ] The runtime JAR and sources JAR are identified in the selected target's output: `build/26.3/libs/` for Fabric 26.3, not the default `build/libs/`.
+- [ ] The runtime JAR and sources JAR are identified in the selected target's output: `build/26.3/libs/` for Fabric 26.3 and `build/libs/` for Fabric 1.21.11.
 - [ ] The runtime JAR contents are inspected and contain no build cache, logs, screenshots, or private data.
 - [ ] SHA-256 checksums are calculated for the files that will be published.
 - [ ] The production startup smoke workflow passes for every artifact being released, including the exact Fabric 26.3 artifact when selected; sanitized logs are retained with the release evidence.
-- [ ] If releasing NeoForge 26.2, its runtime JAR passes archive-content, packaged-client Mixin audit, and packaged dedicated-server smoke checks; no NeoForge 26.3 artifact is implied.
+- [ ] NeoForge is not included in v1.0.0; its 26.3 checks belong to a later support release.
 
 ## Local Minecraft validation
 
-- [ ] The exact artifacts are tested in clean clients matching the selected targets, including Minecraft 26.3 Fabric; shared modern changes also receive 26.2 regression checks.
+- [ ] The exact artifacts are tested in clean clients matching the selected v1.0.0 targets, including Minecraft 26.3 Fabric and 1.21.11 Fabric.
 - [ ] Disabled, Balanced, and Performance modes are compared in the same warmed scenes; opt-in Maximum FPS/reduced geometry is evaluated separately with its underwater backface-loss caveat.
 - [ ] Flat water, water beneath solid ceilings, oceans, flowing water, waterfalls, waterlogged blocks, leaves, transparent blocks, flooded caves, and underwater views are checked. — 17 September 2026: a user general pass was reported on the stated configuration (Apple M2, macOS 27, OpenGL, Sodium absent, Mod Menu present); this item-by-item scene matrix was not individually verified.
 - [ ] Fabric 26.3 OIT on/off is compared where available; hook observation and actual skips are recorded in an eligible scene rather than inferred from selected/active settings. — untested: no OIT on/off comparison was performed.

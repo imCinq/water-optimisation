@@ -14,7 +14,7 @@
   <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <img src="https://img.shields.io/badge/Minecraft-26.3-2563eb.svg" alt="Minecraft 26.3">
   <img src="https://img.shields.io/badge/Minecraft-1.21.11-2563eb.svg" alt="Minecraft 1.21.11">
-  <img src="https://img.shields.io/badge/Fabric%20%7C%20NeoForge-client--side-2563eb.svg" alt="Fabric and NeoForge client-side mod">
+  <img src="https://img.shields.io/badge/Fabric-client--side-2563eb.svg" alt="Fabric client-side mod">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
 
@@ -30,7 +30,7 @@ Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu on Fabric or the Mods screen on NeoForge, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current public [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) is a historical release for Fabric 26.3, Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2. It is not the v1.0.0 target line: Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are being retired from active support. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current public [v1.0.0 release](https://github.com/imCinq/water-optimisation/releases/tag/v1.0.0) supports Fabric 26.3 and Fabric 1.21.11. The previous 0.0.10 release remains available as a historical release for Fabric 26.3, Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | v1.0.0 target | Loader | Java | Status |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 
 | Component | Supported target |
 | --- | --- |
-| Minecraft | 26.3 or 1.21.11 for the v1.0.0 development line |
+| Minecraft | 26.3 or 1.21.11 for the v1.0.0 release line |
 | Java | 25+ for 26.3; 21+ for 1.21.11 |
 | Fabric Loader | `0.19.5+` for 26.3; `0.18.5+` for 1.21.11 |
 | Fabric API | `0.160.6+26.3` for 26.3; `0.141.4+1.21.11` for 1.21.11 |

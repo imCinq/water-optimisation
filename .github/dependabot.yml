@@ -9,8 +9,3 @@ updates:
     directory: /
     schedule:
       interval: weekly
-
-  - package-ecosystem: gradle
-    directory: /neoforge-26.2
-    schedule:
-      interval: weekly

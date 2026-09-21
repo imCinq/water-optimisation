@@ -33,15 +33,11 @@ keeps its log under `build/production-smoke/` and bounds the client lifetime.
 
 The remote build matrix also compiles Minecraft 1.21.11 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
-The existing `neoforge-26.2.yml` workflow is retained as historical 0.0.10
-release evidence. The future NeoForge 26.3 workflow should build exactly one
-NeoForge runtime JAR,
-checks its expanded metadata, license, mixin descriptor/classes, and absence of
-Fabric descriptors, then launches that packaged JAR in isolated client and
-dedicated-server runs. The client run performs a Mixin audit; the target-specific
-fast-path injection is required, so mapping or local-capture drift fails CI.
-The server run must reach the ready marker without loading the client entrypoint.
-Runtime, sources, and smoke logs are uploaded as separate artifacts.
+No NeoForge workflow is active in the v1.0.0 line. Historical NeoForge 26.2
+workflow evidence remains available in older commits and releases. When
+NeoForge 26.3 tooling stabilises, add one dedicated workflow that builds exactly
+one NeoForge runtime JAR, checks its expanded metadata and mixin descriptors,
+and launches that packaged JAR in isolated client and dedicated-server runs.
 
 Unit coverage includes:
 

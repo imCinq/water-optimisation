@@ -2,7 +2,7 @@
 
 ## Current status
 
-Water Optimisation 0.0.10 is the current public GitHub release. It adds supported Fabric 26.3 alongside standalone NeoForge 26.2 support, Fabric 26.2, and 1.21.1 artifacts, with packaged NeoForge client/server smoke and renderer-mixin checks. Earlier releases remain in the changelog and tags as historical records. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation v1.0.0 is the current public GitHub release. It supports Fabric 26.3 and Fabric 1.21.11 with the redesigned settings flow and target-specific runtime/sources JARs. NeoForge 26.3 is a planned follow-up; 0.0.10 remains available as a historical release for the retired targets. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
 
 ## v1.0.0 release line
 
@@ -31,7 +31,7 @@ The v1.0.0 release line includes Fabric 26.3 and Fabric 1.21.11. NeoForge 26.3 i
 
 ## Release artifacts
 
-Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) for the current target-specific Fabric and NeoForge runtime JARs, matching sources JARs, and `SHA256SUMS-0.0.10.txt`.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v1.0.0) for the current Fabric 26.3 and Fabric 1.21.11 runtime JARs, matching sources JARs, `RELEASE_NOTES.md`, and `SHA256SUMS-1.0.0.txt`. The older [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) remains available for historical targets.
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
@@ -81,7 +81,7 @@ Publishing is intentionally manual. No publishing automation or update checker i
 - License: MIT
 - Required dependency: matching Fabric API build on Fabric; NeoForge 26.2.0.77+ on NeoForge
 
-## v1.0.0 planned listing
+## v1.0.0 listing
 
 - Loader: Fabric for 26.3 and 1.21.11; NeoForge 26.3 after stable tooling
 - Environment: Client
