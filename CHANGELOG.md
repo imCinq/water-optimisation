@@ -187,4 +187,4 @@ The first official release of Water Optimisation for Minecraft 26.2.
 - Cached particle-filter settings and the squared distance bound to reduce repeated CPU work for water-particle admission.
 - Simplified the in-game settings labels and clarified the Sodium/vanilla fallback behavior.
 
-The 0.1.0-preview entries below are retained as development history. The 0.0.10 package is the current release for Minecraft 26.3, Minecraft 26.2 Fabric/NeoForge, and Minecraft 1.21.1 Fabric; 0.0.9 is the prior release.
+The 0.1.0-preview entries below are retained as development history. The 0.0.10 package is a historical release for Minecraft 26.3, Minecraft 26.2 Fabric/NeoForge, and Minecraft 1.21.1 Fabric; v1.0.0 is the current release for Fabric 26.3 and Fabric 1.21.11.

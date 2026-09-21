@@ -1,10 +1,10 @@
 # Fabric 26.3
 
-`0.0.10` is a supported stable release and an extension of the public 0.0.9 support claim. The public release now includes Fabric 26.3; the NeoForge release remains 26.2, and no NeoForge 26.3 build is provided.
+`v1.0.0` is the current public Fabric release for Minecraft 26.3. The release also provides a separate Fabric 1.21.11 artifact; NeoForge 26.3 is deferred and no NeoForge artifact is included.
 
 ## Build and launch
 
-Use Java 25, Fabric Loader `0.19.5`, and Fabric API `0.160.6+26.3`. The generated API metadata floor is `>=0.160.6+26.3` for 26.3 only; older targets retain their existing metadata behavior. Mod Menu `21.0.0-beta.1` is optional. The target uses `version_263=0.0.10`; the default target and existing release versions remain unchanged.
+Use Java 25, Fabric Loader `0.19.5`, and Fabric API `0.160.6+26.3`. The generated API metadata floor is `>=0.160.6+26.3`. Mod Menu `21.0.0-beta.1` is optional. The target uses `version_263=1.0.0` and produces the current v1.0.0 artifact.
 
 From the repository root, with Java 25 selected:
 
@@ -15,7 +15,7 @@ From the repository root, with Java 25 selected:
 Runtime output:
 
 ```text
-build/26.3/libs/water-optimisation-0.0.10-mc26.3-fabric.jar
+build/26.3/libs/water-optimisation-1.0.0-mc26.3-fabric.jar
 ```
 
 Install that runtime JAR, not the sources JAR, in an isolated Minecraft 26.3 Fabric client with the dependencies above. Test Mod Menu both installed and absent, and verify the `O` settings shortcut. For an interactive production-client launch with an available display:
@@ -24,11 +24,11 @@ Install that runtime JAR, not the sources JAR, in an isolated Minecraft 26.3 Fab
 ./gradlew -Ptarget_minecraft=26.3 prodClient
 ```
 
-Close the client manually when finished. For bounded startup testing, run `bash scripts/smoke-production-client.sh 26.3`. The build and production-smoke CI matrices include 26.3, with a separate artifact upload path. Preview.1's local packaged-JAR startup passed (initialization marker plus five seconds alive); that is historical startup evidence, not exact-artifact 0.0.10 validation. Current-SHA CI passed for builds and startup smoke per runs 35237266215 and 35237266249. Mod Menu/Sodium combination checks remain outstanding.
+Close the client manually when finished. For bounded startup testing, run `bash scripts/smoke-production-client.sh 26.3`. The build and production-smoke CI matrices include 26.3 and 1.21.11. Historical preview startup evidence is retained below; it is not a substitute for exact-artifact v1.0.0 validation. Mod Menu/Sodium combination checks remain user validation.
 
 ## Scope and validation
 
-The only target-specific modern client adaptation is the keyboard input adapter; renderer, UI, and other modern client code remain shared with 26.2. This is not a new renderer or a Sodium geometry bridge.
+The only target-specific modern client adaptation is the keyboard input adapter; renderer, UI, and other modern client code remain shared with the Fabric 26.3 path. This is not a new renderer or a Sodium geometry bridge.
 
 0.0.10 pins the Gradle distribution checksum and makes configuration logs privacy-safe in modern Fabric, legacy Fabric 1.21.1, and NeoForge. The shared modern fluid mixin now uses a real MixinExtras `@WrapMethod` try/finally with `TessellationContext`: ordinary returns, cancellation, and exceptions clear invocation eligibility, while nested calls restore the outer eligibility. Fluid diagnostics closure uses the entry-time flag. The modern and NeoForge hidden-water predicates now require ordinary source water above, while still allowing solid-rendering down/side neighbors. A solid ceiling alone does not hide the water surface beneath it; see the explicit correction in the [historical audit follow-up](FABRIC_26_3_CHECKLIST_AUDIT.md).
 
