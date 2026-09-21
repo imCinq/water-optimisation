@@ -15,6 +15,7 @@ search_repository() {
 		--exclude-dir=build \
 		--exclude-dir=releases \
 		--exclude-dir=run \
+		--exclude-dir=logs \
 		--exclude-dir=ci-artifacts \
 		--exclude-dir=benchmarks \
 		--exclude=audit-repository.sh \

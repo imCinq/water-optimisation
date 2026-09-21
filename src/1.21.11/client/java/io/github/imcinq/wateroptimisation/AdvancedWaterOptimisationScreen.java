@@ -3,7 +3,7 @@ package io.github.imcinq.wateroptimisation;
 import java.util.List;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -99,7 +99,7 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 		this.doneButton = this.addRenderableWidget(Button.builder(
 				Component.translatable("gui.done"),
-				button -> this.minecraft.gui.setScreen(this.parent)
+				button -> this.minecraft.setScreen(this.parent)
 		).bounds(this.buttonLeft + actionWidth + 10, this.actionY, this.buttonWidth - actionWidth - 10, BUTTON_HEIGHT).build());
 		this.contentBottom = calculateContentBottom();
 		this.maxScrollOffset = Math.max(0, this.contentBottom - this.viewportBottom);
@@ -290,14 +290,15 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		setFooterVisible(false);
 		graphics.enableScissor(contentClipLeft(), this.viewportTop, contentClipRight(), this.viewportBottom);
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		super.render(graphics, mouseX, mouseY, delta);
 		graphics.disableScissor();
 		setContentVisible(false);
 		setFooterVisible(true);
-		super.extractRenderState(graphics, mouseX, mouseY, delta);
+		this.resetButton.render(graphics, mouseX, mouseY, delta);
+		this.doneButton.render(graphics, mouseX, mouseY, delta);
 		setContentVisible(true);
 		updateContentVisibility();
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.advanced.description"), this.descriptionY, 0xFFFFFFFF);
@@ -328,12 +329,16 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	private Component cullingLabel() {
 		if (WaterOptimisationClient.isSodiumLoaded()) {
 			return Component.translatable("screen.wateroptimisation.culling_sodium_unavailable")
+					.withStyle(ChatFormatting.GRAY);
+		}
+		if (!WaterOptimisationClient.supportsReducedWaterBackfaces()) {
+			return Component.translatable("screen.wateroptimisation.culling_unavailable")
 					.withStyle(ChatFormatting.GRAY);
 		}
 		return Component.translatable("screen.wateroptimisation.reduced_faces", yesNo(SettingsPresentation.reducedInwardFaces(this.workingCopy)))
@@ -396,18 +401,18 @@ public final class AdvancedWaterOptimisationScreen extends Screen {
 		return Math.max(1, this.font.split(text, this.contentWidth).size()) * lineHeight();
 	}
 
-	private void drawSectionLabel(GuiGraphicsExtractor graphics, Component text, int left, int top, int width) {
-		graphics.text(this.font, text, left, top, 0xFFE0E0E0, true);
+	private void drawSectionLabel(GuiGraphics graphics, Component text, int left, int top, int width) {
+		graphics.drawString(this.font, text, left, top, 0xFFE0E0E0);
 		int lineY = top + lineHeight() - 2;
 		graphics.fill(left, lineY, left + width, lineY + 1, 0x66555555);
 	}
 
-	private void drawCenteredWrapped(GuiGraphicsExtractor graphics, Component text, int top, int color) {
+	private void drawCenteredWrapped(GuiGraphics graphics, Component text, int top, int color) {
 		List<FormattedCharSequence> lines = this.font.split(text, this.contentWidth);
 		int y = top;
 		int center = this.width / 2;
 		for (FormattedCharSequence line : lines) {
-			graphics.text(this.font, line, center - this.font.width(line) / 2, y, color, false);
+			graphics.drawString(this.font, line, center - this.font.width(line) / 2, y, color);
 			y += lineHeight();
 		}
 	}

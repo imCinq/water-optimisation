@@ -10,12 +10,12 @@ bash scripts/audit-repository.sh
 bash scripts/audit-client-only.sh
 ```
 
-The CI workflow validates the Gradle wrapper, Java 25/21 target toolchains, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging.
+The CI workflow validates the Gradle wrapper, Java 25/21 target toolchains, repository privacy, client-only boundary, unit tests, and client/sources JAR packaging for the active v1.0.0 targets.
 
 The release smoke workflow (`production-smoke.yml`) launches Loom's production
-client task for all three Fabric targets. That task assembles the same user-facing runtime
-JAR path (the remapped JAR for 1.21.1 and the ordinary JAR for the no-remap
-26.2 profile), supplies the matching Fabric API as a production mod, and
+client task for the active Fabric targets. That task assembles the same user-facing runtime
+JAR path (the remapped JAR for 1.21.11 and the ordinary JAR for the no-remap
+26.3 profile), supplies the matching Fabric API as a production mod, and
 requires the mod's initialization log line to appear before the client remains
 alive for a short grace period. It runs on pull requests, version tags, or by manual dispatch;
 the smoke is a startup/crash check, not visual or performance evidence.
@@ -25,16 +25,17 @@ an available display, use:
 
 ```bash
 bash scripts/smoke-production-client.sh 26.3
-bash scripts/smoke-production-client.sh 26.2
-bash scripts/smoke-production-client.sh 1.21.1
+bash scripts/smoke-production-client.sh 1.21.11
 ```
 
 Set `PRODUCTION_SMOKE_USE_XVFB=true` on a headless Linux machine. The script
 keeps its log under `build/production-smoke/` and bounds the client lifetime.
 
-The remote build matrix also compiles Minecraft 1.21.1 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
+The remote build matrix also compiles Minecraft 1.21.11 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
-The `neoforge-26.2.yml` workflow builds exactly one NeoForge runtime JAR,
+The existing `neoforge-26.2.yml` workflow is retained as historical 0.0.10
+release evidence. The future NeoForge 26.3 workflow should build exactly one
+NeoForge runtime JAR,
 checks its expanded metadata, license, mixin descriptor/classes, and absence of
 Fabric descriptors, then launches that packaged JAR in isolated client and
 dedicated-server runs. The client run performs a Mixin audit; the target-specific
@@ -67,8 +68,8 @@ Test with the feature disabled and enabled in:
 - underwater views;
 - chunk loading and block updates;
 - Sodium absent and present;
-- each supported loader artifact, including NeoForge 26.2;
-- Minecraft 1.21.1 Fabric compatibility artifact, with Sodium absent and present;
+- each active loader artifact, with NeoForge 26.3 added after its tooling stabilises;
+- Minecraft 1.21.11 Fabric compatibility artifact, with Sodium absent and present;
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.
 

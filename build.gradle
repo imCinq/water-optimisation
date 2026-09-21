@@ -4,12 +4,13 @@ plugins {
 	id 'maven-publish'
 }
 
-def targetMinecraft = providers.gradleProperty("target_minecraft").orElse("26.2").get()
-def targetProfiles = ["26.2": "", "1.21.1": "_1211", "26.3": "_263"]
+def targetMinecraft = providers.gradleProperty("target_minecraft").orElse("26.3").get()
+def targetProfiles = ["26.2": "", "1.21.1": "_1211", "1.21.11": "_12111", "26.3": "_263"]
 if (!targetProfiles.containsKey(targetMinecraft)) {
-	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2, 1.21.1 or 26.3.")
+	throw new GradleException("Unsupported target_minecraft '${targetMinecraft}'. Use 26.2, 1.21.1, 1.21.11 or 26.3.")
 }
-def legacyTarget = targetMinecraft == "1.21.1"
+def legacyTarget = targetMinecraft in ["1.21.1", "1.21.11"]
+def target12111 = targetMinecraft == "1.21.11"
 def target263 = targetMinecraft == "26.3"
 def propertySuffix = targetProfiles[targetMinecraft]
 apply plugin: legacyTarget ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
@@ -34,7 +35,7 @@ def resourceExpansion = [
 	version: project.version,
 	target_description: targetDescription,
 	loader_dependency: ">=${targetLoaderVersion}",
-	fabric_api_dependency: target263 ? ">=${targetFabricApiVersion}" : "*",
+	fabric_api_dependency: (target263 || target12111) ? ">=${targetFabricApiVersion}" : "*",
 	minecraft_dependency: target263 ? "${targetMinecraftVersion}" : "~${targetMinecraftVersion}",
 	java_dependency: ">=${targetJavaVersion}",
 	modmenu_dependency: ">=${targetModMenuVersion}",
@@ -62,10 +63,10 @@ loom {
 	}
 }
 
-// Modern renderer/UI code is shared; only the input adapter differs after SDL.
-// The legacy client remains entirely isolated.
+// Modern renderer/UI code is shared; each obfuscated legacy target remains
+// isolated because its GUI, input, and renderer APIs are version-specific.
 sourceSets.client.java.setSrcDirs(legacyTarget
-		? ["src/1.21.1/client/java"]
+		? ["src/${targetMinecraft}/client/java"]
 		: ["src/client/java", "src/${targetMinecraft}/client/java"])
 
 if (target263) {

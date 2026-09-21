@@ -5,6 +5,29 @@ See README.md, docs/DISTRIBUTION.md, and docs/FABRIC_26_3.md for current support
 
 Water Optimisation is developed as a conservative, client-only rendering mod. Every optimization must be measurable, visually reviewable, and safe to disable.
 
+## v1.0.0 direction
+
+The active release line is moving to three intended targets:
+
+- Fabric 26.3;
+- Fabric 1.21.11;
+- NeoForge 26.3, once its development beta and build tooling stabilise.
+
+Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical compatibility targets only. Their existing artifacts remain documented for users of 0.0.10, but new v1.0.0 features and UI work should not be designed around them.
+
+The implementation order is:
+
+1. finish the isolated 1.21.11 build/API baseline and make 26.3 the default development profile;
+2. keep one shared settings-presentation model so Fabric and NeoForge expose the same meanings;
+3. finish the main screen with clear preset descriptions, a derived Custom state, capability-aware status text, and preserved Apply/Cancel behavior;
+4. finish the Advanced screen with the two player-facing rendering toggles, Sodium/target unavailable states, and a bounded scrollable layout for small windows;
+5. port the same presentation and entrypoint behavior to NeoForge 26.3 after its stable tooling is available;
+6. only then decide whether a new rendering feature is justified by a clear correctness case. No Sodium geometry bridge or custom water renderer is part of v1.0.0 by default.
+
+The first four settings/UI steps are now implemented in source: the 1.21.11 profile compiles, 26.3 is the default target, the shared presentation rules drive all current adapters, and the Advanced screen has bounded scrolling with a fixed footer. The next version-specific work is the NeoForge 26.3 port after its toolchain stabilises.
+
+Testing is not a prerequisite for continuing this structural work. Builds and focused source checks remain the acceptance gate for compatibility changes; optional in-game smoke or performance checks can be performed later by the user without turning an FPS result into a promise.
+
 ## Current release baseline
 
 The 0.0.7 release is the public baseline for the client-only implementation for Minecraft 26.2 and the target-isolated compatibility implementation for Minecraft 1.21.1:

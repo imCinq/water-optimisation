@@ -5,21 +5,20 @@
 <h1 align="center">Water Optimisation</h1>
 
 <p align="center">
-  <strong>Client-side water rendering for Minecraft 26.3, 26.2 and 1.21.1</strong><br>
+  <strong>Client-side water rendering for Minecraft 26.3 and 1.21.11</strong><br>
   Reduce water-related rendering work while keeping the world, gameplay, and server unchanged.
 </p>
 
 <p align="center">
   <a href="https://github.com/imCinq/water-optimisation/releases/latest"><img src="https://img.shields.io/github/v/release/imCinq/water-optimisation?display_name=tag&sort=semver&color=2563eb&label=latest%20release" alt="Latest release"></a>
   <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
-  <img src="https://img.shields.io/badge/Minecraft-26.2-2563eb.svg" alt="Minecraft 26.2">
   <img src="https://img.shields.io/badge/Minecraft-26.3-2563eb.svg" alt="Minecraft 26.3">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.1-2563eb.svg" alt="Minecraft 1.21.1">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.11-2563eb.svg" alt="Minecraft 1.21.11">
   <img src="https://img.shields.io/badge/Fabric%20%7C%20NeoForge-client--side-2563eb.svg" alt="Fabric and NeoForge client-side mod">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
 
-Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry. Fabric builds support Minecraft 26.3, 26.2 and 1.21.1; NeoForge support currently targets Minecraft 26.2.
+Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry. Version 1.0.0 supports Fabric 26.3 and Fabric 1.21.11; NeoForge 26.3 is planned as a later support update after its development tooling stabilises.
 
 > This mod only changes what is rendered on the client. It does not change fluid simulation, terrain, collision, movement, networking, gameplay, or server state.
 
@@ -27,21 +26,21 @@ Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scene
 
 1. Download the [latest release](https://github.com/imCinq/water-optimisation/releases/latest) and choose the JAR matching both your Minecraft version and loader.
 2. Put the runtime JAR in the client’s `mods` folder.
-3. Launch a supported Minecraft version with Fabric or NeoForge. NeoForge is currently supported on 26.2 only.
+3. Launch a supported Minecraft version with Fabric. NeoForge 26.3 will be added in a later support update once that target leaves development beta.
 4. Open the settings from Mod Menu on Fabric or the Mods screen on NeoForge, or press `O` in the client.
 5. Enable the mod and start with the `Performance` preset.
 
-The current public [0.0.9 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.9) adds a standalone NeoForge 26.2 build alongside Fabric builds for Minecraft 26.2 and 1.21.1. 0.0.9 is superseded by 0.0.10. NeoForge 26.2 requires Java 25 and NeoForge 26.2.0.77+; its packaged runtime is checked with client/server smoke tests and a renderer-mixin audit. Both Fabric targets use vanilla widget scrolling. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current public [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) is a historical release for Fabric 26.3, Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2. It is not the v1.0.0 target line: Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are being retired from active support. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
-| Minecraft | Loader | Java | Geometry scope |
+| v1.0.0 target | Loader | Java | Status |
 | --- | --- | --- | --- |
-| 26.3 | Fabric | 25+ | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
-| 26.2 | Fabric | 25+ | Conservative vanilla hooks; Sodium remains the geometry owner when present. |
-| 26.2 | NeoForge 26.2.0.77+ | 25+ | Conservative vanilla hooks; packaged client/server smoke and mixin audit are enforced in CI. |
-| 1.21.1 | Fabric | 21+ | Conservative vanilla source-water fast path and particle filtering; Sodium remains on the particle-only fallback. |
-| 1.21.1 | NeoForge | — | Not yet supported. |
+| 26.3 | Fabric | 25+ | Included in v1.0.0. |
+| 1.21.11 | Fabric | 21+ | Included in v1.0.0. |
+| 26.3 | NeoForge | 25+ | Planned after the NeoForge 26.3 development beta stabilises. |
 
-## Minecraft 26.3 Fabric support
+The 26.2 Fabric, 1.21.1 Fabric, and 26.2 NeoForge artifacts remain available only as historical 0.0.10 releases. They will not receive the v1.0.0 settings redesign or new rendering features.
+
+## Historical 0.0.10: Minecraft 26.3 Fabric support
 
 The `0.0.10` release supports Minecraft 26.3 Fabric with `-Ptarget_minecraft=26.3`, using Java 25, Fabric Loader `0.19.5`, Fabric API `0.160.6+26.3` (metadata floor `>=0.160.6+26.3` for 26.3 only), and optional Mod Menu `21.0.0-beta.1`. Only the keyboard input adapter differs from the shared modern client code. The 0.0.10 release hardens configuration-log privacy, pins the Gradle distribution checksum, brackets fluid tessellation with try/finally cleanup, and corrects hidden-water skipping beneath solid ceilings. The newer historical local Fabric 26.3 result is 25 tests passed via `test`: 16 config-model tests, 4 context helper tests, and 5 mocked predicate tests. Earlier evidence separately records a forced `test build verifyArtifact --rerun-tasks` pass with 20 tests and clean repository/client-only audits and whitespace checks; it is not a 25-test full-build result. A separate NeoForge 26.2 build passed 20 tests before the new mocked predicate fixture was added. Current-SHA CI passed for builds and startup smoke per runs 35237266215 and 35237266249, and no project-run in-game tests were run for this hardening. Transformed-Mixin cancellation/exception validation remains an open nonvisual gate; helper tests and startup success do not prove transformed behavior or optional local-capture hook execution. A user-reported pass dated 2026-09-17 covered Apple M2 hardware, macOS 27, OpenGL, Sodium absent, and Mod Menu present on CI runtime `water-optimisation-0.0.10-mc26.3-fabric.jar` (SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`); the full visual matrix and FPS remain unvalidated. A follow-up pass covered Mod Menu present and most settings with no failures observed. A further pass covered Sodium present and the Vulkan backend with no failures observed, with Sodium version and scenes unspecified. See the [26.3 build, test, and release guide](docs/FABRIC_26_3.md) and [26.3 release notes](docs/FABRIC_26_3_RELEASE_NOTES.md).
 
@@ -54,7 +53,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 | **Vanilla** | Turns the mod off and restores vanilla behavior. | A reference comparison. |
 | **Balanced** | Keeps vanilla fluid geometry and nearby particles. | A conservative starting point. |
 | **Performance** | Skips only fully hidden source-water blocks and disables water particles by default. | Safer performance testing. |
-| **Maximum FPS** | Includes the Performance path and, on the supported 26.2 vanilla renderer, removes optional inward water faces for ordinary full source water. | Testing the strongest available water-rendering reduction. |
+| **Maximum FPS** | Includes the Performance path and, on supported vanilla renderers, removes optional inward water faces for ordinary full source water. | Testing the strongest available water-rendering reduction. |
 
 `Maximum FPS` is intentionally opt-in. Hidden-water skipping leaves flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous cases on vanilla tessellation. Experimental mode separately removes optional inward faces from ordinary source water and may affect underwater or transparent-boundary views.
 
@@ -62,7 +61,7 @@ The preset selector gives the common choices clear names. Selecting a preset res
 
 ### Fully hidden water blocks
 
-During section compilation, the modern renderer hook reuses the six neighbor states that Minecraft has already loaded to identify hidden ordinary source water. In the 0.0.10 release, shared modern Fabric and NeoForge require ordinary source water **above**; source water or full solid-rendering blocks may hide the down/side faces. A solid ceiling alone is not sufficient because a water surface can remain visible beneath it. This correction does not retroactively change the published 0.0.9 artifacts.
+During section compilation, the modern renderer hook reuses the six neighbor states that Minecraft has already loaded to identify hidden ordinary source water. In the active 26.3 renderer path, ordinary source water is required **above**; source water or full solid-rendering blocks may hide the down/side faces. A solid ceiling alone is not sufficient because a water surface can remain visible beneath it. This correction does not retroactively change the historical 0.0.10 artifacts.
 
 Open-surface water does not qualify, so visible top faces remain. Flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous states fall back to vanilla tessellation.
 
@@ -94,12 +93,12 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 
 | Component | Supported target |
 | --- | --- |
-| Minecraft | 26.3, 26.2 or 1.21.1 |
-| Java | 25+ for 26.3 and 26.2; 21+ for 1.21.1 |
-| Fabric Loader | 0.19.5+ for 26.3; 0.19.3+ for 26.2; 0.16.13+ for 1.21.1 |
-| Fabric API | `0.160.6+26.3` for 26.3; `0.158.0+26.2` for 26.2; `0.116.12+1.21.1` for 1.21.1 |
-| Mod Menu | Optional: `21.0.0-beta.1` for 26.3; `19.0.0-alpha.1` for 26.2; `11.0.4` for 1.21.1 |
-| NeoForge | `26.2.0.77+` for Minecraft 26.2 |
+| Minecraft | 26.3 or 1.21.11 for the v1.0.0 development line |
+| Java | 25+ for 26.3; 21+ for 1.21.11 |
+| Fabric Loader | `0.19.5+` for 26.3; `0.18.5+` for 1.21.11 |
+| Fabric API | `0.160.6+26.3` for 26.3; `0.141.4+1.21.11` for 1.21.11 |
+| Mod Menu | Optional: `21.0.0-beta.1` for 26.3; `17.0.1-beta.1` for 1.21.11 |
+| NeoForge | Planned: matching stable 26.3 release line |
 | Environment | Client only |
 
 ## Documentation

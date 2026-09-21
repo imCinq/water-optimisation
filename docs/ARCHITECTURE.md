@@ -18,7 +18,7 @@ Diagnostics observe these decisions locally without changing gameplay state.
 
 ## Target profiles
 
-The Fabric 26.2 and 1.21.1 client APIs are compiled from separate source roots. The 26.2 profile uses the non-remapping Loom plugin and extraction-based GUI/HUD APIs. The 1.21.1 profile uses remapping Loom with official Mojang mappings and its older `GuiGraphics`, `HudRenderCallback`, key-binding, liquid-renderer, and level-refresh APIs. The generated metadata selects only the mixin configuration for the requested target. NeoForge 26.2 is a standalone ModDevGradle project that reuses version-neutral policy, configuration, diagnostics, tests, assets, and translations while keeping its entrypoint, screens, event registration, metadata, and renderer mixins loader-specific.
+The Fabric 26.3 and 1.21.11 client APIs are compiled from separate source roots. The 26.3 profile uses the non-remapping Loom plugin and extraction-based GUI/HUD APIs. The 1.21.11 profile uses remapping Loom with official Mojang mappings and its older `GuiGraphics`, `HudElementRegistry`, key-binding, liquid-renderer, and level-refresh APIs. The generated metadata selects only the mixin configuration for the requested target. NeoForge 26.3 will remain a standalone ModDevGradle target once its development tooling stabilises; it will reuse version-neutral policy, configuration, diagnostics, tests, assets, and translations while keeping its entrypoint, screens, event registration, metadata, and renderer mixins loader-specific.
 
 ## Components
 
@@ -34,16 +34,16 @@ Only settings that can change compiled fluid geometry invalidate rendered sectio
 
 ### Fluid hooks
 
-The 26.2 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.1 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
+The 26.3 FluidRendererMixin targets the current public fluid tessellation method. The 1.21.11 adapter targets `LiquidBlockRenderer` and performs a smaller safe check because that renderer does not expose the same stable local-state hook. Both policies are intentionally narrow:
 
 - vanilla remains responsible for same-fluid face culling; Minecraft already hides those faces before emitting geometry;
 - Reduced-face mode changes only vanilla's optional reverse-face argument at `FluidRenderer.addFace` for ordinary full source-water blocks, preserving the outward face while reducing translucent geometry. It is enabled by Maximum FPS or manual selection and inactive when Sodium owns fluid rendering. No Sodium geometry mixin is installed or planned; Sodium remains the geometry owner unless project scope is formally reconsidered;
 - the hidden-water path checks the current block and all six already-loaded neighbor block/fluid states, then cancels tessellation only when each face is hidden by ordinary full source-water or full solid-rendering blocks;
 - hidden-water skipping leaves flowing states, boundaries, waterlogged blocks, partial shapes, overlays, transparent neighbors, and other ambiguous cases on vanilla tessellation; experimental reverse-face reduction is a separate change to ordinary source water and may affect underwater or transparent-boundary views.
 
-The 1.21.1 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
+The 1.21.11 adapter does not manufacture a level/position context for its older solid-render query. It therefore proves only fully enclosed ordinary source water whose six neighbors are also ordinary source water; solid-boundary cases remain vanilla. This reduces the compatibility path’s coverage but keeps its correctness proof simple.
 
-The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the 26.2 fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Because the 26.2 builds are target-specific, the fast-path injection is required: renderer-local drift fails the mixin audit instead of silently advertising an unavailable optimization. On 1.21.1 Fabric, the compatibility hook remains fail-soft and first rejects non-source centers and visible upward neighbors, then performs its narrower source-water-only probe with one reusable mutable position. The diagnostics HUD separates the configured fast path, effective active path, one-shot hook observation, and actual skips, so an unobserved hook is not mistaken for measured work. Mixins are client-only and use loader-specific descriptors. They do not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
+The fully hidden-water optimization is injected immediately before vanilla's first face decision, after the six neighbor states have been loaded. This avoids repeating chunk lookups in the 26.3 fast path. The reverse-face argument change is isolated to vanilla's face helper and does not read camera state from an asynchronous section compiler. Because the 26.3 builds are target-specific, the fast-path injection is required: renderer-local drift fails the mixin audit instead of silently advertising an unavailable optimization. On 1.21.11 Fabric, the compatibility hook remains fail-soft and first rejects non-source centers and visible upward neighbors, then performs its narrower source-water-only probe with one reusable mutable position. The diagnostics HUD separates the configured fast path, effective active path, one-shot hook observation, and actual skips, so an unobserved hook is not mistaken for measured work. Mixins are client-only and use loader-specific descriptors. They do not replace RenderType, RenderPipeline, Sodium, FluidState, or world simulation.
 
 ### Particle filter
 
@@ -60,7 +60,7 @@ An optional budget resets at the start of each client tick and is reserved only 
 - Fabric API is the Fabric integration surface; NeoForge lifecycle and client events are used only by the standalone NeoForge target.
 - Mod Menu is optional and contains no renderer logic.
 - Sodium ownership is detected before normal gameplay and disables the vanilla fluid hooks. Sodium remains fully responsible for water geometry; no Sodium geometry bridge is planned, and the mod will not add one unless project scope is formally reconsidered.
-- On Minecraft 1.21.1, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
+- On Minecraft 1.21.11, Sodium ownership disables the vanilla fluid hooks and leaves geometry entirely to Sodium. The compatibility profile adds no unreviewed Sodium mixin.
 - The implementation uses Minecraft's renderer and GUI abstractions; it does not call raw OpenGL.
 - Every uncertain classification falls back to vanilla behavior.
 

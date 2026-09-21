@@ -2,19 +2,19 @@
 
 ## Minecraft and Fabric
 
-The project has isolated target profiles so the incompatible client APIs cannot be loaded across versions.
+The v1.0.0 line has isolated target profiles so incompatible client APIs cannot be loaded across versions. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets and are no longer active development targets.
 
-| Target | Java | Fabric Loader | Fabric API | Mod Menu | Runtime geometry scope |
+| v1.0.0 target | Java | Fabric Loader | Fabric API | Mod Menu | Runtime geometry scope |
 | --- | --- | --- | --- | --- | --- |
 | Minecraft 26.3 | 25+ | 0.19.5+ | 0.160.6+26.3 | Optional 21.0.0-beta.1 | Vanilla conservative/reduced-face hooks; Sodium-owned geometry when present. |
-| Minecraft 26.2 | 25+ | 0.19.3+ | 0.158.0+26.2 | Optional 19.0.0-alpha.1 | Vanilla conservative/reduced-face hooks; Sodium-owned geometry when present. |
-| Minecraft 1.21.1 | 21+ | 0.16.13+ | 0.116.12+1.21.1 | Optional 11.0.4 | Conservative source-water fast path and particles; Sodium-owned geometry when present. |
+| Minecraft 1.21.11 | 21+ | 0.18.5+ | 0.141.4+1.21.11 | Optional 17.0.1-beta.1 | Conservative source-water fast path and particles; Sodium-owned geometry when present. |
+| Minecraft 26.3 | NeoForge stable line | — | — | Native Mods screen | Planned after NeoForge 26.3 development tooling stabilises. |
 
-The 1.21.1 profile uses the remapping Loom plugin and official Mojang mappings, while 26.2 uses the non-remapping Loom profile. Its older GUI, HUD, key-binding, and liquid-renderer APIs live under `src/1.21.1/client/java` and `wateroptimisation.legacy.mixins.json`. NeoForge 26.2 (26.2.0.77+) remains supported as a standalone target.
+The 1.21.11 profile uses the remapping Loom plugin and official Mojang mappings, while 26.3 uses the non-remapping Loom profile. Its older GUI, HUD, key-binding, and liquid-renderer APIs live under `src/1.21.11/client/java` and `wateroptimisation.legacy.mixins.json`. NeoForge 26.3 remains a planned standalone target until its development tooling stabilises.
 
 ## Mod Menu
 
-Mod Menu is an optional compile-only dependency: 21.0.0-beta.1 for 26.3, 19.0.0-alpha.1 for 26.2 and 11.0.4 for 1.21.1. The core mod loads without it and retains the keybind and native settings screen.
+Mod Menu is an optional compile-only dependency: 21.0.0-beta.1 for 26.3 and 17.0.1-beta.1 for 1.21.11. The core mod loads without it and retains the keybind and native settings screen. NeoForge uses its native Mods screen rather than Mod Menu.
 
 ## Sodium
 
@@ -22,7 +22,7 @@ Sodium has its own optimized fluid renderer. When the Sodium mod id is detected,
 
 ## Rendering backends
 
-Minecraft 26.2 can use different rendering backends. The implementation uses Minecraft's Blaze3D/Fabric abstractions and does not call raw OpenGL. Test OpenGL and Vulkan separately when both are available.
+Minecraft 26.3 can use different rendering backends. The implementation uses Minecraft's Blaze3D/Fabric abstractions and does not call raw OpenGL. Test backends separately when both are available.
 
 ## Multiplayer
 

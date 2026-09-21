@@ -24,6 +24,7 @@ public final class WaterOptimisationScreen extends Screen {
 	private int buttonWidth;
 	private int descriptionY;
 	private int effectivePathY;
+	private int profileDescriptionY;
 
 	public WaterOptimisationScreen(Screen parent) {
 		this(parent, ConfigManager.copy());
@@ -46,6 +47,8 @@ public final class WaterOptimisationScreen extends Screen {
 		int y = this.descriptionY + wrappedHeight(description) + 4;
 		this.effectivePathY = y;
 		y += wrappedHeight(effectivePathLabel()) + 8;
+		this.profileDescriptionY = y;
+		y += wrappedHeight(profileDescription()) + 8;
 		this.enabledButton = this.addRenderableWidget(Button.builder(
 				enabledLabel(),
 				button -> {
@@ -89,6 +92,7 @@ public final class WaterOptimisationScreen extends Screen {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		drawCenteredWrapped(graphics, Component.translatable("screen.wateroptimisation.description"), this.descriptionY, 0xFFFFFFFF);
 		drawCenteredWrapped(graphics, effectivePathLabel(), this.effectivePathY, 0xFFB0B0B0);
+		drawCenteredWrapped(graphics, profileDescription(), this.profileDescriptionY, 0xFFB0B0B0);
 	}
 
 	@Override
@@ -116,8 +120,14 @@ public final class WaterOptimisationScreen extends Screen {
 	private Component profileLabel() {
 		return Component.translatable(
 				"screen.wateroptimisation.profile",
-				Component.translatable(this.workingCopy.getPerformanceProfile().translationKey())
+				Component.translatable(SettingsPresentation.profileTranslationKey(this.workingCopy))
 		);
+	}
+
+	private Component profileDescription() {
+		String profileKey = SettingsPresentation.profileTranslationKey(this.workingCopy);
+		String descriptionKey = profileKey.replace("wateroptimisation.profile.", "screen.wateroptimisation.profile_description.");
+		return Component.translatable(descriptionKey);
 	}
 
 	private Component effectivePathLabel() {
