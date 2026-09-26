@@ -2,7 +2,7 @@
 
 Use this checklist before publishing a Water Optimisation artifact. A passing CI build is necessary but does not by itself establish visual equivalence, an FPS improvement, or server compatibility.
 
-For the **v1.0.0 Fabric line**, use the [26.3 guide](FABRIC_26_3.md) and the release assets linked from [Distribution](DISTRIBUTION.md). Target the exact runtime JAR for the selected profile: `build/26.3/libs/water-optimisation-1.0.0-mc26.3-fabric.jar` for Fabric 26.3 or `build/libs/water-optimisation-1.0.0.jar` for Fabric 1.21.11. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets and are not active release checks. The 26.3 and 1.21.11 builds, metadata, checksums, privacy audit, and client-only audit passed for the v1.0.0 release; the full visual and performance matrix remains optional user validation rather than an FPS promise.
+For **v1.1.0**, the release targets are Fabric 26.3 (`build/26.3/libs/water-optimisation-1.1.0-mc26.3-fabric.jar`), Fabric 1.21.11 (`build/libs/water-optimisation-1.1.0.jar`, published as `water-optimisation-1.1.0-mc1.21.11-fabric.jar`), NeoForge 1.21.11 (`neoforge-1.21.11/build/libs/water-optimisation-1.1.0-mc1.21.11-neoforge.jar`), and Forge 26.3 (`forge-26.3/build/libs/water-optimisation-1.1.0-mc26.3-forge.jar`, one-time release). Build them with `./gradlew -Ptarget_minecraft=<26.3|1.21.11> clean test build verifyArtifact` and `./gradlew -p <forge-26.3|neoforge-1.21.11> clean test build verifyArtifact`. Fabric 26.3 and Fabric 1.21.11 write to different folders, but a `clean` of one Fabric target removes the other's output, so copy each jar out before building the next. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets.
 
 ## Product and metadata
 
@@ -28,7 +28,17 @@ For the **v1.0.0 Fabric line**, use the [26.3 guide](FABRIC_26_3.md) and the rel
 - [ ] The runtime JAR contents are inspected and contain no build cache, logs, screenshots, or private data.
 - [ ] SHA-256 checksums are calculated for the files that will be published.
 - [ ] The production startup smoke workflow passes for every artifact being released, including the exact Fabric 26.3 artifact when selected; sanitized logs are retained with the release evidence.
-- [ ] NeoForge is not included in v1.0.0; its 26.3 checks belong to a later support release.
+- [ ] NeoForge 26.3 is not included in v1.0.0; its separate preview/release checks are tracked below.
+
+## NeoForge 26.3 preview and future release
+
+- [ ] The pinned NeoForge coordinate in `neoforge-26.3/gradle.properties` resolves from the official release repository or a documented local preview publication.
+- [ ] From `neoforge-26.3/`, `../gradlew clean test build verifyArtifact --no-daemon --console=plain` passes on Java 25.
+- [ ] The generated `META-INF/neoforge.mods.toml` contains the final NeoForge and Minecraft version ranges, and the target-local artifact verifier passes.
+- [ ] The exact preview/runtime JAR starts a client and logs the Water Optimisation initialization marker without mixin audit failures.
+- [ ] The preview package contains no Fabric metadata, private files, logs, screenshots, or generated runtime data.
+- [ ] The renderer hook descriptors are checked against the exact released NeoForge/Minecraft runtime; the 26.3 `FluidRenderer.shouldRenderFace` neighboring-`FluidState` signature is specifically covered.
+- [ ] The preview is labelled pre-release until the target has documented client validation and publication evidence comparable to the Fabric release line.
 
 ## Local Minecraft validation
 
@@ -63,3 +73,5 @@ Record the accepted commit, artifact filenames, checksums, CI run, target hardwa
 - Visual result: a general client pass was reported on the configuration above. The full scene matrix, OIT on/off, the unrecorded Sodium version and Vulkan detail checks, and all FPS/frame-time/compilation/particle benchmark gates remain unchecked and untested; no stable acceptance is implied.
 - 17 September 2026 follow-up user pass: Mod Menu present and most settings were covered with no failures observed, on the same configuration and artifact SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`.
 - 17 September 2026 further user pass: Sodium present and the Vulkan backend were covered with no failures observed, against artifact SHA-256 `d50d3074a14a0bd70daa7474e91f4f5d54a8751d6ceb5f4a8f84be6ab0db7d24`. Sodium version and scenes were not specified.
+- 22 September 2026 local regression pass: Fabric 26.3 `clean test build verifyArtifact` and Fabric 1.21.11 `clean test build verifyArtifact` both passed after the NeoForge 26.3 release-preparation changes. No NeoForge runtime JAR was produced because the pinned `26.3.0-alpha.0+local` coordinate is not available.
+- The same local build produced Fabric 26.3 runtime SHA-256 `8643fe4748feab5abb53bc3f8ed71a0fe9026b0a4aafc92f13c6016b797bfaf8` and Fabric 1.21.11 runtime SHA-256 `09daccab6e514a8c48631e1b6b986161d3c8806e4bf91f433703e8a15b6cb6fa`; package spot checks found the expected metadata, mixin descriptor, icon, and license entries.

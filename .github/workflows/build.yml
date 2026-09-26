@@ -45,3 +45,36 @@ jobs:
             build/libs/
             build/26.3/libs/
           if-no-files-found: error
+
+  build-module:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: forge-26.3
+            java: '25'
+          - module: neoforge-1.21.11
+            java: '21'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v6
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'microsoft'
+          cache: gradle
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: Build, test, and verify
+        run: ./gradlew -p ${{ matrix.module }} test build verifyArtifact --no-daemon --console=plain
+      - name: Capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: water-optimisation-${{ matrix.module }}-artifacts
+          path: ${{ matrix.module }}/build/libs/
+          if-no-files-found: error

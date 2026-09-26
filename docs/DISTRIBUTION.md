@@ -2,17 +2,17 @@
 
 ## Current status
 
-Water Optimisation v1.0.0 is the current public GitHub release. It supports Fabric 26.3 and Fabric 1.21.11 with the redesigned settings flow and target-specific runtime/sources JARs. NeoForge 26.3 is a planned follow-up; 0.0.10 remains available as a historical release for the retired targets. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation v1.1.0 is the current public GitHub release. It supports Fabric 26.3, Fabric 1.21.11, NeoForge 1.21.11, and Forge 26.3 (one-time) with the tabbed settings screen and target-specific runtime/sources JARs. NeoForge 26.3 remains an engineering preview until NeoForge ships a stable 26.3 release. 0.0.10 remains available as a historical release for the retired targets. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
 
-## v1.0.0 release line
+## v1.1.0 release line
 
-The v1.0.0 release line includes Fabric 26.3 and Fabric 1.21.11. NeoForge 26.3 is planned as a later support update after its development beta and build tooling stabilise. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 remain reproducible only as historical 0.0.10 targets and are not part of the v1.0.0 feature line.
+The v1.1.0 release line includes Fabric 26.3, Fabric 1.21.11, and NeoForge 1.21.11. Forge 26.3 is included once and will not receive later updates. NeoForge 26.3 will be added after NeoForge's stable 26.3 release. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 remain reproducible only as historical 0.0.10 targets and are not part of the current feature line.
 
 | Target | Status | Current direction |
 | --- | --- | --- |
 | Fabric 26.3 | Included | Shared modern settings UI and renderer path. |
 | Fabric 1.21.11 | Included | Isolated compatibility source set with the same settings semantics and conservative renderer path. |
-| NeoForge 26.3 | Planned | Port the shared UI and policy after stable target tooling is available. |
+| NeoForge 26.3 | Engineering preview | Ported target-isolated UI, policy, diagnostics, particles, and renderer hooks; awaiting a usable 26.3 runtime publication. |
 
 ## Historical 0.0.10 build profile
 
@@ -31,7 +31,7 @@ The v1.0.0 release line includes Fabric 26.3 and Fabric 1.21.11. NeoForge 26.3 i
 
 ## Release artifacts
 
-Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v1.0.0) for the current Fabric 26.3 and Fabric 1.21.11 runtime JARs, matching sources JARs, `RELEASE_NOTES.md`, and `SHA256SUMS-1.0.0.txt`. The older [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) remains available for historical targets.
+Use the published [GitHub Release](https://github.com/imCinq/water-optimisation/releases/tag/v1.1.0) for the current runtime JARs, matching sources JARs, `RELEASE_NOTES.md`, and `SHA256SUMS-1.1.0.txt`. The v1.0.0 release remains available for the previous Fabric builds. The NeoForge 26.3 preview must not be listed there until its runtime coordinate resolves and its target-local `verifyArtifact` and startup checks pass. The older [0.0.10 release](https://github.com/imCinq/water-optimisation/releases/tag/v0.0.10) remains available for historical targets.
 
 GitHub Actions artifacts remain temporary build outputs. They expire and are not a substitute for the tagged release.
 
@@ -55,6 +55,14 @@ Before publishing a stable artifact:
 - current server rules are checked before any multiplayer claim;
 - no personal information, credentials, server data, or generated runtime files are included;
 - the listing makes no universal FPS or server-approval claim.
+
+For the NeoForge 26.3 preview or future stable release, also require:
+
+- a published or locally reproducible NeoForge 26.3 runtime coordinate;
+- `../gradlew clean test build verifyArtifact --no-daemon --console=plain` from `neoforge-26.3/`;
+- a packaged client startup check with the exact preview JAR;
+- confirmation that the final metadata dependency range matches the released NeoForge coordinate;
+- a pre-release label until the target has evidence comparable to the public Fabric line.
 
 Use the [public release checklist](RELEASE_CHECKLIST.md) as the acceptance record.
 
@@ -81,13 +89,13 @@ Publishing is intentionally manual. No publishing automation or update checker i
 - License: MIT
 - Required dependency: matching Fabric API build on Fabric; NeoForge 26.2.0.77+ on NeoForge
 
-## v1.0.0 listing
+## v1.1.0 listing
 
-- Loader: Fabric for 26.3 and 1.21.11; NeoForge 26.3 after stable tooling
+- Loader: Fabric for 26.3 and 1.21.11; NeoForge for 1.21.11; Forge for 26.3 (one-time release)
 - Environment: Client
-- Minecraft target: 26.3 and 1.21.11 initially
+- Minecraft target: 26.3 and 1.21.11
 - Java target: 25 for 26.3; 21 for 1.21.11
-- Required dependency: matching Fabric API build on Fabric; matching stable NeoForge 26.3 line when enabled
+- Required dependency: matching Fabric API build on Fabric; NeoForge 21.11.45+ on NeoForge 1.21.11; Forge 66.0.2+ on Forge 26.3
 
 ## Credential boundary
 

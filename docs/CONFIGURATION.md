@@ -23,9 +23,11 @@ The main screen keeps changes in memory until Done. Cancel and Escape discard un
 | Performance | Keeps vanilla fluid-face decisions, enables the explicitly labelled flat source-water fast path, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. Its particle budget defaults to 128 per client tick. |
 | Maximum FPS | Enables the flat source-water fast path and optional reduced-face mode on vanilla, and disables cosmetic water particles by default with a 16-block fog-tightened bound if re-enabled. Its particle budget defaults to 64 per client tick and can limit particles that normally ignore distance. The reduced-face mode can change inside-water views and is unavailable while Sodium owns water geometry. |
 
-Selecting a preset resets its Advanced settings values. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
+Selecting a preset resets the values on the Water and Particles tabs. Choosing Vanilla also turns off the master switch. Presets do not promise a particular FPS result.
 
-## Advanced settings
+## Individual settings
+
+The General tab holds `enabled`, the preset, Reset to preset, and `diagnosticsHud`. The Water tab holds the hidden-water and inward-face options, and the Particles tab holds the particle options. The saved field names are:
 
 | Setting | Default | Behavior |
 | --- | --- | --- |
@@ -42,7 +44,7 @@ The reduced-face setting is optional because it can change how ordinary source w
 
 ## Compatibility behavior
 
-If Sodium is detected, the vanilla fluid hooks are disabled so Water Optimisation does not duplicate or replace Sodium's fluid renderer. Sodium remains the geometry owner on both v1.0.0 target families, and the local particle and settings paths remain available. The main screen and diagnostics HUD report the renderer ownership state.
+If Sodium is detected, the vanilla fluid hooks are disabled so Water Optimisation does not duplicate or replace Sodium's fluid renderer. Sodium remains the geometry owner on every target, and the local particle and settings paths remain available. The settings screen and diagnostics HUD report the renderer ownership state.
 
 The hidden-water fast path leaves waterlogged blocks, flowing edges, partial shapes, transparent neighbors, overlays, and unusual block states to vanilla behavior. Experimental inward-face reduction is separate and may affect underwater or transparent-boundary views for eligible ordinary source water. No setting changes FluidState, collision, movement, world updates, or server state.
 

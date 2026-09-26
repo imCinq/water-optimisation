@@ -1,0 +1,166 @@
+plugins {
+	id 'java'
+	id 'idea'
+	id 'eclipse'
+	id 'maven-publish'
+	id 'net.minecraftforge.gradle' version '[7.0.17,8)'
+}
+
+version = mod_version
+group = 'io.github.imcinq.wateroptimisation'
+base.archivesName = 'water-optimisation'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+def mixinConfig = 'wateroptimisation.forge.mixins.json'
+def sharedNeoForgeRoot = file('../neoforge-26.3/src/main/java').canonicalFile
+def neoForgeEntrypoint = new File(
+		sharedNeoForgeRoot,
+		'io/github/imcinq/wateroptimisation/WaterOptimisationClient.java'
+).canonicalFile
+def forgeSpecificMixinNames = [
+		'ClientLevelMixin.java',
+		'FluidRendererMixin.java',
+		'SectionCompilerMixin.java',
+		'ResortTransparencyTaskMixin.java'
+] as Set
+
+minecraft {
+	runs {
+		configureEach {
+			workingDir = layout.projectDirectory.dir('run')
+			systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+			args "--mixin.config=${mixinConfig}"
+		}
+
+		register('client')
+	}
+}
+
+repositories {
+	minecraft.mavenizer(it)
+	maven fg.forgeMaven
+	maven fg.minecraftLibsMaven
+	mavenCentral()
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir '../src/main/java'
+			srcDir sharedNeoForgeRoot
+			exclude { element ->
+				def sourceFile = element.file.canonicalFile
+				sourceFile == neoForgeEntrypoint
+						|| (sourceFile.toPath().startsWith(sharedNeoForgeRoot.toPath())
+							&& forgeSpecificMixinNames.contains(sourceFile.name))
+			}
+		}
+		resources {
+			srcDir '../src/main/resources'
+			exclude 'fabric.mod.json'
+			exclude 'wateroptimisation.client.mixins.json'
+			exclude 'wateroptimisation.legacy.mixins.json'
+		}
+	}
+	 test {
+		java.srcDir '../src/test/java'
+	}
+}
+
+dependencies {
+	implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+	annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.6'
+	annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+	testImplementation 'org.mockito:mockito-core:5.18.0'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.13.4'
+}
+
+processResources {
+	inputs.properties([
+			minecraft_version: minecraft_version,
+			forge_version: forge_version,
+			mod_id: mod_id,
+			mod_name: mod_name,
+			mod_license: mod_license,
+			mod_version: mod_version
+	])
+	filesMatching('META-INF/mods.toml') {
+		expand minecraft_version: minecraft_version,
+				forge_version: forge_version,
+				mod_id: mod_id,
+				mod_name: mod_name,
+				mod_license: mod_license,
+				mod_version: mod_version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release = 25
+}
+
+tasks.test {
+	useJUnitPlatform()
+}
+
+tasks.named('jar', Jar) {
+	archiveVersion = "${mod_version}-mc26.3-forge"
+	manifest {
+		attributes('MixinConfigs': mixinConfig)
+	}
+	from('../LICENSE') {
+		rename { 'LICENSE_water-optimisation-forge-26.3' }
+	}
+}
+
+java {
+	withSourcesJar()
+}
+
+tasks.register('verifyArtifact') {
+	group = 'verification'
+	description = 'Verify the Forge 26.3 runtime JAR metadata, mixin declarations, and client-only package boundary.'
+	def runtimeJar = tasks.named('jar')
+	dependsOn runtimeJar
+	inputs.file(runtimeJar.flatMap { it.archiveFile })
+		doLast {
+			def archive = runtimeJar.get().archiveFile.get().asFile
+			new java.util.zip.ZipFile(archive).withCloseable { zip ->
+				def packMetadataEntry = zip.getEntry('pack.mcmeta')
+				assert packMetadataEntry != null
+				def packMetadata = new groovy.json.JsonSlurper().parse(zip.getInputStream(packMetadataEntry))
+				assert packMetadata.pack.min_format == [97, 1]
+				assert packMetadata.pack.max_format == [97, 1]
+				def metadata = zip.getInputStream(zip.getEntry('META-INF/mods.toml')).getText('UTF-8')
+			assert metadata.contains('modId="wateroptimisation"')
+			assert metadata.contains('modLoader="javafml"')
+			assert metadata.contains("version=\"${mod_version}\"")
+			assert metadata.contains("versionRange=\"[${minecraft_version},${minecraft_version.tokenize('.')[0]}.${(minecraft_version.tokenize('.')[1].toInteger() + 1)},)\"")
+			assert metadata.contains("versionRange=\"[${forge_version.tokenize('.')[0]},)\"")
+			assert zip.getEntry('wateroptimisation.forge.mixins.json') != null
+			assert zip.getEntry('wateroptimisation.neoforge.mixins.json') == null
+			assert zip.getEntry('fabric.mod.json') == null
+			assert zip.getEntry('META-INF/neoforge.mods.toml') == null
+			assert zip.getEntry('assets/wateroptimisation/icon.png') != null
+			assert zip.getEntry('LICENSE_water-optimisation-forge-26.3') != null
+			[
+					'io/github/imcinq/wateroptimisation/WaterOptimisationClient.class',
+					'io/github/imcinq/wateroptimisation/mixin/client/ClientLevelMixin.class',
+					'io/github/imcinq/wateroptimisation/mixin/client/FluidRendererMixin.class',
+					'io/github/imcinq/wateroptimisation/mixin/client/SectionCompilerMixin.class',
+					'io/github/imcinq/wateroptimisation/mixin/client/ResortTransparencyTaskMixin.class',
+					'io/github/imcinq/wateroptimisation/mixin/client/ForgeGuiMixin.class'
+			].each { classPath ->
+				assert zip.getEntry(classPath) != null: "Missing ${classPath}"
+			}
+		}
+		logger.lifecycle("Verified ${archive.name}: Forge ${minecraft_version}, Java 25, client-only.")
+	}
+}
+
+tasks.named('check') {
+	dependsOn 'verifyArtifact'
+}

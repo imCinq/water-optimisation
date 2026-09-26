@@ -18,7 +18,7 @@ Diagnostics observe these decisions locally without changing gameplay state.
 
 ## Target profiles
 
-The Fabric 26.3 and 1.21.11 client APIs are compiled from separate source roots. The 26.3 profile uses the non-remapping Loom plugin and extraction-based GUI/HUD APIs. The 1.21.11 profile uses remapping Loom with official Mojang mappings and its older `GuiGraphics`, `HudElementRegistry`, key-binding, liquid-renderer, and level-refresh APIs. The generated metadata selects only the mixin configuration for the requested target. NeoForge 26.3 will remain a standalone ModDevGradle target once its development tooling stabilises; it will reuse version-neutral policy, configuration, diagnostics, tests, assets, and translations while keeping its entrypoint, screens, event registration, metadata, and renderer mixins loader-specific.
+The Fabric 26.3 and 1.21.11 client APIs are compiled from separate source roots. The 26.3 profile uses the non-remapping Loom plugin and extraction-based GUI/HUD APIs. The 1.21.11 profile uses remapping Loom with official Mojang mappings and its older `GuiGraphics`, `HudElementRegistry`, key-binding, liquid-renderer, and level-refresh APIs. The generated metadata selects only the mixin configuration for the requested target. NeoForge 26.3 is a standalone ModDevGradle target under `neoforge-26.3/`; it reuses version-neutral policy, configuration, diagnostics, tests, assets, and translations while keeping its entrypoint, screens, event registration, metadata, and renderer mixins loader-specific. Its release remains gated by a usable NeoForge 26.3 runtime coordinate and target validation.
 
 ## Components
 

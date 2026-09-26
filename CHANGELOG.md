@@ -2,12 +2,27 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 1.1.0
+
+- Redesign the settings screen: one tabbed screen (General, Water, Particles) replaces the main and Advanced screens. Each option has an icon, a plain-language explanation, and a note when it is unavailable or has no effect.
+- Change the default "Open settings" key from `O` to `K`, because Minecraft 26.3 binds `O` to its Friends key. Players who already saved a binding keep it and can rebind under Controls.
+- Add NeoForge 1.21.11 (NeoForge 21.11.45+, Java 21).
+- Add Forge 26.3 (Forge 66.0.2+, Java 25) as a one-time release; no further Forge updates are planned.
+- Fabric 26.3 and Fabric 1.21.11 continue. NeoForge 26.3 will follow once NeoForge ships a stable 26.3 release.
+
 ## 1.0.0
 
-- Release the v1.0.0 Fabric line for Minecraft 26.3 and 1.21.11; Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are retired after the 0.0.10 release. NeoForge 26.3 remains planned as a later support update after its development beta stabilises.
+- Release the v1.0.0 Fabric line for Minecraft 26.3 and 1.21.11; Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are retired after the 0.0.10 release. NeoForge 26.3 development is tracked separately as an engineering preview and is not part of this release.
 - Add the isolated Fabric 1.21.11 client baseline and migrate its HUD registration to `HudElementRegistry`.
 - Unify the native Fabric and NeoForge settings semantics around a derived `Custom` state, an explicit hidden-water skipping toggle, and a capability-aware reduced-inward-faces toggle while preserving Apply/Cancel behavior.
 - Add bounded mouse-wheel scrolling and clipped content to the Advanced settings screen while keeping Reset and Done fixed at the bottom.
+
+## Unreleased — NeoForge 26.3 preview
+
+- Start a separate NeoForge 26.3 development target based on the official
+  `26.3.x` development branch and its local preview coordinate.
+- Keep the preview isolated from the released Fabric 26.3 and Fabric 1.21.11
+  targets; it is not an official NeoForge release artifact.
 
 ## 0.0.10
 

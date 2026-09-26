@@ -1,6 +1,6 @@
 # Fabric 26.3
 
-`v1.0.0` is the current public Fabric release for Minecraft 26.3. The release also provides a separate Fabric 1.21.11 artifact; NeoForge 26.3 is deferred and no NeoForge artifact is included.
+`v1.0.0` is the current public Fabric release for Minecraft 26.3. The release also provides a separate Fabric 1.21.11 artifact. NeoForge 26.3 is being developed as a separate preview under `neoforge-26.3/`; no NeoForge artifact is included in the Fabric release.
 
 ## Build and launch
 
@@ -15,10 +15,10 @@ From the repository root, with Java 25 selected:
 Runtime output:
 
 ```text
-build/26.3/libs/water-optimisation-1.0.0-mc26.3-fabric.jar
+build/26.3/libs/water-optimisation-1.1.0-mc26.3-fabric.jar
 ```
 
-Install that runtime JAR, not the sources JAR, in an isolated Minecraft 26.3 Fabric client with the dependencies above. Test Mod Menu both installed and absent, and verify the `O` settings shortcut. For an interactive production-client launch with an available display:
+Install that runtime JAR, not the sources JAR, in an isolated Minecraft 26.3 Fabric client with the dependencies above. Test Mod Menu both installed and absent, and verify the `K` settings shortcut. For an interactive production-client launch with an available display:
 
 ```bash
 ./gradlew -Ptarget_minecraft=26.3 prodClient

@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[${forge_version.tokenize('.')[0]},)"
+license="${mod_license}"
+clientSideOnly=true
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://github.com/imCinq/water-optimisation"
+authors="imCinq"
+displayTest="IGNORE_ALL_VERSION"
+description='''Client-side water rendering and particle optimisation.'''
+
+[[dependencies.${mod_id}]]
+modId="forge"
+mandatory=true
+versionRange="[${forge_version.tokenize('.')[0]},)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+mandatory=true
+versionRange="[${minecraft_version},${minecraft_version.tokenize('.')[0]}.${(minecraft_version.tokenize('.')[1].toInteger() + 1)},)"
+ordering="NONE"
+side="CLIENT"
