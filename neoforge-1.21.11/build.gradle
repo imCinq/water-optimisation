@@ -1,0 +1,183 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.147'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+
+def neoVersion = project.neo_version
+def neoVersionRange = project.neo_version_range
+
+// The 1.21.11 screen, config, renderer policy and mixins are shared with the
+// Fabric 1.21.11 target (both use Mojang names). Only the Fabric entry points
+// are replaced by this module's NeoForge WaterOptimisationClient.
+def shared12111Root = file('../src/1.21.11/client/java').canonicalFile
+def fabricOnlySources = ['WaterOptimisationClient.java', 'ModMenuIntegration.java']
+
+base {
+    archivesName = 'water-optimisation'
+}
+
+// Minecraft 1.21.11 ships with Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+tasks.withType(Jar).configureEach {
+    archiveVersion = "${mod_version}-mc${minecraft_version}-neoforge"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir('../src/main/java')
+            srcDir(shared12111Root)
+            exclude { element ->
+                def sourceFile = element.file.canonicalFile
+                sourceFile.toPath().startsWith(shared12111Root.toPath())
+                        && fabricOnlySources.contains(sourceFile.name)
+            }
+        }
+        resources {
+            // Reuse only shared assets and translations; Fabric metadata/mixin
+            // descriptors are excluded from the NeoForge jar below.
+            srcDir('../src/main/resources')
+            exclude('fabric.mod.json')
+            exclude('wateroptimisation.client.mixins.json')
+            exclude('wateroptimisation.legacy.mixins.json')
+        }
+    }
+    test {
+        java.srcDir('../src/test/java')
+        // This mocked fixture targets the modern Fabric test environment.
+        java.exclude('**/FluidOptimizationPolicyTest.java')
+    }
+    // Empty source set used by CI to launch Minecraft with only the packaged
+    // runtime jar on the mod classpath. This catches packaging differences
+    // that the normal development source-set run cannot see.
+    packagedSmoke
+}
+
+sourceSets.main.resources.srcDir('src/generated/resources')
+
+neoForge {
+    version = neoVersion
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        packagedClient {
+            client()
+            sourceSet = sourceSets.packagedSmoke
+            loadedMods = []
+            systemProperty 'wateroptimisation.verifyMixins', 'true'
+        }
+        packagedServer {
+            server()
+            sourceSet = sourceSets.packagedSmoke
+            loadedMods = []
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+neoForge.addModdingDependenciesTo sourceSets.packagedSmoke
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'
+    testImplementation 'com.google.code.gson:gson:2.14.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.3'
+    packagedSmokeRuntimeOnly files(tasks.named('jar'))
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version_range      : neoVersionRange,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources.srcDir(generateModMetadata)
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from('../LICENSE') {
+        rename { 'LICENSE_water-optimisation-neoforge-1.21.11' }
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+tasks.register('verifyArtifact') {
+    group = 'verification'
+    description = 'Verify the NeoForge 1.21.11 runtime JAR contains the expected client metadata and mixins.'
+    def runtimeJar = tasks.named('jar')
+    dependsOn runtimeJar
+    inputs.file(runtimeJar.flatMap { it.archiveFile })
+    doLast {
+        def archive = runtimeJar.get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(archive).withCloseable { zip ->
+            assert zip.getEntry('pack.mcmeta') != null
+            assert zip.getEntry('assets/wateroptimisation/lang/en_us.json') != null
+            assert zip.getEntry('assets/wateroptimisation/textures/gui/sprites/icons/water.png') != null
+            assert zip.getEntry('io/github/imcinq/wateroptimisation/ModMenuIntegration.class') == null
+            def metadataEntry = zip.getEntry('META-INF/neoforge.mods.toml')
+            assert metadataEntry != null
+            def metadata = zip.getInputStream(metadataEntry).getText('UTF-8')
+            assert metadata.contains('modId="wateroptimisation"')
+            assert metadata.contains("version=\"${mod_version}\"")
+            assert metadata.contains('modId="neoforge"')
+            assert metadata.contains("versionRange=\"${neoVersionRange}\"")
+            assert metadata.contains("versionRange=\"${minecraft_version_range}\"")
+
+            assert zip.getEntry('wateroptimisation.neoforge.mixins.json') != null
+            assert zip.getEntry('fabric.mod.json') == null
+            assert zip.getEntry('wateroptimisation.client.mixins.json') == null
+            assert zip.getEntry('wateroptimisation.legacy.mixins.json') == null
+            assert zip.getEntry('assets/wateroptimisation/icon.png') != null
+            assert zip.getEntry('LICENSE_water-optimisation-neoforge-1.21.11') != null
+
+            [
+                    'io/github/imcinq/wateroptimisation/mixin/client/ClientLevelMixin.class',
+                    'io/github/imcinq/wateroptimisation/mixin/client/FluidRendererMixin.class',
+                    'io/github/imcinq/wateroptimisation/mixin/client/SectionCompilerMixin.class',
+                    'io/github/imcinq/wateroptimisation/mixin/client/ResortTransparencyTaskMixin.class'
+            ].each { classPath ->
+                assert zip.getEntry(classPath) != null
+            }
+        }
+        logger.lifecycle("Verified ${archive.name}: NeoForge ${minecraft_version}, client-only artifact.")
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'verifyArtifact'
+}

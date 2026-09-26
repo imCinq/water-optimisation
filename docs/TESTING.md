@@ -33,11 +33,13 @@ keeps its log under `build/production-smoke/` and bounds the client lifetime.
 
 The remote build matrix also compiles Minecraft 1.21.11 with Java 21 and its target-isolated client sources. This proves packaging and API compatibility only; it does not replace live visual validation.
 
-No NeoForge workflow is active in the v1.0.0 line. Historical NeoForge 26.2
-workflow evidence remains available in older commits and releases. When
-NeoForge 26.3 tooling stabilises, add one dedicated workflow that builds exactly
-one NeoForge runtime JAR, checks its expanded metadata and mixin descriptors,
-and launches that packaged JAR in isolated client and dedicated-server runs.
+No NeoForge workflow runs in the v1.0.0 line. A manual-only preview workflow
+is prepared for `neoforge-26.3/`; it accepts an explicit NeoForge version and
+range, builds exactly one runtime JAR, and checks the expanded metadata and
+mixin descriptors. It remains manual because the current preview coordinate
+does not resolve. Add the packaged-client startup step once a usable runtime
+coordinate is published. Historical NeoForge 26.2 workflow evidence remains
+available in older commits and releases.
 
 Unit coverage includes:
 
@@ -64,7 +66,7 @@ Test with the feature disabled and enabled in:
 - underwater views;
 - chunk loading and block updates;
 - Sodium absent and present;
-- each active loader artifact, with NeoForge 26.3 added after its tooling stabilises;
+- each active loader artifact, with the NeoForge 26.3 preview added once its runtime coordinate resolves;
 - Minecraft 1.21.11 Fabric compatibility artifact, with Sodium absent and present;
 - Mod Menu installed and absent;
 - OpenGL and Vulkan where available.

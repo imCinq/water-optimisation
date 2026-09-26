@@ -6,33 +6,17 @@ The settings are implemented with target-specific native Minecraft screen APIs. 
 
 Mod Menu is compile-only and suggested: version 21.0.0-beta.1 for 26.3 and 17.0.1-beta.1 for 1.21.11. The core client entrypoint does not import Mod Menu. If Mod Menu is absent, the mod keeps its keybind and native settings screen and continues to load.
 
-## Main screen
+## Settings screen
 
-The main screen contains:
+One tabbed screen holds every option. It opens from Mod Menu on Fabric, the Mods screen on NeoForge and Forge, or the `K` key on every loader. The key was `O` before v1.1.0; Minecraft 26.3 binds `O` to its Friends key.
 
-1. an enable switch;
-2. a Vanilla, Balanced, Performance, or Maximum FPS preset selector;
-3. a short client-only explanation;
-4. a read-only effective-path summary;
-5. an Advanced settings button;
-6. Done and Cancel buttons.
+- **General:** a short client-only explanation, the current effective path ("Right now: …"), the main switch, the preset, Reset to preset, and the performance overlay.
+- **Water:** Skip hidden water, and Draw less inside water (experimental).
+- **Particles:** Water particles, Particle distance, Hide particles in fog, New particles per tick, and Limit "always show" particles.
 
-Done saves the working copy. Cancel and Escape return to the parent screen without saving. The screen never changes a server or world setting.
+Each option is one row: an icon on the left, the option button (`Name: Value`), and a plain-language explanation underneath. A yellow note explains when an option is unavailable or currently has no effect: Sodium owns water geometry, the target lacks the reduced-face hook, water particles are off, the main switch is off, or the Vanilla preset is selected. Unavailable options are disabled rather than hidden.
 
-## Advanced screen
-
-Advanced controls are separate from the main screen and are grouped into three sections:
-
-- Performance: skipping hidden water blocks, water particles, particle distance, particle fog culling, and the optional per-tick particle budget;
-- Water rendering: the fluid-geometry mode and the optional reduced-face setting;
-- Diagnostics: performance statistics and fast-path hook status.
-
-Reset preset is kept with the bottom action buttons because it changes the whole
-working copy rather than enabling a diagnostic.
-
-The layout uses two columns at normal widths and falls back to one column on narrow screens. This keeps the performance controls together while separating the visual-risk experiment and diagnostic switches.
-
-The labels are phrased as short questions so their effect is understandable without renderer knowledge: “Skip hidden water blocks?” and “Limit water particles per tick?”. The rendering-mode control identifies the selected mode; the `Experimental reduced inward faces` choice is shown in red, while unavailable Sodium or target states use neutral warning styling. Ordinary Vanilla and Conservative modes do not use warning styling, and hovering the Experimental choice explains that it may cause visual and graphical issues. The hidden-water tooltip states that flowing water, waterlogged blocks, transparent boundaries, partial shapes, overlays, and ambiguous cases stay on vanilla tessellation. Sodium ownership displays a short notice and disables the overlapping vanilla geometry controls because Sodium renders water itself; on 1.21.11, the reduced-face choice is unavailable while the particle and diagnostic controls stay available. The active-path summary is based on the unsaved working copy, so changing a preset immediately explains what Apply will do. The Advanced screen now clips its content, keeps Reset/Done fixed, and scrolls the settings area with the mouse wheel when the window is too short; it still adapts between two columns and one column. Diagnostics separately report what is configured, what the target can activate, whether the hook was observed during this diagnostics session, and how many fluid blocks were actually skipped.
+The rows scroll with the mouse wheel when the window is short; the tabs and the Done/Cancel footer stay fixed. The screen remembers the last tab for the session. Done saves the working copy; Cancel and Escape return without saving. The effective-path line reflects the unsaved working copy.
 
 The target implementations intentionally use different evidence: Minecraft 26.3 reuses the renderer's already-captured neighbor locals at its fail-soft first-face hook, while Minecraft 1.21.11 uses an explicit reusable-position probe after center and upward early rejection. Neither path widens its eligibility based on this UI/diagnostics work.
 
@@ -42,4 +26,4 @@ Configuration loading catches invalid or partial JSON and restores safe defaults
 
 ## Local validation still required
 
-Source-level checks cover the target-isolated screens and renderer adapters; a build still needs to run against both the 26.3 and 1.21.11 toolchains. A later local run should check common GUI scales, readable text, Mod Menu present/absent, keyboard navigation, persistence, and Escape/Cancel behavior on each target.
+On 26 September 2026 the v1.1.0 screen was checked in game on Fabric 26.3, Fabric 1.21.11, Forge 26.3, and NeoForge 1.21.11 with no failures reported. A fuller run should still check common GUI scales, readable text, Mod Menu present/absent, keyboard navigation, persistence, and Escape/Cancel behavior on each target.
