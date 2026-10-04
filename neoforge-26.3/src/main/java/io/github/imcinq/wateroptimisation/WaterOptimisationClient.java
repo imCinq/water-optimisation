@@ -63,16 +63,19 @@ public final class WaterOptimisationClient {
 				IConfigScreenFactory.class,
 				(container, parent) -> new WaterOptimisationScreen(parent)
 		);
+
+		// Smoke-test only: audit during mod construction so headless CI can
+		// verify every injection before Minecraft creates its render backend.
+		if (Boolean.getBoolean("wateroptimisation.verifyMixins")) {
+			MixinEnvironment.getCurrentEnvironment().audit();
+			LOGGER.info("Water Optimisation mixin audit completed");
+		}
 	}
 
 	private void onClientSetup(FMLClientSetupEvent event) {
 		sodiumLoaded = ModList.get().isLoaded("sodium");
 		ConfigManager.load();
 		FluidOptimizationPolicy.refresh();
-		if (Boolean.getBoolean("wateroptimisation.verifyMixins")) {
-			MixinEnvironment.getCurrentEnvironment().audit();
-			LOGGER.info("Water Optimisation mixin audit completed");
-		}
 
 		if (sodiumLoaded) {
 			LOGGER.info("Sodium detected; vanilla fluid optimization hooks are disabled and Sodium remains the water-geometry owner. Water Optimisation applies local particle controls only.");
