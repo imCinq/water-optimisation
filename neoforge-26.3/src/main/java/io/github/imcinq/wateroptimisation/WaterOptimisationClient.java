@@ -39,7 +39,7 @@ public final class WaterOptimisationClient {
 	);
 	private static final KeyMapping OPEN_CONFIG_KEY = new KeyMapping(
 			"key.wateroptimisation.open_config",
-			InputConstants.Type.KEYSYM,
+			InputConstants.Type.KEYBOARD,
 			InputConstants.KEY_K,
 			KEY_CATEGORY
 	);

@@ -1,9 +1,8 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    // Keep this preview pinned to the ModDevGradle line used by NeoForge's
-    // official 26.3.x development branch.
-    id 'net.neoforged.moddev' version '2.0.142'
+    // Match the ModDevGradle line used by NeoForge's official 26.3 MDK.
+    id 'net.neoforged.moddev' version '2.0.147'
     id 'idea'
 }
 
@@ -14,19 +13,19 @@ def neoVersion = providers.gradleProperty('neo_version_override').orElse(project
 def neoVersionRange = providers.gradleProperty('neo_version_range_override').orElse(project.neo_version_range).get()
 
 repositories {
-    // The 26.3 preview is normally consumed from a local publication built
-    // from NeoForge's 26.3.x development branch. Keep the official release
-    // repository available for the eventual stable coordinate as well.
-    mavenLocal()
     maven { url = 'https://maven.neoforged.net/releases' }
     mavenCentral()
 }
 
 base {
-    archivesName = "water-optimisation-neoforge-${minecraft_version}"
+    archivesName = 'water-optimisation'
 }
 
-// Minecraft 26.3 ships with Java 25, so the NeoForge preview uses Java 25.
+tasks.withType(Jar).configureEach {
+    archiveVersion = "${mod_version}-mc${minecraft_version}-neoforge"
+}
+
+// Minecraft 26.3 ships with Java 25.
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 sourceSets {
@@ -170,7 +169,7 @@ tasks.register('verifyArtifact') {
                 assert zip.getEntry(classPath) != null
             }
         }
-        logger.lifecycle("Verified ${archive.name}: NeoForge ${minecraft_version}, client-only preview artifact.")
+        logger.lifecycle("Verified ${archive.name}: NeoForge ${minecraft_version}, client-only release artifact.")
     }
 }
 
