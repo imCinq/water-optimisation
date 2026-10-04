@@ -12,8 +12,8 @@ Water Optimisation v1.1.0 includes a NeoForge 26.3 build under
   `neoforge-26.3/src` (also used by the one-time Forge 26.3 build).
 - Opens settings from NeoForge's native Mods screen or the `K` key.
 - Keeps Sodium as the geometry owner when it is present.
-- Carries the NeoForge renderer mixins, with the 26.3
-  `FluidRenderer.shouldRenderFace` neighboring-`FluidState` descriptor and the
+- Carries the NeoForge renderer mixins, with the NeoForge-patched 26.3
+  `FluidRenderer.shouldRenderFace` neighboring-`BlockState` descriptor and the
   NeoForge `SectionCompiler.compile` overload that also takes the
   `AddSectionGeometryEvent` renderers.
 

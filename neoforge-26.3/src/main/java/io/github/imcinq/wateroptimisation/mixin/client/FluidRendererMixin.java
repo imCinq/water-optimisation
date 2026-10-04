@@ -74,9 +74,10 @@ public abstract class FluidRendererMixin {
 			method = "tesselate",
 			at = @At(
 					value = "INVOKE",
-					// NeoForge 26.3's vanilla renderer passes the neighboring
-					// FluidState here; the 26.2 target used a BlockState instead.
-					target = "Lnet/minecraft/client/renderer/block/FluidRenderer;shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/material/FluidState;)Z",
+					// Vanilla 26.3 passes the neighboring FluidState here, but
+					// NeoForge patches tesselate to call the neighboring-BlockState
+					// overload and deprecates the FluidState one.
+					target = "Lnet/minecraft/client/renderer/block/FluidRenderer;shouldRenderFace(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;)Z",
 					ordinal = 0
 			),
 			cancellable = true,

@@ -37,7 +37,7 @@ For **v1.1.0**, the release targets are Fabric 26.3 (`build/26.3/libs/water-opti
 - [ ] The generated `META-INF/neoforge.mods.toml` contains the final NeoForge and Minecraft version ranges, and the target-local artifact verifier passes.
 - [ ] The CI `neoforge-26-3` job passes for the exact commit: packaged client startup with the mixin audit marker, and dedicated-server ready state.
 - [ ] The package contains no Fabric metadata, private files, logs, screenshots, or generated runtime data.
-- [ ] The renderer hook descriptors are checked against the exact NeoForge/Minecraft runtime; the 26.3 `FluidRenderer.shouldRenderFace` neighboring-`FluidState` signature and the NeoForge `SectionCompiler.compile` overload are specifically covered.
+- [ ] The renderer hook descriptors are checked against the exact NeoForge/Minecraft runtime; the NeoForge-patched 26.3 `FluidRenderer.shouldRenderFace` neighboring-`BlockState` call and the NeoForge `SectionCompiler.compile` overload are specifically covered.
 - [ ] The exact JAR is started in a client by the maintainer before publication.
 - [ ] v1.1.1: repeat these checks against the first stable NeoForge 26.3 coordinate.
 
