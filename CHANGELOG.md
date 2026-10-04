@@ -8,7 +8,8 @@ All notable changes to Water Optimisation are documented here.
 - Change the default "Open settings" key from `O` to `K`, because Minecraft 26.3 binds `O` to its Friends key. Players who already saved a binding keep it and can rebind under Controls.
 - Add NeoForge 1.21.11 (NeoForge 21.11.45+, Java 21).
 - Add Forge 26.3 (Forge 66.0.2+, Java 25) as a one-time release; no further Forge updates are planned.
-- Fabric 26.3 and Fabric 1.21.11 continue. NeoForge 26.3 will follow once NeoForge ships a stable 26.3 release.
+- Add NeoForge 26.3 (NeoForge 26.3.0.45-beta+, Java 25), published as an addition to the v1.1.0 release. It is built on NeoForge's 26.3 beta line; v1.1.1 will move it to the first stable NeoForge 26.3 release.
+- Fabric 26.3 and Fabric 1.21.11 continue.
 
 ## 1.0.0
 
@@ -17,12 +18,11 @@ All notable changes to Water Optimisation are documented here.
 - Unify the native Fabric and NeoForge settings semantics around a derived `Custom` state, an explicit hidden-water skipping toggle, and a capability-aware reduced-inward-faces toggle while preserving Apply/Cancel behavior.
 - Add bounded mouse-wheel scrolling and clipped content to the Advanced settings screen while keeping Reset and Done fixed at the bottom.
 
-## Unreleased — NeoForge 26.3 preview
+## NeoForge 26.3 development history
 
-- Start a separate NeoForge 26.3 development target based on the official
-  `26.3.x` development branch and its local preview coordinate.
-- Keep the preview isolated from the released Fabric 26.3 and Fabric 1.21.11
-  targets; it is not an official NeoForge release artifact.
+- The NeoForge 26.3 target started as a separate preview based on NeoForge's
+  `26.3.x` development branch and a local preview coordinate. It shipped in
+  v1.1.0 on NeoForge 26.3.0.45-beta.
 
 ## 0.0.10
 

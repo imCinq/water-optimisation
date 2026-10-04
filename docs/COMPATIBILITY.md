@@ -10,7 +10,7 @@ The v1.1.0 line has isolated target profiles so incompatible client APIs cannot 
 | Minecraft 1.21.11 | 21+ | 0.18.5+ | 0.141.4+1.21.11 | Optional 17.0.1-beta.1 | Conservative source-water fast path and particles; Sodium-owned geometry when present. |
 | Minecraft 1.21.11 | NeoForge 21.11.45+ | 21+ | — | Native Mods screen | Same scope as Fabric 1.21.11; shares its renderer code. |
 | Minecraft 26.3 | Forge 66.0.2+ | 25+ | — | Native Mods screen | Same scope as Fabric 26.3; one-time release in v1.1.0. |
-| Minecraft 26.3 | NeoForge development preview | 25+ | — | Native Mods screen | Local preview only; planned once NeoForge 26.3 is stable. |
+| Minecraft 26.3 | NeoForge 26.3.0.45-beta+ | 25+ | — | Native Mods screen | Included in v1.1.0; v1.1.1 moves to the stable NeoForge 26.3 release. |
 
 The 1.21.11 profile uses the remapping Loom plugin and official Mojang mappings, while Fabric 26.3 uses the non-remapping Loom profile. Its older GUI, HUD, key-binding, and liquid-renderer APIs live under `src/1.21.11/client/java` and `wateroptimisation.legacy.mixins.json`. NeoForge 26.3 is developed as a separate preview under `neoforge-26.3/` and is not included in the public v1.1.0 release. NeoForge 1.21.11 lives under `neoforge-1.21.11/` and reuses the Fabric 1.21.11 client sources with its own NeoForge entry point; Forge 26.3 lives under `forge-26.3/`.
 

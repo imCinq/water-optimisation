@@ -78,3 +78,89 @@ jobs:
           name: water-optimisation-${{ matrix.module }}-artifacts
           path: ${{ matrix.module }}/build/libs/
           if-no-files-found: error
+
+  neoforge-26-3:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+          cache: gradle
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: Build, test, and verify
+        run: ./gradlew -p neoforge-26.3 test build verifyArtifact --no-daemon --console=plain
+      - name: Install headless display support
+        run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri libglx-mesa0
+      - name: Run packaged NeoForge 26.3 client and mixin audit smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="neoforge-26.3/build/smoke"
+          log_file="$smoke_dir/client.log"
+          mkdir -p "$smoke_dir"
+          : > "$log_file"
+          LIBGL_ALWAYS_SOFTWARE=1 setsid xvfb-run -a -s '-screen 0 1920x1080x24 +extension GLX' ./gradlew -p neoforge-26.3 runPackagedClient --no-daemon --console=plain >"$log_file" 2>&1 &
+          launcher_pid=$!
+          marker="Water Optimisation mixin audit completed"
+          for attempt in $(seq 1 90); do
+            if grep -Fq "$marker" "$log_file"; then
+              kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+              wait "$launcher_pid" 2>/dev/null || true
+              echo "Packaged NeoForge client startup and mixin audit markers observed."
+              exit 0
+            fi
+            if ! kill -0 "$launcher_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          echo "Packaged NeoForge client did not complete the mixin audit." >&2
+          tail -n 200 "$log_file" >&2 || true
+          kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+          wait "$launcher_pid" 2>/dev/null || true
+          exit 1
+      - name: Run packaged NeoForge 26.3 dedicated-server smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_dir="neoforge-26.3/build/smoke"
+          log_file="$smoke_dir/server.log"
+          mkdir -p "$smoke_dir"
+          : > "$log_file"
+          setsid ./gradlew -p neoforge-26.3 runPackagedServer --no-daemon --console=plain >"$log_file" 2>&1 &
+          launcher_pid=$!
+          marker='Done ('
+          for attempt in $(seq 1 90); do
+            if grep -Fq "$marker" "$log_file"; then
+              kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+              wait "$launcher_pid" 2>/dev/null || true
+              echo "Packaged NeoForge dedicated server reached ready state."
+              exit 0
+            fi
+            if ! kill -0 "$launcher_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          echo "Packaged NeoForge dedicated server did not reach ready state." >&2
+          tail -n 200 "$log_file" >&2 || true
+          kill -TERM -- "-$launcher_pid" 2>/dev/null || true
+          wait "$launcher_pid" 2>/dev/null || true
+          exit 1
+      - name: Capture build artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: water-optimisation-neoforge-26.3-artifacts
+          path: |
+            neoforge-26.3/build/libs/
+            neoforge-26.3/build/smoke/
+          if-no-files-found: error

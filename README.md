@@ -18,7 +18,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
 
-Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry. Version 1.1.0 supports Fabric 26.3, Fabric 1.21.11, NeoForge 1.21.11, and Forge 26.3. NeoForge 26.3 will follow once NeoForge publishes a stable 26.3 release.
+Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scenes. It focuses on client rendering and cosmetic water particles: oceans, flooded caves, waterfalls, and large pools can spend less work building or drawing water geometry. Version 1.1.0 supports Fabric 26.3, Fabric 1.21.11, NeoForge 26.3, NeoForge 1.21.11, and Forge 26.3.
 
 > This mod only changes what is rendered on the client. It does not change fluid simulation, terrain, collision, movement, networking, gameplay, or server state.
 
@@ -30,7 +30,7 @@ Water Optimisation is a small, opt-in client mod for water-heavy Minecraft scene
 4. Open the settings from Mod Menu on Fabric, the Mods screen on NeoForge or Forge, or press `K` in game.
 5. Enable the mod and start with the `Performance` preset.
 
-The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation/releases/tag/v1.1.0) supports Fabric 26.3, Fabric 1.21.11, NeoForge 1.21.11, and Forge 26.3. The previous 0.0.10 release remains available as a historical release for Fabric 26.3, Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2. The supplied water-block logo is used in this README and is also packaged as the mod icon.
+The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation/releases/tag/v1.1.0) supports Fabric 26.3, Fabric 1.21.11, NeoForge 26.3, NeoForge 1.21.11, and Forge 26.3. The previous 0.0.10 release remains available as a historical release for Fabric 26.3, Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2. The supplied water-block logo is used in this README and is also packaged as the mod icon.
 
 | Target | Loader | Java | Status |
 | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation
 | 1.21.11 | Fabric | 21+ | Included in v1.1.0. |
 | 1.21.11 | NeoForge | 21+ | New in v1.1.0. |
 | 26.3 | Forge | 25+ | One-time release in v1.1.0; no further Forge updates are planned. |
-| 26.3 | NeoForge | 25+ | Planned once NeoForge ships a stable 26.3 release. |
+| 26.3 | NeoForge | 25+ | New in v1.1.0; built on NeoForge 26.3.0.45-beta. v1.1.1 moves to the stable NeoForge 26.3 release. |
 
 The 26.2 Fabric, 1.21.1 Fabric, and 26.2 NeoForge artifacts remain available only as historical 0.0.10 releases. They will not receive the settings redesign or new rendering features.
 
@@ -104,7 +104,7 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 | Fabric Loader | `0.19.5+` for 26.3; `0.18.5+` for 1.21.11 |
 | Fabric API | `0.160.6+26.3` for 26.3; `0.141.4+1.21.11` for 1.21.11 |
 | Mod Menu | Optional: `21.0.0-beta.1` for 26.3; `17.0.1-beta.1` for 1.21.11 |
-| NeoForge | `21.11.45+` for 1.21.11; 26.3 planned |
+| NeoForge | `21.11.45+` for 1.21.11; `26.3.0.45-beta+` for 26.3 |
 | Forge | `66.0.2+` for 26.3 (one-time release) |
 | Environment | Client only |
 
@@ -116,7 +116,7 @@ For a fair comparison, warm the same scene and compare `Vanilla`, `Performance`,
 - [Benchmark template](docs/BENCHMARK_REPORT.md) — repeatable measurements.
 - [Architecture](docs/ARCHITECTURE.md) — renderer and client-boundary details.
 - [Forge 26.3](docs/FORGE_26_3.md) — build and verification notes for the one-time Forge release.
-- [NeoForge 26.3 preview](docs/NEOFORGE_26_3_PREVIEW.md) — local development target and release gate.
+- [NeoForge 26.3](docs/NEOFORGE_26_3.md) — build and verification notes for the NeoForge 26.3 release.
 - [Privacy](PRIVACY.md) and [security policy](SECURITY.md).
 
 ## Contributing

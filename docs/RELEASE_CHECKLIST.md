@@ -2,7 +2,7 @@
 
 Use this checklist before publishing a Water Optimisation artifact. A passing CI build is necessary but does not by itself establish visual equivalence, an FPS improvement, or server compatibility.
 
-For **v1.1.0**, the release targets are Fabric 26.3 (`build/26.3/libs/water-optimisation-1.1.0-mc26.3-fabric.jar`), Fabric 1.21.11 (`build/libs/water-optimisation-1.1.0.jar`, published as `water-optimisation-1.1.0-mc1.21.11-fabric.jar`), NeoForge 1.21.11 (`neoforge-1.21.11/build/libs/water-optimisation-1.1.0-mc1.21.11-neoforge.jar`), and Forge 26.3 (`forge-26.3/build/libs/water-optimisation-1.1.0-mc26.3-forge.jar`, one-time release). Build them with `./gradlew -Ptarget_minecraft=<26.3|1.21.11> clean test build verifyArtifact` and `./gradlew -p <forge-26.3|neoforge-1.21.11> clean test build verifyArtifact`. Fabric 26.3 and Fabric 1.21.11 write to different folders, but a `clean` of one Fabric target removes the other's output, so copy each jar out before building the next. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets.
+For **v1.1.0**, the release targets are Fabric 26.3 (`build/26.3/libs/water-optimisation-1.1.0-mc26.3-fabric.jar`), Fabric 1.21.11 (`build/libs/water-optimisation-1.1.0.jar`, published as `water-optimisation-1.1.0-mc1.21.11-fabric.jar`), NeoForge 26.3 (`neoforge-26.3/build/libs/water-optimisation-1.1.0-mc26.3-neoforge.jar`, built on NeoForge 26.3.0.45-beta), NeoForge 1.21.11 (`neoforge-1.21.11/build/libs/water-optimisation-1.1.0-mc1.21.11-neoforge.jar`), and Forge 26.3 (`forge-26.3/build/libs/water-optimisation-1.1.0-mc26.3-forge.jar`, one-time release). Build them with `./gradlew -Ptarget_minecraft=<26.3|1.21.11> clean test build verifyArtifact` and `./gradlew -p <forge-26.3|neoforge-26.3|neoforge-1.21.11> clean test build verifyArtifact`. Fabric 26.3 and Fabric 1.21.11 write to different folders, but a `clean` of one Fabric target removes the other's output, so copy each jar out before building the next. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 are historical 0.0.10 targets.
 
 ## Product and metadata
 
@@ -28,17 +28,18 @@ For **v1.1.0**, the release targets are Fabric 26.3 (`build/26.3/libs/water-opti
 - [ ] The runtime JAR contents are inspected and contain no build cache, logs, screenshots, or private data.
 - [ ] SHA-256 checksums are calculated for the files that will be published.
 - [ ] The production startup smoke workflow passes for every artifact being released, including the exact Fabric 26.3 artifact when selected; sanitized logs are retained with the release evidence.
-- [ ] NeoForge 26.3 is not included in v1.0.0; its separate preview/release checks are tracked below.
+- [ ] NeoForge 26.3 ships in v1.1.0 on NeoForge 26.3.0.45-beta; its target-specific checks are tracked below.
 
-## NeoForge 26.3 preview and future release
+## NeoForge 26.3
 
-- [ ] The pinned NeoForge coordinate in `neoforge-26.3/gradle.properties` resolves from the official release repository or a documented local preview publication.
-- [ ] From `neoforge-26.3/`, `../gradlew clean test build verifyArtifact --no-daemon --console=plain` passes on Java 25.
+- [ ] The pinned NeoForge coordinate in `neoforge-26.3/gradle.properties` (`26.3.0.45-beta` for v1.1.0) resolves from the official NeoForge Maven repository.
+- [ ] `./gradlew -p neoforge-26.3 clean test build verifyArtifact --no-daemon --console=plain` passes on Java 25.
 - [ ] The generated `META-INF/neoforge.mods.toml` contains the final NeoForge and Minecraft version ranges, and the target-local artifact verifier passes.
-- [ ] The exact preview/runtime JAR starts a client and logs the Water Optimisation initialization marker without mixin audit failures.
-- [ ] The preview package contains no Fabric metadata, private files, logs, screenshots, or generated runtime data.
-- [ ] The renderer hook descriptors are checked against the exact released NeoForge/Minecraft runtime; the 26.3 `FluidRenderer.shouldRenderFace` neighboring-`FluidState` signature is specifically covered.
-- [ ] The preview is labelled pre-release until the target has documented client validation and publication evidence comparable to the Fabric release line.
+- [ ] The CI `neoforge-26-3` job passes for the exact commit: packaged client startup with the mixin audit marker, and dedicated-server ready state.
+- [ ] The package contains no Fabric metadata, private files, logs, screenshots, or generated runtime data.
+- [ ] The renderer hook descriptors are checked against the exact NeoForge/Minecraft runtime; the NeoForge-patched 26.3 `FluidRenderer.shouldRenderFace` neighboring-`BlockState` call and the NeoForge `SectionCompiler.compile` overload are specifically covered.
+- [ ] The exact JAR is started in a client by the maintainer before publication.
+- [ ] v1.1.1: repeat these checks against the first stable NeoForge 26.3 coordinate.
 
 ## Local Minecraft validation
 
