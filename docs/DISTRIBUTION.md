@@ -2,17 +2,17 @@
 
 ## Current status
 
-Water Optimisation v1.1.0 is the current public GitHub release. It supports Fabric 26.3, Fabric 1.21.11, NeoForge 1.21.11, and Forge 26.3 (one-time) with the tabbed settings screen and target-specific runtime/sources JARs. NeoForge 26.3 remains an engineering preview until NeoForge ships a stable 26.3 release. 0.0.10 remains available as a historical release for the retired targets. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
+Water Optimisation v1.1.0 is the current public GitHub release. It supports Fabric 26.3, Fabric 1.21.11, NeoForge 26.3, NeoForge 1.21.11, and Forge 26.3 (one-time) with the tabbed settings screen and target-specific runtime/sources JARs. NeoForge 26.3 is built on NeoForge 26.3.0.45-beta; v1.1.1 moves it to the stable NeoForge 26.3 release. 0.0.10 remains available as a historical release for the retired targets. Maximum FPS remains an opt-in visual trade-off inside an otherwise client-only release.
 
 ## v1.1.0 release line
 
-The v1.1.0 release line includes Fabric 26.3, Fabric 1.21.11, and NeoForge 1.21.11. Forge 26.3 is included once and will not receive later updates. NeoForge 26.3 will be added after NeoForge's stable 26.3 release. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 remain reproducible only as historical 0.0.10 targets and are not part of the current feature line.
+The v1.1.0 release line includes Fabric 26.3, Fabric 1.21.11, NeoForge 26.3, and NeoForge 1.21.11. Forge 26.3 is included once and will not receive later updates. NeoForge 26.3 is built on NeoForge 26.3.0.45-beta; v1.1.1 moves it to the stable NeoForge 26.3 release. Fabric 26.2, Fabric 1.21.1, and NeoForge 26.2 remain reproducible only as historical 0.0.10 targets and are not part of the current feature line.
 
 | Target | Status | Current direction |
 | --- | --- | --- |
 | Fabric 26.3 | Included | Shared modern settings UI and renderer path. |
 | Fabric 1.21.11 | Included | Isolated compatibility source set with the same settings semantics and conservative renderer path. |
-| NeoForge 26.3 | Engineering preview | Ported target-isolated UI, policy, diagnostics, particles, and renderer hooks; awaiting a usable 26.3 runtime publication. |
+| NeoForge 26.3 | Included | Target-isolated UI, policy, diagnostics, particles, and renderer hooks on NeoForge 26.3.0.45-beta. |
 
 ## Historical 0.0.10 build profile
 
@@ -56,13 +56,13 @@ Before publishing a stable artifact:
 - no personal information, credentials, server data, or generated runtime files are included;
 - the listing makes no universal FPS or server-approval claim.
 
-For the NeoForge 26.3 preview or future stable release, also require:
+For NeoForge 26.3, also require:
 
-- a published or locally reproducible NeoForge 26.3 runtime coordinate;
-- `../gradlew clean test build verifyArtifact --no-daemon --console=plain` from `neoforge-26.3/`;
-- a packaged client startup check with the exact preview JAR;
-- confirmation that the final metadata dependency range matches the released NeoForge coordinate;
-- a pre-release label until the target has evidence comparable to the public Fabric line.
+- the pinned NeoForge coordinate resolves from the official NeoForge Maven repository;
+- `./gradlew -p neoforge-26.3 clean test build verifyArtifact --no-daemon --console=plain` passes;
+- the CI packaged client mixin audit and dedicated-server smoke pass for the exact commit;
+- the metadata dependency range matches the pinned NeoForge coordinate;
+- the exact JAR is started in a client before publication.
 
 Use the [public release checklist](RELEASE_CHECKLIST.md) as the acceptance record.
 
