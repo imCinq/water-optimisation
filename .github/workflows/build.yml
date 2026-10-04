@@ -98,7 +98,7 @@ jobs:
       - name: Build, test, and verify
         run: ./gradlew -p neoforge-26.3 test build verifyArtifact --no-daemon --console=plain
       - name: Install headless display support
-        run: sudo apt-get update && sudo apt-get install --yes xvfb
+        run: sudo apt-get update && sudo apt-get install --yes xvfb libgl1-mesa-dri libglx-mesa0
       - name: Run packaged NeoForge 26.3 client and mixin audit smoke
         shell: bash
         run: |
@@ -107,7 +107,7 @@ jobs:
           log_file="$smoke_dir/client.log"
           mkdir -p "$smoke_dir"
           : > "$log_file"
-          setsid xvfb-run -a ./gradlew -p neoforge-26.3 runPackagedClient --no-daemon --console=plain >"$log_file" 2>&1 &
+          LIBGL_ALWAYS_SOFTWARE=1 setsid xvfb-run -a -s '-screen 0 1920x1080x24 +extension GLX' ./gradlew -p neoforge-26.3 runPackagedClient --no-daemon --console=plain >"$log_file" 2>&1 &
           launcher_pid=$!
           marker="Water Optimisation mixin audit completed"
           for attempt in $(seq 1 90); do
