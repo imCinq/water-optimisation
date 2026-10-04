@@ -52,9 +52,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Forge 26.3 was a one-time v1.1.0 release and is no longer built in CI;
+        # build it locally with ./gradlew -p forge-26.3 if it is ever needed.
         include:
-          - module: forge-26.3
-            java: '25'
           - module: neoforge-1.21.11
             java: '21'
     steps:
