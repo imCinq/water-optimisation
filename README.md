@@ -35,6 +35,7 @@ The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation
 | Target | Loader | Java | Status |
 | --- | --- | --- | --- |
 | 26.3 | Fabric | 25+ | Included in v1.1.0. |
+| 26.1.2 | Fabric | 25+ | Build target added after v1.1.0; not yet released. |
 | 1.21.11 | Fabric | 21+ | Included in v1.1.0. |
 | 1.21.11 | NeoForge | 21+ | New in v1.1.0. |
 | 26.3 | Forge | 25+ | One-time release in v1.1.0; no further Forge updates are planned. |

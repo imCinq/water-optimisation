@@ -2,6 +2,10 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## Unreleased
+
+- Add Fabric 26.1.2 build target (`-Ptarget_minecraft=26.1.2`, Java 25, Fabric Loader 0.19.5+, Fabric API 0.155.3+26.1.2, optional Mod Menu 18.0.2+).
+
 ## 1.1.0
 
 - Redesign the settings screen: one tabbed screen (General, Water, Particles) replaces the main and Advanced screens. Each option has an icon, a plain-language explanation, and a note when it is unavailable or has no effect.
