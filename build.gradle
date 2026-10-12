@@ -75,14 +75,6 @@ sourceSets.client.java.setSrcDirs(legacyTarget
 		? ["src/${targetMinecraft}/client/java"]
 		: ["src/client/java", "src/${targetMinecraft}/client/java"])
 
-// 26.1.2 has different Gui/GameRenderer/levelRenderer member names, so these three
-// shared client classes are forked into src/26.1.2 and the shared copies are excluded.
-if (target2612) {
-	def forked2612 = ["WaterOptimisationScreen.java", "ConfigManager.java", "WaterOptimisationClient.java"]
-	def shared2612Dir = layout.projectDirectory.dir("src/client/java/io/github/imcinq/wateroptimisation").asFile
-	sourceSets.client.java.exclude { element -> element.file.parentFile == shared2612Dir && element.name in forked2612 }
-}
-
 if (target263) {
 	tasks.withType(Jar).configureEach {
 		archiveVersion = "${project.version}-mc26.3-fabric"

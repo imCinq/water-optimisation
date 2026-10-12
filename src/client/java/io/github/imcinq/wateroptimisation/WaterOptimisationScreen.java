@@ -440,11 +440,11 @@ public final class WaterOptimisationScreen extends Screen {
 
 	private void saveAndClose() {
 		ConfigManager.save(this.workingCopy);
-		this.minecraft.gui.setScreen(this.parent);
+		ClientCompat.setScreen(this.minecraft, this.parent);
 	}
 
 	private void closeWithoutSaving() {
-		this.minecraft.gui.setScreen(this.parent);
+		ClientCompat.setScreen(this.minecraft, this.parent);
 	}
 
 	private Component tabLabel(Tab target) {
