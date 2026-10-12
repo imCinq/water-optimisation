@@ -3,16 +3,16 @@
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
-	echo "Usage: $0 <1.21.11|26.3>" >&2
+	echo "Usage: $0 <1.21.11|26.1.2|26.3>" >&2
 	exit 2
 fi
 
 target=$1
 case "$target" in
-	1.21.11|26.3)
+	1.21.11|26.1.2|26.3)
 		;;
 	*)
-	echo "Unsupported target '$target'. Use 1.21.11 or 26.3." >&2
+	echo "Unsupported target '$target'. Use 1.21.11, 26.1.2 or 26.3." >&2
 		exit 2
 		;;
 esac

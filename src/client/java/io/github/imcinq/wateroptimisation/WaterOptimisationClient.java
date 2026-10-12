@@ -54,8 +54,8 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			updateParticleReference(client);
 			while (openConfigKey.consumeClick()) {
-				if (client.gui.screen() == null) {
-					client.gui.setScreen(new WaterOptimisationScreen(null));
+				if (ClientCompat.currentScreen(client) == null) {
+					ClientCompat.setScreen(client, new WaterOptimisationScreen(null));
 				}
 			}
 		});
@@ -201,7 +201,7 @@ public final class WaterOptimisationClient implements ClientModInitializer {
 		double referenceX = client.player.getX();
 		double referenceY = client.player.getY();
 		double referenceZ = client.player.getZ();
-		Camera camera = client.gameRenderer.mainCamera();
+		Camera camera = ClientCompat.mainCamera(client);
 		if (camera.isInitialized()) {
 			Vec3 cameraPosition = camera.position();
 			referenceX = cameraPosition.x;

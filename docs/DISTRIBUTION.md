@@ -12,6 +12,7 @@ The v1.1.0 release line includes Fabric 26.3, Fabric 1.21.11, NeoForge 26.3, and
 | --- | --- | --- |
 | Fabric 26.3 | Included | Shared modern settings UI and renderer path. |
 | Fabric 1.21.11 | Included | Isolated compatibility source set with the same settings semantics and conservative renderer path. |
+| Fabric 26.1.2 | Added after v1.1.0 | Shared modern settings UI and renderer path with a version compatibility shim; not part of v1.1.0. |
 | NeoForge 26.3 | Included | Target-isolated UI, policy, diagnostics, particles, and renderer hooks on NeoForge 26.3.0.45-beta. |
 
 ## Historical 0.0.10 build profile

@@ -14,6 +14,7 @@
   <a href="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml"><img src="https://github.com/imCinq/water-optimisation/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <img src="https://img.shields.io/badge/Minecraft-26.3-2563eb.svg" alt="Minecraft 26.3">
   <img src="https://img.shields.io/badge/Minecraft-1.21.11-2563eb.svg" alt="Minecraft 1.21.11">
+  <img src="https://img.shields.io/badge/Minecraft-26.1.2-2563eb.svg" alt="Minecraft 26.1.2">
   <img src="https://img.shields.io/badge/Fabric-client--side-2563eb.svg" alt="Fabric client-side mod">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb.svg" alt="MIT License"></a>
 </p>
@@ -35,6 +36,7 @@ The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation
 | Target | Loader | Java | Status |
 | --- | --- | --- | --- |
 | 26.3 | Fabric | 25+ | Included in v1.1.0. |
+| 26.1.2 | Fabric | 25+ | Build target added after v1.1.0; not yet released. |
 | 1.21.11 | Fabric | 21+ | Included in v1.1.0. |
 | 1.21.11 | NeoForge | 21+ | New in v1.1.0. |
 | 26.3 | Forge | 25+ | One-time release in v1.1.0; no further Forge updates are planned. |

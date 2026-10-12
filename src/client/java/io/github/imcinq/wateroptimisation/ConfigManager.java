@@ -175,9 +175,7 @@ public final class ConfigManager {
 
 		if (previous == null || !previous.sameFluidRenderingConfiguration(updated)) {
 			Minecraft client = Minecraft.getInstance();
-			if (client.level != null && client.levelExtractor != null) {
-				client.levelExtractor.allChanged();
-			}
+			ClientCompat.markAllChanged(client);
 		}
 	}
 

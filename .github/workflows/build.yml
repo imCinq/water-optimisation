@@ -16,6 +16,8 @@ jobs:
         include:
           - target: 26.3
             java: '25'
+          - target: 26.1.2
+            java: '25'
           - target: 1.21.11
             java: '21'
     steps:
@@ -44,6 +46,7 @@ jobs:
           path: |
             build/libs/
             build/26.3/libs/
+            build/26.1.2/libs/
           if-no-files-found: error
 
   build-module:
