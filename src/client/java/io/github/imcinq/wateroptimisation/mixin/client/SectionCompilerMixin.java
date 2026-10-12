@@ -1,47 +1,36 @@
 package io.github.imcinq.wateroptimisation.mixin.client;
 
 import io.github.imcinq.wateroptimisation.Diagnostics;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.chunk.SectionCompiler;
 import net.minecraft.core.SectionPos;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SectionCompiler.class)
 public abstract class SectionCompilerMixin {
-	@Inject(
-			method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;",
-			at = @At("HEAD")
-	)
-	private void wateroptimisation$beforeCompile(
+	/** Bracket the complete compile, including exceptions, so diagnostics stay balanced. */
+	@WrapMethod(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;")
+	private SectionCompiler.Results wateroptimisation$aroundCompile(
 				SectionPos sectionPos,
 				RenderSectionRegion region,
 				VertexSorting vertexSorting,
 				SectionBufferBuilderPack builders,
-				CallbackInfoReturnable<?> callback
+				Operation<SectionCompiler.Results> original
 	) {
-		if (Diagnostics.isEnabled()) {
+		boolean diagnosticsEnabled = Diagnostics.isEnabled();
+		if (diagnosticsEnabled) {
 			Diagnostics.beginSectionCompile();
 		}
-	}
-
-	@Inject(
-			method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;",
-			at = @At("RETURN")
-	)
-	private void wateroptimisation$afterCompile(
-			SectionPos sectionPos,
-			RenderSectionRegion region,
-			VertexSorting vertexSorting,
-			SectionBufferBuilderPack builders,
-			CallbackInfoReturnable<?> callback
-	) {
-		if (Diagnostics.isEnabled()) {
-			Diagnostics.endSectionCompile();
+		try {
+			return original.call(sectionPos, region, vertexSorting, builders);
+		} finally {
+			if (diagnosticsEnabled) {
+				Diagnostics.endSectionCompile();
+			}
 		}
 	}
 }
