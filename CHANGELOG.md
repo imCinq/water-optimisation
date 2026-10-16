@@ -2,6 +2,11 @@
 
 All notable changes to Water Optimisation are documented here.
 
+## 1.1.2 — Unreleased
+
+- Move the NeoForge 26.3 build from NeoForge 26.3.0.45-beta to stable NeoForge 26.3.0.86 (Java 25). Other loader builds are unchanged.
+- Release validation is tracked in [the NeoForge 26.3 guide](docs/NEOFORGE_26_3.md).
+
 ## 1.1.1
 
 - Add Fabric 26.1.2 build target (`-Ptarget_minecraft=26.1.2`, Java 25, Fabric Loader 0.19.5+, Fabric API 0.155.3+26.1.2, optional Mod Menu 18.0.2+).
