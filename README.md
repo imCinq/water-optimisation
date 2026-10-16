@@ -40,7 +40,7 @@ The current public [v1.1.0 release](https://github.com/imCinq/water-optimisation
 | 1.21.11 | Fabric | 21+ | Included in v1.1.0. |
 | 1.21.11 | NeoForge | 21+ | New in v1.1.0. |
 | 26.3 | Forge | 25+ | One-time release in v1.1.0; no further Forge updates are planned. |
-| 26.3 | NeoForge | 25+ | New in v1.1.0; built on NeoForge 26.3.0.45-beta. v1.1.1 moves to the stable NeoForge 26.3 release. |
+| 26.3 | NeoForge | 25+ | Public v1.1.0 uses NeoForge 26.3.0.45-beta. Unreleased v1.1.2 targets stable NeoForge 26.3.0.86. |
 
 The 26.2 Fabric, 1.21.1 Fabric, and 26.2 NeoForge artifacts remain available only as historical 0.0.10 releases. They will not receive the settings redesign or new rendering features.
 
